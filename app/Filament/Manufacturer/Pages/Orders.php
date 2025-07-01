@@ -20,18 +20,12 @@ class Orders extends Page
 
     public function loadOrders()
     {
-        $manufacturerId = Auth::id();
-
-        $manufacturerId = Auth::id();
-
-        $this->orders = Order::whereHas('orderitem.product', function ($query) use ($manufacturerId) {
-            $query->where('user_id', $manufacturerId);
-        })
-        ->with(['user', 'orderitem.product.inventory']) // eager load relationships
-        ->latest()
-        ->get();
+       $this->orders = Order::query()
+       ->where('created by', Auth::user()->id)
+       ->orderBy('id','desc')
+       ->get();   
+       
     }
-
     public function render(): \Illuminate\Contracts\View\View
     {
         return view('filament.manufacturer.pages.orders');
