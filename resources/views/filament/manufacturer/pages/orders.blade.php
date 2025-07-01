@@ -76,4 +76,5 @@
         </div>
     @endif
 </div>
+
 </x-filament-panels::page>
