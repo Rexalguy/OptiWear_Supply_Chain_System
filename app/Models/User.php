@@ -62,5 +62,43 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    
+    public function rawMaterials()
+    {
+        return $this->hasMany(RawMaterial::class, 'supplier_id');
+    }
+
+    public function createdPurchaseOrders()
+    {
+        return $this->hasMany(RawMaterialPurchaseOrder::class, 'created_by');
+    }
+
+    public function createdProductionOrders()
+    {
+        return $this->hasMany(ProductionOrder::class, 'created_by');
+    }
+
+    public function createdOrders()
+    {
+        return $this->hasMany(Order::class, 'created_by');
+    }
+
+    public function createdVendorOrders()
+    {
+        return $this->hasMany(VendorOrder::class, 'created_by');
+    }
+
+    public function vendorValidation()
+    {
+        return $this->hasOne(VendorValidation::class);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
 }
