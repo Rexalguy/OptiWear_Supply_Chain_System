@@ -40,9 +40,10 @@
             </div>
 
             <div class="mt-6 text-right">
-                <x-filament::button wire:click="placeOrder" color="success">
-                    Confirm Order
-                </x-filament::button>
+                <button  wire:click="placeOrder" types="button" 
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-md shadow-md">
+                    Order
+                </button>
             </div>
         @else
             <p>Your cart is empty.</p>
