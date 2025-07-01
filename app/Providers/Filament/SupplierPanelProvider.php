@@ -27,7 +27,12 @@ class SupplierPanelProvider extends PanelProvider
             ->id('supplier')
             ->path('supplier')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Teal,     // Clean and supply-related
+                'info' => Color::Cyan,
+                'success' => Color::Green,
+                'warning' => Color::Amber,
+                'danger' => Color::Rose,
+                'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Supplier/Resources'), for: 'App\\Filament\\Supplier\\Resources')
             ->discoverPages(in: app_path('Filament/Supplier/Pages'), for: 'App\\Filament\\Supplier\\Pages')

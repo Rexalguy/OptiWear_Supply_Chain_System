@@ -27,7 +27,12 @@ class VendorPanelProvider extends PanelProvider
             ->id('vendor')
             ->path('vendor')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Amber,    // Business-focused, marketplace feel
+                'info' => Color::Sky,
+                'success' => Color::Lime,
+                'warning' => Color::Orange,
+                'danger' => Color::Red,
+                'gray' => Color::Stone,
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')

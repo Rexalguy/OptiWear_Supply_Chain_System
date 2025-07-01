@@ -28,10 +28,17 @@ class CustomerPanelProvider extends PanelProvider
             ->path('customer')
             ->default()
             ->login()
+            ->profile()
             ->registration()
+            ->topNavigation()
             ->colors([
-                'primary' => Color::Amber,
-            ])
+            'primary' => Color::Sky,      // Friendly and intuitive
+            'info' => Color::Blue,
+            'success' => Color::Emerald,
+            'warning' => Color::Yellow,
+            'danger' => Color::Rose,
+            'gray' => Color::Gray,
+        ])
             ->discoverResources(in: app_path('Filament/Customer/Resources'), for: 'App\\Filament\\Customer\\Resources')
             ->discoverPages(in: app_path('Filament/Customer/Pages'), for: 'App\\Filament\\Customer\\Pages')
             ->pages([
@@ -76,11 +83,6 @@ class CustomerPanelProvider extends PanelProvider
                  ->label('Vendor Panel')
                  ->icon('heroicon-o-building-storefront')
                  ->url('/vendor'),
-
-                 MenuItem::make()
-                 ->label('Customer Panel')
-                 ->icon('heroicon-o-user-group')
-                 ->url('/customer'),
             ]);
     }
 }

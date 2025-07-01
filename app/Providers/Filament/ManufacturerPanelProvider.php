@@ -27,7 +27,12 @@ class ManufacturerPanelProvider extends PanelProvider
             ->id('manufacturer')
             ->path('manufacturer')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,   // Bold, industrial
+                'info' => Color::Blue,
+                'success' => Color::Green,
+                'warning' => Color::Yellow,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
