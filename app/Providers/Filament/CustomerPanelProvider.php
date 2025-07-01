@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -25,6 +26,9 @@ class CustomerPanelProvider extends PanelProvider
         return $panel
             ->id('customer')
             ->path('customer')
+            ->default()
+            ->login()
+            ->registration()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -51,6 +55,32 @@ class CustomerPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                MenuItem::make()
+                 ->label('Admin Panel')
+                 ->icon('heroicon-o-cog')
+                 ->url('/admin'),
+
+                 MenuItem::make()
+                 ->label('Suplier Panel')
+                 ->icon('heroicon-o-truck')
+                 ->url('/supplier'),
+
+                 MenuItem::make()
+                 ->label('Manufacturer Panel')
+                 ->icon('heroicon-o-cog-6-tooth')
+                 ->url('/manufacturer'),
+
+                  MenuItem::make()
+                 ->label('Vendor Panel')
+                 ->icon('heroicon-o-building-storefront')
+                 ->url('/vendor'),
+
+                 MenuItem::make()
+                 ->label('Customer Panel')
+                 ->icon('heroicon-o-user-group')
+                 ->url('/customer'),
             ]);
     }
 }
