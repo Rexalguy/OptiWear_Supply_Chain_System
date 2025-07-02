@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Filament\Customer\Pages;
+
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\OrderItem;
+use Filament\Pages\Page;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Notifications\Notification;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Concerns\InteractsWithTable;
+
+class MyOrders extends Page implements HasTable
+{
+    use InteractsWithTable;
+
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
+    protected static string $view = 'filament.customer.pages.my-orders';
+
+    public array $cart = [];
+
+    public function mount(): void
+    {
+        $this->cart = session()->get('cart', []);
+    }
+
+    public function placeOrder(): void
+    {
+        if (empty($this->cart)) {
+            Notification::make()->title('Cart is empty')->danger()->send();
+            return;
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $total = 0;
+
+            foreach ($this->cart as $productId => $quantity) {
+                $product = Product::findOrFail($productId);
+                $total += $product->price * $quantity;
+            }
+
+            $order = Order::create([
+                'created_by' => Auth::id(),
+                'status' => 'pending',
+                'delivery_option' => 'pickup',
+                'total' => $total,
+            ]);
+
+            foreach ($this->cart as $productId => $quantity) {
+                $product = Product::findOrFail($productId);
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'unit_price' => $product->price,
+                ]);
+            }
+
+            DB::commit();
+
+            $this->cart = [];
+            session()->forget('cart');
+
+            Notification::make()->title('Order placed successfully!')->success()->send();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
+        }
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
+            ->columns([
+                TextColumn::make('id')->label('Order #')->sortable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'confirmed',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
+                    ]),
+                TextColumn::make('delivery_option')->label('Delivery'),
+                TextColumn::make('total')->money('UGX', true),
+                TextColumn::make('created_at')->label('Placed On')->dateTime('d M Y H:i'),
+
+                TextColumn::make('items_summary')
+                    ->label('Items')
+                    ->formatStateUsing(fn ($state, $record) =>
+                        $record->orderItems->map(fn ($item) =>
+                            $item->product->name . ' (x' . $item->quantity . ')'
+                        )->implode(', ')
+                    )
+                    ->wrap(),
+            ]);
+    }
+}

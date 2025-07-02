@@ -10,24 +10,20 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Notifications\Notification;
 
 class PlaceOrder extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static string $view = 'filament.customer.pages.place-order';
 
-    public $cart = [];
-    public bool $showCartSummaryModal = false;
+    public array $cart = [];
 
     public function mount(): void
     {
@@ -51,7 +47,7 @@ class PlaceOrder extends Page implements HasTable
     public function incrementQuantity($productId): void
     {
         $product = Product::find($productId);
-        if ($product && ($this->cart[$productId] ?? 0) < $product->quantity_available) {
+        if ($product && isset($this->cart[$productId]) && $this->cart[$productId] < $product->quantity_available) {
             $this->cart[$productId]++;
             session()->put('cart', $this->cart);
         }
@@ -68,17 +64,7 @@ class PlaceOrder extends Page implements HasTable
         }
     }
 
-    public function showCartSummary(): void
-    {
-        if (empty($this->cart)) {
-            Notification::make()->title('Cart is empty')->danger()->send();
-            return;
-        }
-
-        $this->showCartSummaryModal = true;
-    }
-
-    public function finalizeOrder(): void
+    public function placeOrder(): void
     {
         if (empty($this->cart)) {
             Notification::make()->title('Cart is empty')->danger()->send();
@@ -91,50 +77,37 @@ class PlaceOrder extends Page implements HasTable
             $total = 0;
 
             foreach ($this->cart as $productId => $quantity) {
-                $product = Product::find($productId);
-                if ($product) {
-                    $total += $product->price * $quantity;
-                }
+                $product = Product::findOrFail($productId);
+                $total += $product->price * $quantity;
             }
 
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
-                'delivery_option' => 'standard',
+                'delivery_option' => 'pickup', // or 'door_delivery'
                 'total' => $total,
             ]);
 
             foreach ($this->cart as $productId => $quantity) {
-                $product = Product::find($productId);
-                if ($product) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'quantity' => $quantity,
-                        'unit_price' => $product->price,
-                    ]);
-                }
+                $product = Product::findOrFail($productId);
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'unit_price' => $product->price,
+                ]);
             }
 
             DB::commit();
 
             $this->cart = [];
             session()->forget('cart');
-            $this->showCartSummaryModal = false;
 
-            Notification::make()
-                ->title('Order placed successfully!')
-                ->success()
-                ->send();
-
+            Notification::make()->title('Order placed successfully!')->success()->send();
         } catch (\Exception $e) {
             DB::rollBack();
-
-            Notification::make()
-                ->title('Failed to place order')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
+            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
         }
     }
 
@@ -147,6 +120,7 @@ class PlaceOrder extends Page implements HasTable
                 TextColumn::make('price')->money('UGX', true)->sortable(),
                 TextColumn::make('quantity_available')
                     ->label('In Stock')
+                    ->sortable()
                     ->color(fn ($state) => $state > 10 ? 'success' : 'warning'),
             ])
             ->actions([
