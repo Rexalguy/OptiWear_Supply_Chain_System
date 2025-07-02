@@ -1,74 +1,64 @@
-<x-filament::page>
+<x-filament::page class="pt-6">
+    <div class="max-w-4xl mx-auto">
 
-    
+        {{-- Instructions --}}
+        <div class="mt-10 p-4 bg-white dark:bg-gray-900 rounded-md shadow-sm text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold mb-3">Vendor Application Submission Guide</h2>
 
-    {{-- Instructions --}}
-    <div class="text-gray-900 dark:text-white">
+            <ol class="list-decimal list-inside space-y-2 text-sm leading-relaxed">
+                <li><strong>Download the Form:</strong> Click the <span class="font-medium">Download PDF Template</span> below.</li>
+                <li><strong>Fill Out the Form:</strong> Use a PDF reader like Adobe Acrobat Reader. No commas or decimals.</li>
+                <li><strong>Save the Form:</strong> Don’t print or scan — save the digital file.</li>
+                <li><strong>Upload the Application:</strong> Use the button below to submit your PDF.</li>
+                <li><strong>Upload Supporting Documents:</strong> PDF, JPG, PNG formats only.</li>
+            </ol>
 
-        <div class="mt-6 bg-gray-800 border border-gray-700 rounded-xl p-6 text-sm  space-y-3 shadow-md">
+            <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                <p><strong>Tips:</strong></p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Use Adobe Acrobat Reader.</li>
+                    <li>Double-check before submitting.</li>
+                    <li>Need help? <a href="mailto:aburekemmanuel@gmail.com" class="text-blue-600 dark:text-blue-400 underline">Contact support</a>.</li>
+                </ul>
+            </div>
+        </div>
 
-            <h2 class="text-xl font-semibold mb-2">Vendor Application</h2>
+        {{-- Download Template --}}
+        <div class="mt-10 p-4 bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
+            <h2 class="text-lg font-semibold mb-3">Download PDF Template</h2>
+            <a 
+                href="{{ asset('storage/templates/Vendor-validation-application.pdf') }}" 
+                target="_blank"
+                class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition"
+            >
+                <x-heroicon-o-arrow-down-tray class="w-5 h-5 mr-2" />
+                Download Application Template (.pdf)
+            </a>
+        </div>
 
-        <p class="italic text-sm mb-6">
-            Kindly download and complete the official application template provided below. Ensure that each required field is filled out clearly and accurately according to the instructions. After completion, export the document as a PDF and upload it here for review. Note that incomplete or incorrectly formatted applications may be declined.
-        </p>
+        {{-- Upload Form --}}
+        <div class="mt-10 p-4 bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
+            <h2 class="text-lg font-semibold mb-3">Submit Your Application</h2>
+            <form wire:submit.prevent="submit" class="space-y-4">
+                {{ $this->form }}
+                <x-filament::button type="submit">Submit Application</x-filament::button>
+            </form>
+        </div>
 
-            <h2 class="text-base font-semibold text-white">How to Fill the Application</h2>
+        {{-- Application Status --}}
+        <div class="mt-10 p-4 bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
+            <h2 class="text-lg font-semibold mb-3">Application Status</h2>
 
-            <ul class="list-disc list-inside space-y-1">
-                <li><strong>Name</strong>: Full business name (e.g., <code>Acme Corp</code>)</li>
-                <li><strong>Capital</strong>: Numeric value only, in USD (e.g., <code>15000</code>)</li>
-                <li><strong>Revenue</strong>: Numeric, in USD (e.g., <code>120000</code>)</li>
-                <li><strong>Debt</strong>: Numeric, in USD (e.g., <code>20000</code>)</li>
-                <li><strong>Experience</strong>: Number of years as integer (e.g., <code>3</code>)</li>
-                <li><strong>Blacklisted</strong>: <code>true</code> or <code>false</code></li>
-                <li><strong>License</strong>: <code>true</code> or <code>false</code></li>
-                <li><strong>TaxCertificate</strong>: <code>true</code> or <code>false</code></li>
-            </ul>
+            @if (is_null($this->latestApplication?->notified_at))
+                <div class="text-gray-200 bg-yellow-600/20 border border-yellow-500 p-4 rounded-md">
+                    Status of your application will be displayed here after review...
+                </div>
+            @endif
 
-            <p class="text-gray-300"><strong>⚠️ Important:</strong> Ensure the field names and structure exactly match the template format. Do not reorder or rename fields.</p>
-            <p class="text-xs text-gray-400 italic">After filling, save as PDF: <code>File → Save As → PDF</code></p>
+            @if (!is_null($this->latestApplication?->notified_at))
+                {{ $this->infolist }}
+            @endif
         </div>
 
     </div>
-
-    {{-- Download Template --}}
-    <div class="mt-8">
-        <a 
-            href="{{ asset('storage/templates/vendor-application-template.docx') }}" 
-            target="_blank"
-            class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition"
-        >
-            <x-heroicon-o-arrow-down-tray class="w-5 h-5 mr-2" />
-            Download Application Template (.docx)
-        </a>
-    </div>
-
-
-
-    {{-- Upload Form --}}
-    <form wire:submit.prevent="submit" class="space-y-6 mt-8">
-        {{ $this->form }}
-        <x-filament::button type="submit" class="mt-2">
-            Submit Application
-        </x-filament::button>
-    </form>
-
-    {{-- Application Status --}}
-    <div class="mt-12">
-        <h1 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            Application Status
-        </h1>
-
-        @if (is_null($this->latestApplication?->notified_at))
-            <div class="text-gray-200 bg-yellow-600/20 border border-yellow-500 p-4 rounded-md">
-                Status of Application will be displayed here after review...
-            </div>
-        @endif
-
-        @if (!is_null($this->latestApplication?->notified_at))
-            {{ $this->infolist }}
-        @endif
-    </div>
-
 </x-filament::page>
