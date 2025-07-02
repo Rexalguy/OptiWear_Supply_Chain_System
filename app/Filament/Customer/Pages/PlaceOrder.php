@@ -2,70 +2,160 @@
 
 namespace App\Filament\Customer\Pages;
 
-use Filament\Pages\Page;
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Filament\Pages\Page;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Notifications\Notification;
 
-class PlaceOrder extends Page
+class PlaceOrder extends Page implements HasTable
 {
+    use InteractsWithTable;
+
+    protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static string $view = 'filament.customer.pages.place-order';
 
-    public $products;
     public $cart = [];
+    public bool $showCartSummaryModal = false;
 
-    // Load products and cart on mount
-    public function mount()
+    public function mount(): void
     {
-        // Load products with available quantity > 0
-        $this->products = Product::where('quantity_available', '>', 0)->get();
-
-        // Load cart from session or initialize empty array
         $this->cart = session()->get('cart', []);
     }
 
-    // Add product to cart with quantity increment
-    public function addToCart($productId)
+    public function addToCart($productId): void
     {
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId]++;
-        } else {
-            $this->cart[$productId] = 1;
-        }
-        session()->put('cart', $this->cart);
-
-        $this->dispatchBrowserEvent('notify', ['message' => 'Added to cart']);
-    }
-
-    // Remove product from cart
-    public function removeFromCart($productId)
-    {
-        if (isset($this->cart[$productId])) {
-            unset($this->cart[$productId]);
-            session()->put('cart', $this->cart);
-            $this->dispatchBrowserEvent('notify', ['message' => 'Removed from cart']);
-        }
-    }
-
-    // Update quantity in cart
-    public function updateQuantity($productId, $quantity)
-    {
-        if ($quantity < 1) {
-            $this->removeFromCart($productId);
+        $product = Product::find($productId);
+        if (!$product || $product->quantity_available < 1) {
+            Notification::make()->title('Product out of stock')->danger()->send();
             return;
         }
 
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId] = $quantity;
+        $this->cart[$productId] = ($this->cart[$productId] ?? 0) + 1;
+        session()->put('cart', $this->cart);
+
+        Notification::make()->title('Added to cart')->success()->send();
+    }
+
+    public function incrementQuantity($productId): void
+    {
+        $product = Product::find($productId);
+        if ($product && ($this->cart[$productId] ?? 0) < $product->quantity_available) {
+            $this->cart[$productId]++;
             session()->put('cart', $this->cart);
-            $this->dispatchBrowserEvent('notify', ['message' => 'Quantity updated']);
         }
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function decrementQuantity($productId): void
     {
-        return view(static::$view, [
-            'products' => $this->products,
-            'cart' => $this->cart,
-        ]);
+        if (isset($this->cart[$productId])) {
+            $this->cart[$productId]--;
+            if ($this->cart[$productId] < 1) {
+                unset($this->cart[$productId]);
+            }
+            session()->put('cart', $this->cart);
+        }
+    }
+
+    public function showCartSummary(): void
+    {
+        if (empty($this->cart)) {
+            Notification::make()->title('Cart is empty')->danger()->send();
+            return;
+        }
+
+        $this->showCartSummaryModal = true;
+    }
+
+    public function finalizeOrder(): void
+    {
+        if (empty($this->cart)) {
+            Notification::make()->title('Cart is empty')->danger()->send();
+            return;
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $total = 0;
+
+            foreach ($this->cart as $productId => $quantity) {
+                $product = Product::find($productId);
+                if ($product) {
+                    $total += $product->price * $quantity;
+                }
+            }
+
+            $order = Order::create([
+                'created_by' => Auth::id(),
+                'status' => 'pending',
+                'delivery_option' => 'standard',
+                'total' => $total,
+            ]);
+
+            foreach ($this->cart as $productId => $quantity) {
+                $product = Product::find($productId);
+                if ($product) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'quantity' => $quantity,
+                        'unit_price' => $product->price,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            $this->cart = [];
+            session()->forget('cart');
+            $this->showCartSummaryModal = false;
+
+            Notification::make()
+                ->title('Order placed successfully!')
+                ->success()
+                ->send();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Notification::make()
+                ->title('Failed to place order')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(Product::query()->where('quantity_available', '>', 0))
+            ->columns([
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('price')->money('UGX', true)->sortable(),
+                TextColumn::make('quantity_available')
+                    ->label('In Stock')
+                    ->color(fn ($state) => $state > 10 ? 'success' : 'warning'),
+            ])
+            ->actions([
+                Action::make('add')
+                    ->label('Add to Cart')
+                    ->icon('heroicon-o-plus-circle')
+                    ->button()
+                    ->color('primary')
+                    ->action(fn (Product $record) => $this->addToCart($record->id)),
+            ]);
     }
 }
