@@ -7,6 +7,7 @@ use Filament\Pages\Page;
 use App\Models\VendorValidation;
 use Filament\Infolists\Infolist;
 use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\Tabs;
@@ -63,7 +64,8 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
         foreach ($results as $result) {
             $validation = VendorValidation::create([
-                'name' => $result['vendor'],
+                'user_id' => Auth::id(),
+                'business_name' => $result['vendor'],
                 'is_valid' => $result['valid'],
                 'visit_date' => $result['visitDate'] ?? null,
                 'reasons' => is_array($result['reasons'] ?? []) 

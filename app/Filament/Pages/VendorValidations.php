@@ -28,7 +28,7 @@ class VendorValidations extends Page implements HasTable
         return $table
             ->query(VendorValidation::query())
             ->columns([
-            TextColumn::make('name')
+            TextColumn::make('business_name')
                 ->label('Vendor Name')
                 ->searchable()
                 ->sortable(),
