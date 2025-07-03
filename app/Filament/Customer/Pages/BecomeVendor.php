@@ -85,7 +85,8 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
     } catch (\Exception $e) {
         Notification::make()
             ->title('Error')
-            ->body( $e->getMessage()) 
+            ->body( "Unable to connect to the validation service. Please try again later.") 
+            // $e->getMessage()
             
             ->danger()
             ->send();
