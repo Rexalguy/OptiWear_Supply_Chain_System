@@ -95,7 +95,7 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('total')->money('UGX', true),
                 TextColumn::make('created_at')->label('Placed On')->dateTime('d M Y H:i'),
 
-                TextColumn::make('items_summary')
+                TextColumn::make('orderItems')
                     ->label('Items')
                     ->formatStateUsing(fn ($state, $record) =>
                         $record->orderItems->map(fn ($item) =>

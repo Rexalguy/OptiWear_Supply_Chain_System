@@ -23,7 +23,7 @@
                             <li class="flex justify-between">
                                 <div>
                                     <div class="font-medium">{{ $product->name }}</div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                    <div class="font-small">
                                         UGX {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
                                 </div>
@@ -42,7 +42,7 @@
 
                 <div class="text-right mt-4">
                     <x-filament::button color="success" wire:click="placeOrder">
-                        ✅ Place Order
+                        Order
                     </x-filament::button>
                 </div>
             </div>
