@@ -2,10 +2,9 @@
 
 namespace App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\Pages;
 
-use Filament\Actions;
-use Illuminate\Support\Facades\Auth;
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource;
+use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewRawMaterialsPurchaseOrder extends ViewRecord
 {
@@ -15,7 +14,7 @@ class ViewRawMaterialsPurchaseOrder extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-            ->visible(fn ($record) => Auth::user()?->role === 'manufacturer'),
+            
         ];
     }
 }

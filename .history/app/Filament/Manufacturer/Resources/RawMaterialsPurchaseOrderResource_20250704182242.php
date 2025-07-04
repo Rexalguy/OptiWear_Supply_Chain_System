@@ -3,24 +3,19 @@
 namespace App\Filament\Manufacturer\Resources;
 
 use Filament\Forms;
-use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\RawMaterial;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
 use App\Models\RawMaterialsPurchaseOrder;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\Pages;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\RelationManagers;

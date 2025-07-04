@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Filament\Manufacturer\Resources;
+namespace App\Filament\Resources;
 
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\RawMaterial;
@@ -16,14 +18,22 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use App\Models\RawMaterialsPurchaseOrder;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\Pages;
-use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\RelationManagers;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\Pages;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\RelationManagers;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\Pages\EditRawMaterialsPurchaseOrder;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\Pages\ViewRawMaterialsPurchaseOrder;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\Pages\ListRawMaterialsPurchaseOrders;
+use App\Filament\Resources\RawMaterialsPurchaseOrderResource\Pages\CreateRawMaterialsPurchaseOrder;
+
 
 class RawMaterialsPurchaseOrderResource extends Resource
 {

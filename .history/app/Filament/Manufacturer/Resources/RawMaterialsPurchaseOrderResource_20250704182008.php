@@ -3,24 +3,13 @@
 namespace App\Filament\Manufacturer\Resources;
 
 use Filament\Forms;
-use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use App\Models\RawMaterial;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
 use App\Models\RawMaterialsPurchaseOrder;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\Pages;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource\RelationManagers;
@@ -142,125 +131,19 @@ class RawMaterialsPurchaseOrderResource extends Resource
 }
     public static function table(Table $table): Table
     {
-        return $table
-        ->columns([
-            Tables\Columns\TextColumn::make('rawMaterial.name')
-                ->label('Raw Material')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('supplier.name')
-                ->sortable()
-                ->searchable()
-                ->visible(fn ($record) => Auth::user()?->role == 'manufacturer'),
-            Tables\Columns\TextColumn::make('quantity')
-                ->numeric()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('price_per_unit')
-                ->numeric()
-                ->money()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('total_price')
-                ->numeric()
-                ->money()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('order_date')
-                ->date()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('expected_delivery_date')
-                ->date()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('status')
-                ->label('Status')
-                ->searchable()
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                    'pending' => 'warning',
-                    'confirmed' => 'success',
-                    'cancelled' => 'danger',
-                    'delivered' => 'success',
-                    default => 'gray',
-                }),
-            Tables\Columns\TextColumn::make('delivery_option'),
-            Tables\Columns\TextColumn::make('created_at')
-                ->dateTime()
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-            Tables\Columns\TextColumn::make('updated_at')
-                ->dateTime()
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-            
-        ])
-        ->filters([
-            //
-        ])
-        ->actions([
-            Action::make('ResumeOrder')
-            ->icon('heroicon-o-play')
-            ->color('success')
-            ->action(function ($record) {
-                $record->update(['status' => 'pending']);
-                Notification::make()
-                    ->title('Order Resumed Successfully')
-                    ->success()
-                    ->send();
-            })->visible(fn ($record)=> $record->status == 'cancelled' && Auth::User()->role == 'manufacturer')
-            ->label('Resume Order'),
-            Action::make('markAsDelivered')
-            ->label('Mark As Delivered')
-            ->icon('heroicon-o-truck')
-            ->color('success')
-            ->action(function ($record) {
-                $rawMaterial = RawMaterial::find($record->raw_material_id);
-                if ($rawMaterial) {
-                    $rawMaterial->update([
-                        'current_stock' => $rawMaterial->current_stock + $record->quantity
-                    ]);
-                }
-                $record->update(['status' => 'delivered']);
-                
-                Notification::make()
-                ->title('Order marked as delivered')
-                ->body('Raw material received and current stock updated.')
-                ->success()
-                ->send();
-            })
-            ->visible(fn ($record) => $record->status == 'confirmed' && Auth::User()->role=='manufacturer'),
-            Action::make('CancelOrder')
-            ->label('Cancel Order')
-            ->icon('heroicon-o-x-mark')
-            ->color('danger')
-            ->action(function ($record) {
-                $record->update(['status' => 'cancelled']);
-                Notification::make()
-                ->title('Order cancelled')
-                ->success()
-                ->send();
-            })
-            ->visible(fn ($record) => $record->status == 'pending' && Auth::User()->role == 'manufacturer'),
-            Action::make('ConfirmOrder')
-            ->label('Confirm Order')
-            ->icon('heroicon-o-check')
-            ->color('success')
-            ->action(function ($record) {
-                $record->update(['status' => 'confirmed']);
-                Notification::make()
-                ->title('Order confirmed')
-                ->success()
-                ->send();
-            })
-            ->visible(fn ($record) => $record->status == 'pending' && Auth::User()->role == 'supplier'),
-            ViewAction::make(),
-            EditAction::make()
-            ->visible(fn ($record) => Auth::user()?->role === 'manufacturer'),
-            
-        ])
-        ->bulkActions([
-            BulkActionGroup::make([
-            DeleteBulkAction::make(),
-            ]),
-        ]);
-}
+        
+Josemiles@Joseph MINGW64 ~/Desktop/SCM (newMain)
+$ git status
+On branch newMain
+Your branch is up to date with 'otherRepo/newMain'.
+
+nothing to commit, working tree clean
+
+Josemiles@Joseph MINGW64 ~/Desktop/SCM (newMain)
+$ php artisan cache:clear
+
+   INFO  Application cache cleared successfully.
+
 
     public static function getRelations(): array
     {
