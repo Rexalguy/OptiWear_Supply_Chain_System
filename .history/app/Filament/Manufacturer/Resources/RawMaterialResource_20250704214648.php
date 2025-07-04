@@ -24,7 +24,7 @@ class RawMaterialResource extends Resource
 
     protected static ?string $navigationGroup = 'Raw Materials';
     public static function canViewAny():bool{
-        $user = Auth::user();
+        $user = auth()->user();
     return $user && $user->role === 'manufacturer';
     }
     public static function getEloquentQuery(): Builder
