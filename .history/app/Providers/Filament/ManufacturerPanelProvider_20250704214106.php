@@ -26,6 +26,7 @@ class ManufacturerPanelProvider extends PanelProvider
         return $panel
             ->id('manufacturer')
             ->path('manufacturer')
+            ->lo
             ->colors([
                 'primary' => Color::Indigo,   // Bold, industrial
                 'info' => Color::Blue,
