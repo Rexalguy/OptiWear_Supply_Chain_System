@@ -8,8 +8,8 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
 
 class Orders extends Page implements HasTable
 {
@@ -26,7 +26,7 @@ class Orders extends Page implements HasTable
                     ->label('Order #')
                     ->sortable(),
 
-                TextColumn::make('creator.name') 
+                TextColumn::make('creator.name')
                     ->label('Customer')
                     ->searchable()
                     ->sortable()
@@ -66,44 +66,45 @@ class Orders extends Page implements HasTable
             ])
             ->actions([
                 Action::make('markConfirmed')
-                ->lable('confirmed')
-                ->color('info')
-                ->icon('heroicon-o-check-cicle')
-                ->visible(fn (Order $record)=>$record->status !== 'confirmed')
-            ->action(function (Order $record){
-                $record->update(['status'=>'confirmed']);
-                Notification::make()
-                ->title('order confirmed')
-                ->success()
-                ->send();
-            }),
-Action::make('markDelivered')
-->label('Deliver')
-->color('success')
-->icon('heroicon-o-truck')
-->visible(fn (Order $record)=>$record->status !== 'delivered')
-->action(function (Order $record){
-    $record->update(['status'=> 'delivered']);
-    Notification::make()
-    ->title('order marked as delivered')
-    ->success()
-    ->send();
-}),
-Action::make('markCancelled')
-->label('cancel')
-->color('danger')
-->icon('heroicon-o-x-circle')
-->visible(fn (Order $record)=>$record->status !== 'cancelled')
-->requiresConfirmation()
-->action(function (Order $record){
-    $record->update(['status'=> 'cancelled']);
-    Notification::make()
-    ->title('order cancelled')
-    ->danger()
-    ->send();}),
+                    ->label('Confirm')
+                    ->color('info')
+                    ->icon('heroicon-o-check-circle')
+                    ->visible(fn (Order $record) => $record->status !== 'confirmed')
+                    ->action(function (Order $record) {
+                        $record->update(['status' => 'confirmed']);
+                        Notification::make()
+                            ->title('Order confirmed')
+                            ->success()
+                            ->send();
+                    }),
 
+                Action::make('markDelivered')
+                    ->label('Deliver')
+                    ->color('success')
+                    ->icon('heroicon-o-truck')
+                    ->visible(fn (Order $record) => $record->status !== 'delivered')
+                    ->action(function (Order $record) {
+                        $record->update(['status' => 'delivered']);
+                        Notification::make()
+                            ->title('Order marked as delivered')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('markCancelled')
+                    ->label('Cancel')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->visible(fn (Order $record) => $record->status !== 'cancelled')
+                    ->requiresConfirmation()
+                    ->action(function (Order $record) {
+                        $record->update(['status' => 'cancelled']);
+                        Notification::make()
+                            ->title('Order cancelled')
+                            ->danger()
+                            ->send();
+                    }),
             ])
-            
             ->defaultSort('id', 'desc');
-    }
-}
+    }  
+ }

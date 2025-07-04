@@ -84,7 +84,7 @@ class PlaceOrder extends Page implements HasTable
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
-                'delivery_option' => 'pickup', // or 'door_delivery'
+                'delivery_option' => 'pickup', 
                 'total' => $total,
             ]);
 
