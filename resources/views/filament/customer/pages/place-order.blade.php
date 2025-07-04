@@ -2,7 +2,11 @@
     <div class="p-6 space-y-6">
 
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🛍️ Available Products</h2>
-
+<div class="mt-6 text-right">
+   <x-filament::button color="primary" tag="a" href="{{ url('/customer/my-orders') }}">
+    View cart ({{ $this->cartCount }})
+</x-filament::button>
+</div>
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
                 <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800">
@@ -23,10 +27,6 @@
                 </div>
             @endforeach
         </div>
-<div class="mt-6 text-right">
-   <x-filament::button color="primary" tag="a" href="{{ url('/customer/my-orders') }}">
-    View cart ({{ $this->cartCount }})
-</x-filament::button>
-</div>
+
     </div>
 </x-filament-panels::page>
