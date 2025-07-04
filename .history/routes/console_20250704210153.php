@@ -13,5 +13,5 @@ Schedule::command('send:supplier-report')
 
 Schedule::command('send:manufacturer-report')
              ->weekly()
-             ->at('07:00')
+             ->at('00:00')
              ->timezone(config('app.timezone'));

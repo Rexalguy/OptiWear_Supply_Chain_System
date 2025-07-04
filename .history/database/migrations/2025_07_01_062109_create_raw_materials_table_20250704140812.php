@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('raw_material_categories');
             $table->integer('current_stock');
             $table->integer('reorder_level');
-            $table->enum('unit_of_measure', ['kg', 'g', 'liter', 'meter','piece'])->default('kg');
+            $table->string('unit_of_measure');
             $table->timestamps();
         });
     }
