@@ -73,7 +73,58 @@ class MyOrders extends Page implements HasTable
             Notification::make()->title('Order placed successfully!')->success()->send();
         } catch (\Exception $e) {
             DB::rollBack();
-            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
+            Notification::make()
+                ->title('Failed to place order')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function increaseQuantity($productId): void
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            Notification::make()
+                ->title('Product not found')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $currentQty = $this->cart[$productId] ?? 0;
+
+        if ($currentQty >= 50) {
+            Notification::make()
+                ->title('Limit: Max 50 units per product')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        if ($currentQty >= $product->quantity_available) {
+            Notification::make()
+                ->title("Only {$product->quantity_available} units available for {$product->name}")
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $this->cart[$productId] = $currentQty + 1;
+        session()->put('cart', $this->cart);
+    }
+
+    public function decreaseQuantity($productId): void
+    {
+        if (isset($this->cart[$productId])) {
+            if ($this->cart[$productId] > 1) {
+                $this->cart[$productId]--;
+            } else {
+                unset($this->cart[$productId]);
+            }
+
+            session()->put('cart', $this->cart);
         }
     }
 

@@ -17,6 +17,7 @@
                             $product = $products->get($productId);
                             $subtotal = $product ? $product->price * $qty : 0;
                             $total += $subtotal;
+                            $maxReached = $qty >= 50 || $qty >= ($product->quantity_available ?? 0);
                         @endphp
 
                         @if ($product)
@@ -26,7 +27,34 @@
                                     <div class="text-sm text-gray-600 dark:text-gray-400">
                                         UGX {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
+
+                                    <div class="mt-2 flex items-center space-x-2">
+                                        <x-filament::button
+                                            size="sm"
+                                            color="gray"
+                                            wire:click="decreaseQuantity({{ $productId }})"
+                                            wire:loading.attr="disabled"
+                                            :disabled="$qty <= 1"
+                                        >-</x-filament::button>
+
+                                        <span class="text-sm">{{ $qty }}</span>
+
+                                        <x-filament::button
+                                            size="sm"
+                                            color="gray"
+                                            wire:click="increaseQuantity({{ $productId }})"
+                                            wire:loading.attr="disabled"
+                                            :disabled="$maxReached"
+                                        >+</x-filament::button>
+                                    </div>
+
+                                    @if ($maxReached)
+                                        <div class="text-xs text-red-500 mt-1">
+                                            Max limit ({{ min(50, $product->quantity_available) }}) reached
+                                        </div>
+                                    @endif
                                 </div>
+
                                 <div class="text-right font-semibold">
                                     UGX {{ number_format($subtotal) }}
                                 </div>
@@ -41,7 +69,11 @@
                 </div>
 
                 <div class="text-right mt-4">
-                    <x-filament::button color="success" wire:click="placeOrder" wire:loading.attr="disabled">
+                    <x-filament::button
+                        color="success"
+                        wire:click="placeOrder"
+                        wire:loading.attr="disabled"
+                    >
                         Place Order
                     </x-filament::button>
                 </div>
