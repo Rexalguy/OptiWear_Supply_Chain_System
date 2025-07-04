@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('raw_material_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('description')->nullable();
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
