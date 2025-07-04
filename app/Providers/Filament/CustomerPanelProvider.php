@@ -63,7 +63,7 @@ class CustomerPanelProvider extends PanelProvider
             // Register key widgets explicitly
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

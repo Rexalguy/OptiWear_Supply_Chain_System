@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vendor_validations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->nullable();
             $table->string('business_name');
             $table->boolean('is_valid')->default(false);
             $table->text('reasons')->nullable();
