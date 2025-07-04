@@ -26,7 +26,7 @@ class Orders extends Page implements HasTable
                     ->label('Order #')
                     ->sortable(),
 
-                TextColumn::make('creator.name')
+                TextColumn::make('creator.name') 
                     ->label('Customer')
                     ->searchable()
                     ->sortable()
@@ -106,5 +106,5 @@ class Orders extends Page implements HasTable
                     }),
             ])
             ->defaultSort('id', 'desc');
-    }  
- }
+    }
+}
