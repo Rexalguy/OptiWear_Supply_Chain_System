@@ -14,6 +14,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Actions\Action;
 
 class MyOrders extends Page implements HasTable
 {
@@ -82,6 +83,7 @@ class MyOrders extends Page implements HasTable
             ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
             ->columns([
                 TextColumn::make('id')->label('Order #')->sortable(),
+
                 TextColumn::make('status')
                     ->badge()
                     ->sortable()
@@ -91,8 +93,11 @@ class MyOrders extends Page implements HasTable
                         'success' => 'delivered',
                         'danger' => 'cancelled',
                     ]),
+
                 TextColumn::make('delivery_option')->label('Delivery'),
+
                 TextColumn::make('total')->money('UGX', true),
+
                 TextColumn::make('created_at')->label('Placed On')->dateTime('d M Y H:i'),
 
                 TextColumn::make('orderItems')
@@ -103,6 +108,22 @@ class MyOrders extends Page implements HasTable
                         )->implode(', ')
                     )
                     ->wrap(),
-            ]);
+            ])
+            ->actions([
+                Action::make('cancel')
+                    ->label('Cancel')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->visible(fn (Order $record) => $record->status === 'pending')
+                    ->requiresConfirmation()
+                    ->action(function (Order $record) {
+                        $record->update(['status' => 'cancelled']);
+                        Notification::make()
+                            ->title('Order cancelled')
+                            ->danger()
+                            ->send();
+                    }),
+            ])
+            ->defaultSort('id', 'desc');
     }
 }

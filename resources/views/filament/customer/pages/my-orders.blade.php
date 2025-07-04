@@ -20,10 +20,10 @@
                         @endphp
 
                         @if ($product)
-                            <li class="flex justify-between">
+                            <li class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">{{ $product->name }}</div>
-                                    <div class="font-small">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">
                                         UGX {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
                                 </div>
@@ -41,10 +41,14 @@
                 </div>
 
                 <div class="text-right mt-4">
-                    <x-filament::button color="success" wire:click="placeOrder">
-                        Order
+                    <x-filament::button color="success" wire:click="placeOrder" wire:loading.attr="disabled">
+                        Place Order
                     </x-filament::button>
                 </div>
+            </div>
+        @else
+            <div class="text-center text-gray-500 dark:text-gray-400 py-10">
+                Your cart is empty.
             </div>
         @endif
 

@@ -69,11 +69,27 @@ class Orders extends Page implements HasTable
                     ->label('Confirm')
                     ->color('info')
                     ->icon('heroicon-o-check-circle')
-                    ->visible(fn (Order $record) => $record->status !== 'confirmed')
+                    ->visible(fn (Order $record) => $record->status === 'pending')
                     ->action(function (Order $record) {
+                        // Reduce product quantities only if order is pending
+                        foreach ($record->orderItems as $item) {
+                            $product = $item->product;
+                            // Check if enough quantity is available before reducing
+                            if ($product->quantity_available < $item->quantity) {
+                                Notification::make()
+                                    ->title("Not enough stock for {$product->name}")
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                        }
+                        foreach ($record->orderItems as $item) {
+                            $product = $item->product;
+                            $product->decrement('quantity_available', $item->quantity);
+                        }
                         $record->update(['status' => 'confirmed']);
                         Notification::make()
-                            ->title('Order confirmed')
+                            ->title('Order confirmed and stock reduced')
                             ->success()
                             ->send();
                     }),
@@ -82,7 +98,7 @@ class Orders extends Page implements HasTable
                     ->label('Deliver')
                     ->color('success')
                     ->icon('heroicon-o-truck')
-                    ->visible(fn (Order $record) => $record->status !== 'delivered')
+                    ->visible(fn (Order $record) => $record->status === 'confirmed')
                     ->action(function (Order $record) {
                         $record->update(['status' => 'delivered']);
                         Notification::make()
@@ -95,12 +111,17 @@ class Orders extends Page implements HasTable
                     ->label('Cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
-                    ->visible(fn (Order $record) => $record->status !== 'cancelled')
+                    ->visible(fn (Order $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
                     ->action(function (Order $record) {
+                        // Restore product quantities only if order is pending or confirmed
+                        foreach ($record->orderItems as $item) {
+                            $product = $item->product;
+                            $product->increment('quantity_available', $item->quantity);
+                        }
                         $record->update(['status' => 'cancelled']);
                         Notification::make()
-                            ->title('Order cancelled')
+                            ->title('Order cancelled and stock restored')
                             ->danger()
                             ->send();
                     }),
