@@ -24,7 +24,10 @@
                             <li class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">{{ $product->name }}</div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="text-sm ">
+                                        SKU: {{ $product->sku }}
+                                    </div>
+                                    <div class="text-sm ">
                                         UGX {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
 

@@ -60,6 +60,7 @@ class MyOrders extends Page implements HasTable
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'SKU' => $product->sku,
                     'quantity' => $quantity,
                     'unit_price' => $product->price,
                 ]);
@@ -155,7 +156,7 @@ class MyOrders extends Page implements HasTable
                     ->label('Items')
                     ->formatStateUsing(fn ($state, $record) =>
                         $record->orderItems->map(fn ($item) =>
-                            $item->product->name . ' (x' . $item->quantity . ')'
+                            $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')'
                         )->implode(', ')
                     )
                     ->wrap(),

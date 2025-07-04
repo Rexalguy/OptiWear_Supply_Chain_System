@@ -6,39 +6,41 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Filament\Pages\Page;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Concerns\InteractsWithTable;
 
-class PlaceOrder extends Page implements HasTable
+class PlaceOrder extends Page
 {
-    use InteractsWithTable;
-
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static string $view = 'filament.customer.pages.place-order';
 
     public array $cart = [];
+    public $products;
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
+        $this->products = Product::where('quantity_available', '>', 0)->get();
     }
 
     public function addToCart($productId): void
     {
         $product = Product::find($productId);
+
         if (!$product || $product->quantity_available < 1) {
             Notification::make()->title('Product out of stock')->danger()->send();
             return;
         }
 
-        $this->cart[$productId] = ($this->cart[$productId] ?? 0) + 1;
+        $qty = $this->cart[$productId] ?? 0;
+
+        if ($qty >= 50) {
+            Notification::make()->title('Maximum 50 items per product allowed')->warning()->send();
+            return;
+        }
+
+        $this->cart[$productId] = $qty + 1;
         session()->put('cart', $this->cart);
 
         Notification::make()->title('Added to cart')->success()->send();
@@ -47,7 +49,9 @@ class PlaceOrder extends Page implements HasTable
     public function incrementQuantity($productId): void
     {
         $product = Product::find($productId);
-        if ($product && isset($this->cart[$productId]) && $this->cart[$productId] < $product->quantity_available) {
+        $qty = $this->cart[$productId] ?? 0;
+
+        if ($product && $qty < min(50, $product->quantity_available)) {
             $this->cart[$productId]++;
             session()->put('cart', $this->cart);
         }
@@ -57,9 +61,11 @@ class PlaceOrder extends Page implements HasTable
     {
         if (isset($this->cart[$productId])) {
             $this->cart[$productId]--;
+
             if ($this->cart[$productId] < 1) {
                 unset($this->cart[$productId]);
             }
+
             session()->put('cart', $this->cart);
         }
     }
@@ -84,7 +90,7 @@ class PlaceOrder extends Page implements HasTable
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
-                'delivery_option' => 'pickup', 
+                'delivery_option' => 'pickup',
                 'total' => $total,
             ]);
 
@@ -94,42 +100,29 @@ class PlaceOrder extends Page implements HasTable
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'SKU' => $product->sku,
                     'quantity' => $quantity,
                     'unit_price' => $product->price,
                 ]);
             }
 
             DB::commit();
-
             $this->cart = [];
             session()->forget('cart');
 
             Notification::make()->title('Order placed successfully!')->success()->send();
         } catch (\Exception $e) {
             DB::rollBack();
-            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
+            Notification::make()
+                ->title('Failed to place order')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
         }
     }
 
-    public function table(Table $table): Table
+    public function getCartCountProperty(): int
     {
-        return $table
-            ->query(Product::query()->where('quantity_available', '>', 0))
-            ->columns([
-                TextColumn::make('name')->searchable()->sortable(),
-                TextColumn::make('price')->money('UGX', true)->sortable(),
-                TextColumn::make('quantity_available')
-                    ->label('In Stock')
-                    ->sortable()
-                    ->color(fn ($state) => $state > 10 ? 'success' : 'warning'),
-            ])
-            ->actions([
-                Action::make('add')
-                    ->label('Add to Cart')
-                    ->icon('heroicon-o-plus-circle')
-                    ->button()
-                    ->color('primary')
-                    ->action(fn (Product $record) => $this->addToCart($record->id)),
-            ]);
+        return array_sum($this->cart);
     }
 }

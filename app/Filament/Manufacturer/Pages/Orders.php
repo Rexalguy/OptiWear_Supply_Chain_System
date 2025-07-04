@@ -59,7 +59,7 @@ class Orders extends Page implements HasTable
                     ->label('Items')
                     ->formatStateUsing(function ($state, $record) {
                         return $record->orderItems->map(function ($item) {
-                            return $item->product->name . ' (x' . $item->quantity . ')';
+                            return $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')';
                         })->implode(', ');
                     })
                     ->wrap(),
