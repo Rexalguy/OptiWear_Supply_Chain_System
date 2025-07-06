@@ -20,4 +20,10 @@ class ProductionOrder extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function productionStages()
+    {
+        return $this->hasMany(ProductionStage::class);
+    }
+
 }

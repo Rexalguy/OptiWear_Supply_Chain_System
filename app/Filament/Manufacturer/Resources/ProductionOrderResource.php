@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\Pages;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\RelationManagers;
 
@@ -50,52 +51,62 @@ class ProductionOrderResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\TextColumn::make('product.name')->label('Product'),
-            Tables\Columns\TextColumn::make('quantity'),
-            Tables\Columns\TextColumn::make('status')->badge(),
-            Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                        Tables\Columns\TextColumn::make('product.name')->label('Product'),
+                        Tables\Columns\TextColumn::make('quantity'),
+                        Tables\Columns\TextColumn::make('status')->badge(),
+                        Tables\Columns\TextColumn::make('created_at')->dateTime(),
 
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-            Tables\Actions\Action::make('build')
-            ->label('Build')
-            ->icon('heroicon-o-cog-6-tooth')
-            ->color('success')
-            ->requiresConfirmation()
-            ->action(function (ProductionOrder $record) {
-                $materials = BillOfMaterial::where('product_id', $record->product_id)->get();
+                        ])
+                        ->filters([
+                            //
+                        ])
+                        ->actions([
+                        Tables\Actions\Action::make('build')
+                ->label('Build')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->color('success')
+                ->requiresConfirmation()
+                ->action(function (ProductionOrder $record) {
+                    $materials = BillOfMaterial::where('product_id', $record->product_id)->get();
 
-                foreach ($materials as $material) {
-                    $raw = $material->rawMaterial;
-                    $required = $material->quantity_required * $record->quantity;
+                    // ✅ 1. Check for stock availability
+                    foreach ($materials as $material) {
+                        $raw = $material->rawMaterial;
+                        $required = $material->quantity_required * $record->quantity;
 
-                    if ($raw->quantity_in_stock < $required) {
-                        Notification::make()
-                            ->title("Insufficient stock for {$raw->name}")
-                            ->danger()
-                            ->send();
-                        return;
+                        if ($raw->current_stock < $required) {
+                            Notification::make()
+                                ->title("Insufficient stock for {$raw->name}")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
                     }
-                }
 
-                foreach ($materials as $material) {
-                    $raw = $material->rawMaterial;
-                    $required = $material->quantity_required * $record->quantity;
-                    $raw->decrement('quantity_in_stock', $required);
-                }
+                    // ✅ 2. Deduct stock
+                    foreach ($materials as $material) {
+                        $raw = $material->rawMaterial;
+                        $required = $material->quantity_required * $record->quantity;
 
-                $record->product->increment('quantity_in_stock', $record->quantity);
-                $record->update(['status' => 'completed']);
+                        $raw->decrement('current_stock', $required);
+                    }
 
-                Notification::make()
-                    ->title('Production complete!')
-                    ->success()
-                    ->send();
-            })
-            ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
+                    // ✅ 3. Create printing stage
+                    $record->productionStages()->create([
+                        'stage' => 'printing',
+                        'status' => 'pending',
+                    ]);
+
+                    // ✅ 4. Update status to 'in_progress'
+                    $record->update(['status' => 'in_progress']);
+
+                    Notification::make()
+                        ->title('Production started and raw materials deducted.')
+                        ->success()
+                        ->send();
+                })
+    ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
+            
 
 
             // 🆕 BOM Action
@@ -144,6 +155,38 @@ class ProductionOrderResource extends Resource
     ->modalSubmitAction(false)
     ->modalCancelActionLabel('Close')
     ,
+
+    Tables\Actions\Action::make('log')
+    ->label('Log')
+    ->icon('heroicon-o-clipboard-document-list')
+    ->modalHeading('Production Stages Log')
+    ->infolist(function (ProductionOrder $record) {
+        $stages = $record->productionStages()->with('workforce')->get();
+
+        return [
+            Section::make('Workflow Log')
+                ->schema(
+                    $stages->map(function ($stage) {
+                        return Grid::make(3)->schema([
+                            TextEntry::make('Stage')
+                                ->label('Stage')
+                                ->default(ucfirst($stage->stage)),
+
+                            TextEntry::make('Status')
+                                ->label('Status')
+                                ->default(ucfirst($stage->status)),
+
+                            TextEntry::make('Worker')
+                                ->label('Assigned To')
+                                ->default(optional($stage->workforce)->name ?? 'Unassigned'),
+                        ]);
+                    })->toArray()
+                )
+        ];
+    })
+    ->modalSubmitAction(false)
+    ->modalCancelActionLabel('Close')
+    ->visible(fn (ProductionOrder $record) => $record->status !== 'pending')
             
             ])
             ->bulkActions([
