@@ -114,7 +114,7 @@ class PackagingStage extends Page implements HasTable
                         ]);
 
                         Notification::make()
-                            ->title('Packaging completed. Delivery stage created.')
+                            ->title('Packaging completed. Moved to Delivery.')
                             ->success()
                             ->send();
                     }

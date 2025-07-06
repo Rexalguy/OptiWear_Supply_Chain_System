@@ -50,19 +50,40 @@ class ProductionOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                        Tables\Columns\TextColumn::make('product.name')->label('Product'),
-                        Tables\Columns\TextColumn::make('quantity'),
-                        Tables\Columns\TextColumn::make('status')->badge(),
-                        Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                    ->columns([
+            Tables\Columns\TextColumn::make('product.name')
+                ->label('Product')
+                ->searchable()
+                ->sortable(),
+
+            Tables\Columns\TextColumn::make('quantity')
+                ->label('Quantity')
+                ->numeric()
+                ->alignRight(),
+
+            Tables\Columns\TextColumn::make('status')
+                ->label('Status')
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                    'pending' => 'gray',
+                    'in_progress' => 'warning',
+                    'completed' => 'success',
+                    default => 'gray',
+                }),
+
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Created')
+                ->since() // or ->dateTime('d M Y')
+                ->sortable(),
+
 
                         ])
                         ->filters([
                             //
                         ])
                         ->actions([
-                        Tables\Actions\Action::make('build')
-                ->label('Build')
+                        Tables\Actions\Action::make('stitch')
+                ->label('Stitch')
                 ->icon('heroicon-o-cog-6-tooth')
                 ->color('success')
                 ->requiresConfirmation()
@@ -101,7 +122,7 @@ class ProductionOrderResource extends Resource
                     $record->update(['status' => 'in_progress']);
 
                     Notification::make()
-                        ->title('Production started and raw materials deducted.')
+                        ->title('Stitching complete and ready for printing.')
                         ->success()
                         ->send();
                 })
@@ -110,83 +131,68 @@ class ProductionOrderResource extends Resource
 
 
             // 🆕 BOM Action
-           Tables\Actions\Action::make('bom')
-    ->label('BOM')
-    ->icon('heroicon-o-information-circle')
-    ->modalHeading('Required Raw Materials')
-    ->infolist(function (ProductionOrder $record): array {
-        $materials = BillOfMaterial::with('rawMaterial')
-            ->where('product_id', $record->product_id)
-            ->get();
+            Tables\Actions\Action::make('bom')
+                ->label('View BOM')
+                ->icon('heroicon-o-information-circle')
+                ->modalHeading('Required Raw Materials')
+                ->infolist(function (ProductionOrder $record): array {
+                    $materials = BillOfMaterial::with('rawMaterial')
+                        ->where('product_id', $record->product_id)
+                        ->get();
 
-        if ($materials->isEmpty()) {
-            return [
-                Section::make('BOM Details')->schema([
-                    TextEntry::make('empty')
-                        ->default('No Bill of Materials defined for this product.')
-                        ->columnSpanFull()
-                        ->color('danger'),
-                ]),
-            ];
-        }
+                    if ($materials->isEmpty()) {
+                        return [
+                            Section::make('No BOM Found')->schema([
+                                TextEntry::make('note')->default('No Bill of Materials defined for this product.')->color('danger'),
+                            ]),
+                        ];
+                    }
 
-        return [
-            Section::make('Required Materials')
-                ->description("Based on quantity: {$record->quantity}")
-                ->schema(
-                    $materials->map(function ($material) use ($record) {
-                        return Grid::make(3)->schema([
-                            TextEntry::make('material')
-                                ->label('Material')
-                                ->default($material->rawMaterial->name),
-
-                            TextEntry::make('required_quantity')
-                                ->label('Quantity')
-                                ->default($material->quantity_required * $record->quantity),
-
-                            TextEntry::make('unit')
-                                ->label('Unit')
-                                ->default($material->rawMaterial->unit),
-                        ]);
-                    })->toArray()
-                ),
-        ];
-    })
+                    return [
+                        Section::make('Required Materials')
+                            ->description("Based on quantity: {$record->quantity}")
+                            ->schema(
+                                $materials->map(function ($material) use ($record) {
+                                    return Grid::make(3)->schema([
+                                        TextEntry::make('material')->label('Material')->default($material->rawMaterial->name),
+                                        TextEntry::make('quantity')->label('Quantity')->default($material->quantity_required * $record->quantity),
+                                        TextEntry::make('unit')->label('Unit')->default($material->rawMaterial->unit_of_measure),
+                                    ]);
+                                })->toArray()
+                            ),
+                    ];
+                })
     ->modalSubmitAction(false)
     ->modalCancelActionLabel('Close')
     ,
 
-    Tables\Actions\Action::make('log')
-    ->label('Log')
-    ->icon('heroicon-o-clipboard-document-list')
-    ->modalHeading('Production Stages Log')
-    ->infolist(function (ProductionOrder $record) {
-        $stages = $record->productionStages()->with('workforce')->get();
 
-        return [
-            Section::make('Workflow Log')
-                ->schema(
-                    $stages->map(function ($stage) {
-                        return Grid::make(3)->schema([
-                            TextEntry::make('Stage')
-                                ->label('Stage')
-                                ->default(ucfirst($stage->stage)),
+//Log action
 
-                            TextEntry::make('Status')
-                                ->label('Status')
-                                ->default(ucfirst($stage->status)),
-
-                            TextEntry::make('Worker')
-                                ->label('Assigned To')
-                                ->default(optional($stage->workforce)->name ?? 'Unassigned'),
+        Tables\Actions\Action::make('viewLog')
+            ->label('Stage Log')
+            ->icon('heroicon-o-clock')
+            ->modalHeading('Production Stage Log')
+            ->infolist(function (ProductionOrder $record): array {
+                return $record->productionStages->map(function ($stage) {
+                    return Section::make(ucfirst($stage->stage))
+                        ->schema([
+                            Grid::make(2)->schema([
+                                TextEntry::make('Worker')->default(optional($stage->workforce)->name ?? 'Unassigned'),
+                                TextEntry::make('Status')->default($stage->status)->badge()->color(match ($stage->status) {
+                                    'pending' => 'gray',
+                                    'in_progress' => 'warning',
+                                    'completed' => 'success',
+                                    default => 'gray',
+                                }),
+                            ]),
+                           
                         ]);
-                    })->toArray()
-                )
-        ];
-    })
-    ->modalSubmitAction(false)
-    ->modalCancelActionLabel('Close')
-    ->visible(fn (ProductionOrder $record) => $record->status !== 'pending')
+                })->toArray();
+            })
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close')
+            ->visible(fn (ProductionOrder $record) => $record->status !== 'pending')
             
             ])
             ->bulkActions([
