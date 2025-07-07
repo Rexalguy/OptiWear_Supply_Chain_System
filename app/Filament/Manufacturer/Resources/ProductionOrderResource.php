@@ -10,23 +10,29 @@ use Filament\Tables\Table;
 use App\Models\BillOfMaterial;
 use App\Models\ProductionOrder;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\Pages;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\RelationManagers;
+use Filament\Tables\Actions\ActionGroup;
 
 class ProductionOrderResource extends Resource
 {
     protected static ?string $model = ProductionOrder::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Product';
+
+
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 
     public static function form(Form $form): Form
     {
@@ -51,15 +57,17 @@ class ProductionOrderResource extends Resource
     {
         return $table
                     ->columns([
+            
             Tables\Columns\TextColumn::make('product.name')
                 ->label('Product')
                 ->searchable()
-                ->sortable(),
+                ->sortable()
+                ->grow(false),
 
             Tables\Columns\TextColumn::make('quantity')
                 ->label('Quantity')
-                ->numeric()
-                ->alignRight(),
+                ->numeric(),
+                
 
             Tables\Columns\TextColumn::make('status')
                 ->label('Status')
@@ -74,14 +82,30 @@ class ProductionOrderResource extends Resource
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Created')
                 ->since() // or ->dateTime('d M Y')
-                ->sortable(),
+                ->sortable()
+                ->dateTimeTooltip(),
 
 
                         ])
                         ->filters([
-                            //
+                            Tables\Filters\SelectFilter::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'in_progress' => 'In Progress',
+                                'completed' => 'Completed',
+                                ])->native(false),
+
+                            Tables\Filters\SelectFilter::make('product_id')
+                                    ->label('Product')
+                                    ->multiple()
+                                    ->options(Product::pluck('name', 'id')->toArray())
+                                    ->searchable(),
                         ])
+                            
+
                         ->actions([
+                            
                         Tables\Actions\Action::make('stitch')
                 ->label('Stitch')
                 ->icon('heroicon-o-cog-6-tooth')
@@ -129,8 +153,8 @@ class ProductionOrderResource extends Resource
     ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
             
 
-
-            // 🆕 BOM Action
+                    ActionGroup::make([
+                                      // 🆕 BOM Action
             Tables\Actions\Action::make('bom')
                 ->label('View BOM')
                 ->icon('heroicon-o-information-circle')
@@ -163,8 +187,8 @@ class ProductionOrderResource extends Resource
                     ];
                 })
     ->modalSubmitAction(false)
-    ->modalCancelActionLabel('Close')
-    ,
+    ->modalCancelActionLabel('Close'),
+    
 
 
 //Log action
@@ -193,6 +217,11 @@ class ProductionOrderResource extends Resource
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Close')
             ->visible(fn (ProductionOrder $record) => $record->status !== 'pending')
+                            ])
+                                ->icon('heroicon-m-ellipsis-horizontal')
+                                ->color('info')
+                                ->tooltip('Logistics')
+      
             
             ])
             ->bulkActions([

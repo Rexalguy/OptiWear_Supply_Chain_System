@@ -45,11 +45,18 @@ class DeliveryStage extends Page implements HasTable
             Tables\Columns\TextColumn::make('delivery_status')
                 ->label('Delivery Status')
                 ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'pending' => 'gray',
+                    'in_progress' => 'warning',
+                    'completed' => 'success',
+                    default => 'secondary',
+                })
                 ->getStateUsing(fn ($record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->status ?? '-'
                 ),
             Tables\Columns\TextColumn::make('delivery_worker')
                 ->label('Assigned To')
+                ->icon('heroicon-m-wrench')
                 ->getStateUsing(fn ($record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->workforce->name ?? 'Unassigned'
                 ),

@@ -2,22 +2,27 @@
 
 namespace App\Filament\Manufacturer\Resources;
 
-use App\Filament\Manufacturer\Resources\ProductResource\Pages;
-use App\Filament\Manufacturer\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Manufacturer\Resources\ProductResource\Pages;
+use App\Filament\Manufacturer\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Product';
+
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     public static function canCreate(): bool
     {
@@ -31,6 +36,15 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+
+                Forms\Components\TextInput::make('image')
+                    ->label('Image URL')
+                    ->url()
+                    ->placeholder('https://example.com/image.webp')
+                    ->required(),
+                    
+                    
+
                 Forms\Components\TextInput::make('sku')
                     ->label('SKU')
                     ->required()
@@ -53,8 +67,17 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('sku')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Product Image')
+                    ->height(80)
+                    ->width(80)
+                    ->circular(), // important!
+                
+
+                Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
@@ -76,10 +99,11 @@ class ProductResource extends Resource
                 //     ->sortable(),
             ])
             ->filters([
-                //
+                // 
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
                 
             ])
             ->bulkActions([

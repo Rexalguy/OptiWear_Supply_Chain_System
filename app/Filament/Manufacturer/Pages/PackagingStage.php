@@ -44,12 +44,19 @@ class PackagingStage extends Page implements HasTable
             Tables\Columns\TextColumn::make('packaging_status')
                 ->label('Packaging Status')
                 ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'pending' => 'gray',
+                    'in_progress' => 'warning',
+                    'completed' => 'success',
+                    default => 'secondary',
+                })
                 ->getStateUsing(function ($record) {
                     return optional($record->productionStages->firstWhere('stage', 'packaging'))->status ?? '-';
                 }),
 
             Tables\Columns\TextColumn::make('packaging_worker')
                 ->label('Assigned To')
+                ->icon('heroicon-m-wrench')
                 ->getStateUsing(function ($record) {
                     return optional($record->productionStages->firstWhere('stage', 'packaging'))->workforce->name ?? 'Unassigned';
                 }),

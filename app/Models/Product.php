@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-     protected $fillable = ['name', 'sku', 'price', 'quantity_available'];
+     protected $fillable = ['name','image', 'sku', 'price', 'quantity_available'];
 
     public function billOfMaterials()
     {

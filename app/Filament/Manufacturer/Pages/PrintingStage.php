@@ -34,8 +34,16 @@ use InteractsWithTable;
         return [
             Tables\Columns\TextColumn::make('productionOrder.product.name')->label('Product'),
             Tables\Columns\TextColumn::make('productionOrder.quantity')->label('Quantity'),
-            Tables\Columns\TextColumn::make('status')->badge(),
-            Tables\Columns\TextColumn::make('workforce.name')->label('Assigned To')->placeholder('Unassigned'),
+            Tables\Columns\TextColumn::make('status')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'pending' => 'gray',
+                    'in_progress' => 'warning',
+                    'completed' => 'success',
+                    default => 'secondary',
+                }),
+            Tables\Columns\TextColumn::make('workforce.name')->label('Assigned To')->placeholder('Unassigned')
+            ->icon('heroicon-m-wrench'),
         ];
     }
 
