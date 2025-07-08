@@ -156,11 +156,38 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->numeric()
                 ->sortable(),
             Tables\Columns\TextColumn::make('price_per_unit')
-                ->numeric(2) 
+                ->numeric()                <?php
+                // ...existing code...
+                TextInput::make('price_per_unit')
+                    ->numeric(2) // Set to 2 decimal places
+                    ->required()
+                    ->prefix('$')
+                    ->reactive()
+                    ->readonly()
+                    ->disabled(fn ($get) => ! $get('raw_material_id'))
+                    ->dehydrated(true)
+                    ->live()
+                    ->extraAttributes(['readonly' => true])
+                    ->visible(fn ($get) => $get('raw_material_id'))
+                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                        $quantity = $get('quantity') ?? 0;
+                        $set('total_price', $quantity * $state);
+                    }),
+                // ...existing code...
+                TextInput::make('total_price')
+                    ->disabled()
+                    ->numeric(2) // Set to 2 decimal places
+                    ->dehydrated()
+                    ->prefix('UGX')
+                    ->extraAttributes(['readonly' => true])
+                    ->visible(fn ($get) => $get('quantity') && $get('price_per_unit'))
+                    ->default(0)
+                    ->reactive(),
+                // ...existing code...
                 ->money('UGX')
                 ->sortable(),
             Tables\Columns\TextColumn::make('total_price')
-                ->numeric(2)
+                ->numeric()
                 ->money('UGX')
                 ->sortable(),
             Tables\Columns\TextColumn::make('order_date')

@@ -156,7 +156,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->numeric()
                 ->sortable(),
             Tables\Columns\TextColumn::make('price_per_unit')
-                ->numeric(2) 
+                ->numeric(2) // Set to 2 decimal place
                 ->money('UGX')
                 ->sortable(),
             Tables\Columns\TextColumn::make('total_price')

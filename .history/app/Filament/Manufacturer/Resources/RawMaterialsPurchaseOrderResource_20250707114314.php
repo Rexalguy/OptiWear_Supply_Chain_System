@@ -156,12 +156,12 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->numeric()
                 ->sortable(),
             Tables\Columns\TextColumn::make('price_per_unit')
-                ->numeric(2) 
+                ->numeric()
                 ->money('UGX')
                 ->sortable(),
             Tables\Columns\TextColumn::make('total_price')
-                ->numeric(2)
-                ->money('UGX')
+                ->numeric()
+                ->money()
                 ->sortable(),
             Tables\Columns\TextColumn::make('order_date')
                 ->date()

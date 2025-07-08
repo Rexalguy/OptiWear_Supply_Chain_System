@@ -114,7 +114,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->disabled()
                     ->numeric()
                     ->dehydrated()
-                    ->prefix('UGX')
+                    ->prefix('')
                     ->extraAttributes(['readonly' => true])
                     ->visible(fn ($get) => $get('quantity') && $get('price_per_unit'))
                     ->default(0)
@@ -156,12 +156,12 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->numeric()
                 ->sortable(),
             Tables\Columns\TextColumn::make('price_per_unit')
-                ->numeric(2) 
-                ->money('UGX')
+                ->numeric()
+                ->money()
                 ->sortable(),
             Tables\Columns\TextColumn::make('total_price')
-                ->numeric(2)
-                ->money('UGX')
+                ->numeric()
+                ->money()
                 ->sortable(),
             Tables\Columns\TextColumn::make('order_date')
                 ->date()
