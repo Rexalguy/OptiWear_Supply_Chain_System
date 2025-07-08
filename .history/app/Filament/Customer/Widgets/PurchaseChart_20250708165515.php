@@ -9,7 +9,7 @@ class PurchaseChart extends ChartWidget
     protected static ?string $heading = 'Purchase Orders chart';
 
     protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
+    protected static int | string | arr$columnSpan = 'full';
 
     protected function getData(): array
     {

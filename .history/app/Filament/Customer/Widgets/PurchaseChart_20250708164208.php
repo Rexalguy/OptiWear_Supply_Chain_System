@@ -8,15 +8,12 @@ class PurchaseChart extends ChartWidget
 {
     protected static ?string $heading = 'Purchase Orders chart';
 
-    protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
-
     protected function getData(): array
     {
         return [
             'datasets' => [
                 [
-                    'label' => 'Purchase orders',
+                    'label' => 'Purchad',
                     'data' => [0, 10, 5, 2, 21, 32, 45, 74, 65, 45, 77, 89],
                 ],
             ],
