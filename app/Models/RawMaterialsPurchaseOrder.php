@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RawMaterialsPurchaseOrder extends Model
 {
      protected $fillable = [
-        'raw_material_id', 'supplier_id', 'quantity', 'unit_price',
+        'raw_materials_id', 'supplier_id', 'quantity', 'unit_price',
         'order_date', 'expected_delivery', 'status', 'notes',
         'delivery_option', 'total_price', 'created_by'
     ];
