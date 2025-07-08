@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function createdPurchaseOrders()
     {
-        return $this->hasMany(RawMaterialPurchaseOrder::class, 'created_by');
+        return $this->hasMany(RawMaterialsPurchaseOrder::class, 'created_by');
     }
 
     public function createdProductionOrders()
@@ -100,5 +100,30 @@ class User extends Authenticatable
     public function receivedMessages()
     {
         return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
+
+        public function manufacturingInfo()
+    {
+        return $this->hasOne(ManufacturingInfo::class);
+    }
+
+            public function vendorInfo()
+    {
+        return $this->hasOne(VendorInfo::class);
+    }
+
+            public function supplierInfo()
+    {
+        return $this->hasOne(SupplierInfo::class);
+    }
+
+        public function adminInfo()
+    {
+        return $this->hasOne(AdminInfo::class);
+    }
+
+        public function customerInfo()
+    {
+        return $this->hasOne(CustomerInfo::class);
     }
 }

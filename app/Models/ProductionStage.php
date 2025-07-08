@@ -8,7 +8,7 @@ class ProductionStage extends Model
 {
     
     protected $fillable = [
-        'production_order_id', 'stage', 'workforce_id',
+        'production_order_id', 'stage', 'workforces_id',
         'status', 'started_at', 'completed_at'
     ];
 

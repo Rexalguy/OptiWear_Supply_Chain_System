@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['pending','delivered', 'cancelled']);
-            $table->foreignId('created_by')->constrained('users');
-            $table->enum('delivery_option', ['pickup', 'door_delivery']);
-            $table->decimal('total', 12, 2);
+            $table->enum('status',['pending','confirmed','delivered','cancelled',])->default('pending');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->enum('delivery_option',['delivery','pickup'])->default('pickup');
+            $table->decimal('total', 10, 2);
+            $table->timestamp('expected_delivery_date')->nullable();
             $table->timestamps();
         });
     }

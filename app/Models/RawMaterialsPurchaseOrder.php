@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RawMaterialPurchaseOrder extends Model
+class RawMaterialsPurchaseOrder extends Model
 {
      protected $fillable = [
         'raw_material_id', 'supplier_id', 'quantity', 'unit_price',

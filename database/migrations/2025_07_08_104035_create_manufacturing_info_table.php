@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bill_of_materials', function (Blueprint $table) {
+        Schema::create('manufacturing_info', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
-            $table->foreignId('raw_material_id')->constrained('raw_materials');
-            $table->integer('quantity_required');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('factory_name');
+            $table->string('location');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bill_of_materials');
+        Schema::dropIfExists('manufacturing_info');
     }
 };

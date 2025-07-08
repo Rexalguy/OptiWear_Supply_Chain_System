@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('vendor_validations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('business_name');
             $table->boolean('is_valid')->default(false);
             $table->text('reasons')->nullable();
-            $table->dateTime('visit_date')->nullable();
+            $table->timestamp('visit_date')->nullable();
             $table->text('supporting_documents')->nullable();
-            $table->dateTime('notified_at')->nullable();
+            $table->timestamp('notified_at')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_validations');
+        Schema::dropIfExists('vendor_validation');
     }
 };

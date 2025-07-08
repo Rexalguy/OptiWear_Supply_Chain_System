@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('production_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->integer('quantity');
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled']);
-            $table->dateTime('started_at')->nullable();
-            $table->dateTime('completed_at')->nullable();
-            $table->foreignId('created_by')->constrained('users');
+            $table->enum('status',['pending','in_progress','completed','cancelled'])->default('pending');
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
+            $table->foreignId('created_by')->nullable();
             $table->timestamps();
         });
     }

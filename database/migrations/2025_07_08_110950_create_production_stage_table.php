@@ -13,15 +13,14 @@ return new class extends Migration
     {
         Schema::create('production_stages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('production_order_id')->constrained()->onDelete('cascade');
-            $table->string('stage'); // printing, packaging, delivery
-            $table->foreignId('workforce_id')->nullable()->constrained()->onDelete('set null');
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->foreignId('production_order_id')->constrained('production_orders')->onDelete('cascade');
+            $table->string('stage');
+            $table->foreignId('workforces_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('status',['pending','in_progress','completed',])->default('pending');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('production_stages');
+        Schema::dropIfExists('production_stage');
     }
 };

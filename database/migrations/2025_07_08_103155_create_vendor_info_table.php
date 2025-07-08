@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('workforces', function (Blueprint $table) {
+        Schema::create('vendor_info', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('job'); // printing, packaging, delivery
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('business_name');
+            $table->string('location');
             $table->timestamps();
-});
-
+        });
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('workforces');
+        Schema::dropIfExists('vendor_info');
     }
 };
