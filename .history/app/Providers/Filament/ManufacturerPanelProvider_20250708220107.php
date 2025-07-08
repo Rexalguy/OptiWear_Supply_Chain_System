@@ -28,6 +28,7 @@ class ManufacturerPanelProvider extends PanelProvider
         return $panel
             ->id('manufacturer')
             ->path('manufacturer')
+            ->auth(fn () => $user->role === 'manufacturer') // Ensure only manufacturer users can access this panel
             ->colors([
                 'primary' => Color::Indigo,   // Bold, industrial
                 'info' => Color::Blue,
@@ -35,8 +36,7 @@ class ManufacturerPanelProvider extends PanelProvider
                 'warning' => Color::Yellow,
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
-                ])
-            
+            ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([

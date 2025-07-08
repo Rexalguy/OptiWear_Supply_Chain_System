@@ -83,25 +83,22 @@ class CustomerPanelProvider extends PanelProvider
                 MenuItem::make()
                     ->label('Admin Panel')
                     ->icon('heroicon-o-cog')
-                    ->visible(fn () => auth()->user()->role === 'admin') // Only show if user is admin 
+                    
                     ->url('/admin'),
 
                 MenuItem::make()
                     ->label('Supplier Panel')      // Fixed typo here
                     ->icon('heroicon-o-truck')
-                    ->visible(fn () => auth()->user()->role === 'supplier') // Only show if user is supplier
                     ->url('/supplier'),
 
                 MenuItem::make()
                     ->label('Manufacturer Panel')
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->visible(fn () => auth()->user()->role === 'manufacturer') // Only show if user is manufacturer
                     ->url('/manufacturer'),
 
                 MenuItem::make()
                     ->label('Vendor Panel')
                     ->icon('heroicon-o-building-storefront')
-                    ->visible(fn () => auth()->user()->role === 'vendor') // Only show if user is vendor
                     ->url('/vendor'),
             ]);
     }

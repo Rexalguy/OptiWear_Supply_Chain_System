@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use auth;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -20,34 +19,36 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource;
 
-class ManufacturerPanelProvider extends PanelProvider
+class SupplierPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('manufacturer')
-            ->path('manufacturer')
+            ->id('supplier')
+            ->path('supplier')
             ->colors([
-                'primary' => Color::Indigo,   // Bold, industrial
-                'info' => Color::Blue,
+                'primary' => Color::Teal,     // Clean and supply-related
+                'info' => Color::Cyan,
                 'success' => Color::Green,
-                'warning' => Color::Yellow,
+                'warning' => Color::Amber,
                 'danger' => Color::Rose,
-                'gray' => Color::Gray,
-                ])
-            
-            ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
-            ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
+                'gray' => Color::Slate,
+            ])
+            ->discoverResources(in: app_path('Filament/Supplier/Resources'), for: 'App\\Filament\\Supplier\\Resources')
+            ->discoverPages(in: app_path('Filament/Supplier/Pages'), for: 'App\\Filament\\Supplier\\Pages')
             ->pages([
-                
                 Pages\Dashboard::class,
                 ChatPage::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')
+            ->resources([
+                RawMaterialsPurchaseOrderResource::class,
+            ])
+            ->discoverWidgets(in: app_path('Filament/Supplier/Widgets'), for: 'App\\Filament\\Supplier\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -69,5 +70,11 @@ class ManufacturerPanelProvider extends PanelProvider
                  ->icon('heroicon-o-user-group')
                  ->url('/customer'),
             ]);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Logic to determine if the user can access the Supplier panel
+        return auth()->check() && auth()->user()->role === 'supplier';
     }
 }

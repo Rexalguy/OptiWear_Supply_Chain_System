@@ -36,7 +36,7 @@ class ManufacturerPanelProvider extends PanelProvider
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
                 ])
-            
+->auth(fn () => auth::check() && auth::user()->role  === 'manufacturer') // Ensure only manufacturer users can access this panel
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([

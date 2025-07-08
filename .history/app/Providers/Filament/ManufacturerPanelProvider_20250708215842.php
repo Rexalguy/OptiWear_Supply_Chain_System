@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use auth;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -28,6 +27,7 @@ class ManufacturerPanelProvider extends PanelProvider
         return $panel
             ->id('manufacturer')
             ->path('manufacturer')
+            ->auth(auth::user())
             ->colors([
                 'primary' => Color::Indigo,   // Bold, industrial
                 'info' => Color::Blue,
@@ -35,8 +35,7 @@ class ManufacturerPanelProvider extends PanelProvider
                 'warning' => Color::Yellow,
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
-                ])
-            
+            ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
