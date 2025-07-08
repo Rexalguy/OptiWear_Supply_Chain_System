@@ -28,7 +28,7 @@
                                         SKU: {{ $product->sku }}
                                     </div>
                                     <div class="text-sm ">
-                                        UGX {{ number_format($product->price) }} × {{ $qty }}
+                                        $ {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
 
                                     <div class="mt-2 flex items-center space-x-2">
@@ -59,7 +59,7 @@
                                 </div>
 
                                 <div class="text-right font-semibold">
-                                    UGX {{ number_format($subtotal) }}
+                                    ${{ number_format($subtotal) }}
                                 </div>
                             </li>
                         @endif
@@ -68,7 +68,7 @@
 
                 <div class="border-t pt-4 mt-4 flex justify-between font-bold text-lg">
                     <span>Total:</span>
-                    <span>UGX {{ number_format($total) }}</span>
+                    <span>$ {{ number_format($total) }}</span>
                 </div>
 
                 <div class="text-right mt-4">

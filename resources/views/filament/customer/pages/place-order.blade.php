@@ -14,7 +14,7 @@
                     <p class="text-sm ">
                         SKU: {{ $product->sku }}
                     </p>
-                    <p class="text-sm ">UGX {{ number_format($product->price) }}</p>
+                    <p class="text-sm ">$ {{ number_format($product->price) }}</p>
                     <p class="text-sm mt-1 {{ $product->quantity_available > 10 ? 'text-green-600' : 'text-yellow-600' }}">
                         {{ $product->quantity_available }} in stock
                     </p>
