@@ -63,7 +63,7 @@ class MyOrders extends Page implements HasTable
                     'product_id' => $product->id,
                     'SKU' => $product->sku,
                     'quantity' => $quantity,
-                    'unit_price' => $product->price,
+                    
                 ]);
             }
 
@@ -152,7 +152,7 @@ class MyOrders extends Page implements HasTable
     ->badge()
     ->color(fn ($state) => match($state) {
         'pickup' => 'gray',
-        'door_delivery' => 'info',
+        'delivery' => 'info',
         default => 'secondary',
     }),
     
