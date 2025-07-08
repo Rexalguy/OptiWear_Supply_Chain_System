@@ -10,22 +10,29 @@ use Filament\Tables\Table;
 use App\Models\BillOfMaterial;
 use App\Models\ProductionOrder;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\Pages;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\RelationManagers;
+use Filament\Tables\Actions\ActionGroup;
 
 class ProductionOrderResource extends Resource
 {
     protected static ?string $model = ProductionOrder::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Product';
+
+
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 
     public static function form(Form $form): Form
     {
@@ -49,101 +56,172 @@ class ProductionOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-            Tables\Columns\TextColumn::make('product.name')->label('Product'),
-            Tables\Columns\TextColumn::make('quantity'),
-            Tables\Columns\TextColumn::make('status')->badge(),
-            Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                    ->columns([
+            
+            Tables\Columns\TextColumn::make('product.name')
+                ->label('Product')
+                ->searchable()
+                ->sortable()
+                ->grow(false),
 
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-            Tables\Actions\Action::make('build')
-            ->label('Build')
-            ->icon('heroicon-o-cog-6-tooth')
-            ->color('success')
-            ->requiresConfirmation()
-            ->action(function (ProductionOrder $record) {
-                $materials = BillOfMaterial::where('product_id', $record->product_id)->get();
+            Tables\Columns\TextColumn::make('quantity')
+                ->label('Quantity')
+                ->numeric(),
+                
 
-                foreach ($materials as $material) {
-                    $raw = $material->rawMaterial;
-                    $required = $material->quantity_required * $record->quantity;
+            Tables\Columns\TextColumn::make('status')
+                ->label('Status')
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                    'pending' => 'gray',
+                    'in_progress' => 'warning',
+                    'completed' => 'success',
+                    default => 'gray',
+                }),
 
-                    if ($raw->quantity_in_stock < $required) {
-                        Notification::make()
-                            ->title("Insufficient stock for {$raw->name}")
-                            ->danger()
-                            ->send();
-                        return;
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Created')
+                ->since() // or ->dateTime('d M Y')
+                ->sortable()
+                ->dateTimeTooltip(),
+
+
+                        ])
+                        ->filters([
+                            Tables\Filters\SelectFilter::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'in_progress' => 'In Progress',
+                                'completed' => 'Completed',
+                                ])->native(false),
+
+                            Tables\Filters\SelectFilter::make('product_id')
+                                    ->label('Product')
+                                    ->multiple()
+                                    ->options(Product::pluck('name', 'id')->toArray())
+                                    ->searchable(),
+                        ])
+                            
+
+                        ->actions([
+                            
+                        Tables\Actions\Action::make('stitch')
+                ->label('Stitch')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->color('success')
+                ->requiresConfirmation()
+                ->action(function (ProductionOrder $record) {
+                    $materials = BillOfMaterial::where('product_id', $record->product_id)->get();
+
+                    // ✅ 1. Check for stock availability
+                    foreach ($materials as $material) {
+                        $raw = $material->rawMaterial;
+                        $required = $material->quantity_required * $record->quantity;
+
+                        if ($raw->current_stock < $required) {
+                            Notification::make()
+                                ->title("Insufficient stock for {$raw->name}")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
                     }
-                }
 
-                foreach ($materials as $material) {
-                    $raw = $material->rawMaterial;
-                    $required = $material->quantity_required * $record->quantity;
-                    $raw->decrement('quantity_in_stock', $required);
-                }
+                    // ✅ 2. Deduct stock
+                    foreach ($materials as $material) {
+                        $raw = $material->rawMaterial;
+                        $required = $material->quantity_required * $record->quantity;
 
-                $record->product->increment('quantity_in_stock', $record->quantity);
-                $record->update(['status' => 'completed']);
+                        $raw->decrement('current_stock', $required);
+                    }
 
-                Notification::make()
-                    ->title('Production complete!')
-                    ->success()
-                    ->send();
-            })
-            ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
+                    // ✅ 3. Create printing stage
+                    $record->productionStages()->create([
+                        'stage' => 'printing',
+                        'status' => 'pending',
+                    ]);
 
+                    // ✅ 4. Update status to 'in_progress'
+                    $record->update(['status' => 'in_progress']);
 
-            // 🆕 BOM Action
-           Tables\Actions\Action::make('bom')
-    ->label('BOM')
-    ->icon('heroicon-o-information-circle')
-    ->modalHeading('Required Raw Materials')
-    ->infolist(function (ProductionOrder $record): array {
-        $materials = BillOfMaterial::with('rawMaterial')
-            ->where('product_id', $record->product_id)
-            ->get();
+                    Notification::make()
+                        ->title('Stitching complete and ready for printing.')
+                        ->success()
+                        ->send();
+                })
+    ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
+            
 
-        if ($materials->isEmpty()) {
-            return [
-                Section::make('BOM Details')->schema([
-                    TextEntry::make('empty')
-                        ->default('No Bill of Materials defined for this product.')
-                        ->columnSpanFull()
-                        ->color('danger'),
-                ]),
-            ];
-        }
+                    ActionGroup::make([
+                                      // 🆕 BOM Action
+            Tables\Actions\Action::make('bom')
+                ->label('View BOM')
+                ->icon('heroicon-o-information-circle')
+                ->modalHeading('Required Raw Materials')
+                ->infolist(function (ProductionOrder $record): array {
+                    $materials = BillOfMaterial::with('rawMaterial')
+                        ->where('product_id', $record->product_id)
+                        ->get();
 
-        return [
-            Section::make('Required Materials')
-                ->description("Based on quantity: {$record->quantity}")
-                ->schema(
-                    $materials->map(function ($material) use ($record) {
-                        return Grid::make(3)->schema([
-                            TextEntry::make('material')
-                                ->label('Material')
-                                ->default($material->rawMaterial->name),
+                    if ($materials->isEmpty()) {
+                        return [
+                            Section::make('No BOM Found')->schema([
+                                TextEntry::make('note')->default('No Bill of Materials defined for this product.')->color('danger'),
+                            ]),
+                        ];
+                    }
 
-                            TextEntry::make('required_quantity')
-                                ->label('Quantity')
-                                ->default($material->quantity_required * $record->quantity),
-
-                            TextEntry::make('unit')
-                                ->label('Unit')
-                                ->default($material->rawMaterial->unit),
-                        ]);
-                    })->toArray()
-                ),
-        ];
-    })
+                    return [
+                        Section::make('Required Materials')
+                            ->description("Based on quantity: {$record->quantity}")
+                            ->schema(
+                                $materials->map(function ($material) use ($record) {
+                                    return Grid::make(3)->schema([
+                                        TextEntry::make('material')->label('Material')->default($material->rawMaterial->name),
+                                        TextEntry::make('quantity')->label('Quantity')->default($material->quantity_required * $record->quantity),
+                                        TextEntry::make('unit')->label('Unit')->default($material->rawMaterial->unit_of_measure),
+                                    ]);
+                                })->toArray()
+                            ),
+                    ];
+                })
     ->modalSubmitAction(false)
-    ->modalCancelActionLabel('Close')
-    ,
+    ->modalCancelActionLabel('Close'),
+    
+
+
+//Log action
+
+        Tables\Actions\Action::make('viewLog')
+            ->label('Stage Log')
+            ->icon('heroicon-o-clock')
+            ->modalHeading('Production Stage Log')
+            ->infolist(function (ProductionOrder $record): array {
+                return $record->productionStages->map(function ($stage) {
+                    return Section::make(ucfirst($stage->stage))
+                        ->schema([
+                            Grid::make(2)->schema([
+                                TextEntry::make('Worker')->default(optional($stage->workforce)->name ?? 'Unassigned'),
+                                TextEntry::make('Status')->default($stage->status)->badge()->color(match ($stage->status) {
+                                    'pending' => 'gray',
+                                    'in_progress' => 'warning',
+                                    'completed' => 'success',
+                                    default => 'gray',
+                                }),
+                            ]),
+                           
+                        ]);
+                })->toArray();
+            })
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close')
+            ->visible(fn (ProductionOrder $record) => $record->status !== 'pending')
+                            ])
+                                ->icon('heroicon-m-ellipsis-horizontal')
+                                ->color('info')
+                                ->tooltip('Logistics')
+      
             
             ])
             ->bulkActions([

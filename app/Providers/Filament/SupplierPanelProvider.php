@@ -39,7 +39,7 @@ class SupplierPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Supplier/Resources'), for: 'App\\Filament\\Supplier\\Resources')
             ->discoverPages(in: app_path('Filament/Supplier/Pages'), for: 'App\\Filament\\Supplier\\Pages')
             ->pages([
-                // Pages\Dashboard::class,
+                Pages\Dashboard::class,
                 ChatPage::class,
             ])
             ->resources([

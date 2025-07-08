@@ -25,26 +25,42 @@ class CustomerPanelProvider extends PanelProvider
     {
         return $panel
             ->id('customer')
-            ->path('customer')
-            ->default()
+            ->path('customer')           // URL prefix for this panel
+            ->default()                  // Make this the default panel
             ->login()
             ->profile()
             ->registration()
             // ->topNavigation()
             ->colors([
-            'primary' => Color::Sky,      // Friendly and intuitive
-            'info' => Color::Blue,
-            'success' => Color::Emerald,
-            'warning' => Color::Yellow,
-            'danger' => Color::Rose,
-            'gray' => Color::Gray,
-        ])
-            ->discoverResources(in: app_path('Filament/Customer/Resources'), for: 'App\\Filament\\Customer\\Resources')
-            ->discoverPages(in: app_path('Filament/Customer/Pages'), for: 'App\\Filament\\Customer\\Pages')
+                'primary' => Color::Sky,
+                'info' => Color::Blue,
+                'success' => Color::Emerald,
+                'warning' => Color::Yellow,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
+            ])
+       
+            ->discoverResources(
+                in: app_path('Filament/Customer/Resources'),
+                for: 'App\\Filament\\Customer\\Resources'
+            )
+           
+            ->discoverPages(
+                in: app_path('Filament/Customer/Pages'),
+                for: 'App\\Filament\\Customer\\Pages'
+            )
+          
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Customer\Pages\PlaceOrder::class,
+                
             ])
-            ->discoverWidgets(in: app_path('Filament/Customer/Widgets'), for: 'App\\Filament\\Customer\\Widgets')
+            // Discover widgets automatically
+            ->discoverWidgets(
+                in: app_path('Filament/Customer/Widgets'),
+                for: 'App\\Filament\\Customer\\Widgets'
+            )
+            // Register key widgets explicitly
             ->widgets([
                 Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
@@ -65,24 +81,24 @@ class CustomerPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 MenuItem::make()
-                 ->label('Admin Panel')
-                 ->icon('heroicon-o-cog')
-                 ->url('/admin'),
+                    ->label('Admin Panel')
+                    ->icon('heroicon-o-cog')
+                    ->url('/admin'),
 
-                 MenuItem::make()
-                 ->label('Suplier Panel')
-                 ->icon('heroicon-o-truck')
-                 ->url('/supplier'),
+                MenuItem::make()
+                    ->label('Supplier Panel')      // Fixed typo here
+                    ->icon('heroicon-o-truck')
+                    ->url('/supplier'),
 
-                 MenuItem::make()
-                 ->label('Manufacturer Panel')
-                 ->icon('heroicon-o-cog-6-tooth')
-                 ->url('/manufacturer'),
+                MenuItem::make()
+                    ->label('Manufacturer Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/manufacturer'),
 
-                  MenuItem::make()
-                 ->label('Vendor Panel')
-                 ->icon('heroicon-o-building-storefront')
-                 ->url('/vendor'),
+                MenuItem::make()
+                    ->label('Vendor Panel')
+                    ->icon('heroicon-o-building-storefront')
+                    ->url('/vendor'),
             ]);
     }
 }

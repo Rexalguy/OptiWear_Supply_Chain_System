@@ -38,7 +38,7 @@ class VendorPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
             ->pages([
-                // Pages\Dashboard::class,
+                Pages\Dashboard::class,
                 ChatPage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
