@@ -16,6 +16,8 @@ class Orders extends Page implements HasTable
     use InteractsWithTable;
 
     protected static string $view = 'filament.manufacturer.pages.orders';
+    
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
 
     public function table(Tables\Table $table): Tables\Table
     {
