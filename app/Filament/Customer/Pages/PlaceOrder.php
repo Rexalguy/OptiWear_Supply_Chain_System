@@ -87,10 +87,14 @@ class PlaceOrder extends Page
                 $total += $product->price * $quantity;
             }
 
+            // Set expected delivery date to 3 days from now (example)
+            $expectedDate = now()->addDays(3);
+
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
                 'delivery_option' => 'pickup',
+                'expected_delivery_date' => $expectedDate,
                 'total' => $total,
             ]);
 

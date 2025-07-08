@@ -48,10 +48,16 @@ class MyOrders extends Page implements HasTable
                 $total += $product->price * $quantity;
             }
 
+            // Calculate estimated delivery date
+            $expectedDate = now()->addHours(
+                $this->deliveryOption === 'delivery' ? 48 : 12
+            );
+
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
                 'delivery_option' => $this->deliveryOption,
+                'expected_delivery_date' => $expectedDate,
                 'total' => $total,
             ]);
 
@@ -63,18 +69,22 @@ class MyOrders extends Page implements HasTable
                     'product_id' => $product->id,
                     'SKU' => $product->sku,
                     'quantity' => $quantity,
-                    'unit_price' => $product->price,
                 ]);
             }
 
             DB::commit();
-
             $this->cart = [];
             session()->forget('cart');
 
-            Notification::make()->title('Order placed successfully!')->success()->send();
+            Notification::make()
+                ->title('Order placed successfully!')
+                ->body('🕒 Expected delivery: ' . $expectedDate->format('d M Y, h:i A'))
+                ->success()
+                ->send();
+
         } catch (\Exception $e) {
             DB::rollBack();
+
             Notification::make()
                 ->title('Failed to place order')
                 ->body($e->getMessage())
@@ -88,28 +98,19 @@ class MyOrders extends Page implements HasTable
         $product = Product::find($productId);
 
         if (!$product) {
-            Notification::make()
-                ->title('Product not found')
-                ->danger()
-                ->send();
+            Notification::make()->title('Product not found')->danger()->send();
             return;
         }
 
         $currentQty = $this->cart[$productId] ?? 0;
 
         if ($currentQty >= 50) {
-            Notification::make()
-                ->title('Limit: Max 50 units per product')
-                ->warning()
-                ->send();
+            Notification::make()->title('Limit: Max 50 units per product')->warning()->send();
             return;
         }
 
         if ($currentQty >= $product->quantity_available) {
-            Notification::make()
-                ->title("Only {$product->quantity_available} units available for {$product->name}")
-                ->danger()
-                ->send();
+            Notification::make()->title("Only {$product->quantity_available} units available for {$product->name}")->danger()->send();
             return;
         }
 
@@ -125,7 +126,6 @@ class MyOrders extends Page implements HasTable
             } else {
                 unset($this->cart[$productId]);
             }
-
             session()->put('cart', $this->cart);
         }
     }
@@ -148,18 +148,24 @@ class MyOrders extends Page implements HasTable
                     ]),
 
                 TextColumn::make('delivery_option')
-    ->label('Delivery')
-    ->badge()
-    ->color(fn ($state) => match($state) {
-        'pickup' => 'gray',
-        'door_delivery' => 'info',
-        default => 'secondary',
-    }),
-    
+                    ->label('Delivery')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'pickup' => 'gray',
+                        'door_delivery' => 'info',
+                        default => 'secondary',
+                    }),
+
+                TextColumn::make('expected_delivery_date')
+                    ->label('Expected Delivery')
+                    ->dateTime('d M Y, h:i A')
+                    ->sortable(),
 
                 TextColumn::make('total')->money('UGX', true),
 
-                TextColumn::make('created_at')->label('Placed On')->dateTime('d M Y H:i'),
+                TextColumn::make('created_at')
+                    ->label('Placed On')
+                    ->dateTime('d M Y H:i'),
 
                 TextColumn::make('orderItems')
                     ->label('Items')
@@ -179,10 +185,7 @@ class MyOrders extends Page implements HasTable
                     ->requiresConfirmation()
                     ->action(function (Order $record) {
                         $record->update(['status' => 'cancelled']);
-                        Notification::make()
-                            ->title('Order cancelled')
-                            ->danger()
-                            ->send();
+                        Notification::make()->title('Order cancelled')->danger()->send();
                     }),
             ])
             ->defaultSort('id', 'desc');
