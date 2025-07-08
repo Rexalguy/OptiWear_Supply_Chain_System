@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BillOfMaterial extends Model
 {
-    protected $fillable = ['product_id', 'raw_material_id', 'quantity_required'];
+    protected $fillable = ['product_id', 'raw_materials_id', 'quantity_required'];
 
     public function product()
     {
@@ -15,6 +15,6 @@ class BillOfMaterial extends Model
 
     public function rawMaterial()
     {
-        return $this->belongsTo(RawMaterial::class);
+        return $this->belongsTo(RawMaterial::class, 'raw_materials_id');
     }
 }

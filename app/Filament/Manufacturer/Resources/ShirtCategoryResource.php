@@ -31,8 +31,7 @@ class ShirtCategoryResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull()
-                    ->words(20)
-                    ->wrap(),
+                    
             ]);
     }
 

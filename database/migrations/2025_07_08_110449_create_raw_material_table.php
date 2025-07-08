@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->foreignId('supplier_id')->constrained('users');
-            $table->foreignId('category_id')->constrained('raw_material_categories');
-            $table->integer('current_stock');
-            $table->integer('reorder_level');
-            $table->enum('unit_of_measure', ['kg', 'g', 'liter', 'meter','piece'])->default('kg');
+            $table->foreignId('supplier_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('raw_material_category')->onDelete('cascade');
+            $table->integer('current_stock')->default(0);
+            $table->integer('reorder_level')->default(0);
+            $table->string('unit_of_measure');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('raw_materials');
+        Schema::dropIfExists('raw_material');
     }
 };
