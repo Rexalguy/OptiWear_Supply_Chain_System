@@ -47,6 +47,11 @@ class Orders extends Page implements HasTable
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
+                TextColumn::make('expected_delivery_date')
+                    ->label('Expected Delivery Date')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->default(fn (Order $record) => $record->expected_delivery_date ? $record->expected_delivery_date->format('d M Y H:i') : 'N/A'),                   
 
                 TextColumn::make('total')
                     ->money('UGX', true)

@@ -157,7 +157,7 @@ class MyOrders extends Page implements HasTable
                     }),
 
                 TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery')
+                    ->label('Expected Delivery Date')
                     ->dateTime('d M Y, h:i A')
                     ->sortable(),
 
