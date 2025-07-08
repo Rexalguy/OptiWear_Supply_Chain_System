@@ -70,6 +70,13 @@
                     <span>Total:</span>
                     <span>$ {{ number_format($total) }}</span>
                 </div>
+                <div class="mt-6">
+    <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Delivery Option</label>
+    <select id="deliveryOption" wire:model="deliveryOption" class="filament-forms-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+        <option value="pickup">Pickup</option>
+        <option value="door_delivery">Door Delivery</option>
+    </select>
+</div>
 
                 <div class="text-right mt-4">
                     <x-filament::button

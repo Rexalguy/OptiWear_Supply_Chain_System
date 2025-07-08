@@ -24,6 +24,7 @@ class MyOrders extends Page implements HasTable
     protected static string $view = 'filament.customer.pages.my-orders';
 
     public array $cart = [];
+    public string $deliveryOption = 'pickup';
 
     public function mount(): void
     {
@@ -50,7 +51,7 @@ class MyOrders extends Page implements HasTable
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
-                'delivery_option' => 'pickup',
+                'delivery_option' => $this->deliveryOption,
                 'total' => $total,
             ]);
 
@@ -146,7 +147,15 @@ class MyOrders extends Page implements HasTable
                         'danger' => 'cancelled',
                     ]),
 
-                TextColumn::make('delivery_option')->label('Delivery'),
+                TextColumn::make('delivery_option')
+    ->label('Delivery')
+    ->badge()
+    ->color(fn ($state) => match($state) {
+        'pickup' => 'gray',
+        'door_delivery' => 'info',
+        default => 'secondary',
+    }),
+    
 
                 TextColumn::make('total')->money('UGX', true),
 
