@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('workforces', function (Blueprint $table) {
+        Schema::create('raw_material_category', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('job'); // printing, packaging, delivery
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
             $table->timestamps();
-});
-
+        });
     }
 
     /**
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('workforces');
+        Schema::dropIfExists('raw_material_category');
     }
 };

@@ -143,7 +143,8 @@ class ProductionOrderResource extends Resource
                     ]);
 
                     // ✅ 4. Update status to 'in_progress'
-                    $record->update(['status' => 'in_progress']);
+                    $record->update(['status' => 'in_progress',
+                                                  'created_by' => Auth::user()->id  ]);
 
                     Notification::make()
                         ->title('Stitching complete and ready for printing.')

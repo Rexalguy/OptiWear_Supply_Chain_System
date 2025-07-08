@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('bill_of_materials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
-            $table->foreignId('raw_material_id')->constrained('raw_materials');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('raw_materials_id')->constrained('raw_materials')->onDelete('cascade');
             $table->integer('quantity_required');
             $table->timestamps();
         });
