@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use App\Livewire\Chat;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -20,28 +21,29 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
-class VendorPanelProvider extends PanelProvider
+class ManufacturerPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('vendor')
-            ->path('vendor')
+            ->id('manufacturer')
+            ->path('manufacturer')
             ->colors([
-                'primary' => Color::Amber,    // Business-focused, marketplace feel
-                'info' => Color::Sky,
-                'success' => Color::Lime,
-                'warning' => Color::Orange,
-                'danger' => Color::Red,
-                'gray' => Color::Stone,
+                'primary' => Color::Indigo,   // Bold, industrial
+                'info' => Color::Blue,
+                'success' => Color::Green,
+                'warning' => Color::Yellow,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
             ])
-            ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
-            ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
+            ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
+            ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
+                
                 Pages\Dashboard::class,
                 ChatPage::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,

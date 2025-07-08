@@ -20,28 +20,29 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
-class VendorPanelProvider extends PanelProvider
+class SupplierPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('vendor')
-            ->path('vendor')
+            ->id('supplier')
+            ->path('supplier')
             ->colors([
-                'primary' => Color::Amber,    // Business-focused, marketplace feel
-                'info' => Color::Sky,
-                'success' => Color::Lime,
-                'warning' => Color::Orange,
-                'danger' => Color::Red,
-                'gray' => Color::Stone,
+                'primary' => Color::Teal,     // Clean and supply-related
+                'info' => Color::Cyan,
+                'success' => Color::Green,
+                'warning' => Color::Amber,
+                'danger' => Color::Rose,
+                'gray' => Color::Slate,
             ])
-            ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
-            ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
+            ->discoverResources(in: app_path('Filament/Supplier/Resources'), for: 'App\\Filament\\Supplier\\Resources')
+            ->discoverPages(in: app_path('Filament/Supplier/Pages'), for: 'App\\Filament\\Supplier\\Pages')
             ->pages([
                 Pages\Dashboard::class,
                 ChatPage::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
+            ->resources()
+            ->discoverWidgets(in: app_path('Filament/Supplier/Widgets'), for: 'App\\Filament\\Supplier\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,

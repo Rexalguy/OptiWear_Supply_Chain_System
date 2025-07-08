@@ -30,7 +30,7 @@ class CustomerPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->registration()
-            // ->topNavigation()
+            ->topNavigation()
             ->colors([
             'primary' => Color::Sky,      // Friendly and intuitive
             'info' => Color::Blue,
@@ -61,7 +61,7 @@ class CustomerPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-            Authenticate::class
+                Authenticate::class,
             ])
             ->userMenuItems([
                 MenuItem::make()

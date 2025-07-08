@@ -30,7 +30,7 @@ class CustomerPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->registration()
-            // ->topNavigation()
+            ->topNavigation()
             ->colors([
             'primary' => Color::Sky,      // Friendly and intuitive
             'info' => Color::Blue,
