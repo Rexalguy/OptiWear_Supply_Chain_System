@@ -53,7 +53,7 @@ use InteractsWithTable;
             Action::make('assign')
                 ->label('Assign Worker')
                 ->form([
-                    Select::make('workforce_id')
+                    Select::make('workforces_id')
                         ->label('Printing Workforce')
                         ->options(Workforce::where('job', 'printing')->pluck('name', 'id'))
                         ->searchable()
@@ -61,7 +61,7 @@ use InteractsWithTable;
                 ])
                 ->action(function (array $data, ProductionStage $record) {
                     $record->update([
-                        'workforces_id' => $data['workforce_id'],
+                        'workforces_id' => $data['workforces_id'],
                         'status' => 'in_progress',
                         'started_at' => now(),
                     ]);
