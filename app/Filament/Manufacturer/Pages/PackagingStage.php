@@ -69,7 +69,7 @@ class PackagingStage extends Page implements HasTable
             Tables\Actions\Action::make('assignWorkforce')
                 ->label('Assign Packaging Worker')
                 ->form([
-                    Select::make('workforce_id')
+                    Select::make('workforces_id')
                         ->label('Select Worker')
                         ->options(Workforce::where('job', 'packaging')->pluck('name', 'id'))
                         ->searchable()
@@ -87,7 +87,7 @@ class PackagingStage extends Page implements HasTable
 
                     if ($stage->status === 'pending') {
                         $stage->update([
-                            'workforce_id' => $data['workforce_id'],
+                            'workforces_id' => $data['workforces_id'],
                             'status' => 'in_progress',
                             'started_at' => now(),
                         ]);

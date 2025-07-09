@@ -19,7 +19,7 @@ class ProductionStage extends Model
 
     public function workforce()
     {
-        return $this->belongsTo(Workforce::class);
+        return $this->belongsTo(Workforce::class,'workforces_id');
     }
     
 }
