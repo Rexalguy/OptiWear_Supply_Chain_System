@@ -50,9 +50,10 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('price')
+                    ->label('Price (UGX)')
                     ->required()
-                    ->numeric()
-                    ->prefix('UGX'),
+                    ->numeric(),
+                    
                 Forms\Components\TextInput::make('quantity_available')
                     ->required()
                     ->numeric(),
@@ -82,7 +83,8 @@ class ProductResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
-                    ->sortable(),
+                    ->sortable()
+                    ->prefix('UGX'),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()
                     ->sortable(),

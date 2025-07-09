@@ -43,9 +43,9 @@ class RawMaterialResource extends Resource
                 ->maxLength(255)
                 ->default(null),
             Forms\Components\TextInput::make('price')
+                ->label('Price (UGX)')
                 ->required()
-                ->numeric()
-                ->prefix('$'),
+                ->numeric(),
             Forms\Components\Select::make('supplier_id')
                 ->label('Supplier')
                 ->native(false)
