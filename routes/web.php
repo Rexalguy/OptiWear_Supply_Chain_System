@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('getstarted');
 })->name('home');
-Route::post('manufacturer/logout', function () {
+/*Route::post('manufacturer/logout', function () {
     auth()->guard('manufacturer')->logout();
     return redirect()->route('customer.login');
-})->name('manufacturer.logout');
+})->name('manufacturer.logout');*/
 // Route::view('dashboard', 'dashboard')
 //     ->middleware(['auth', 'verified'])
 //     ->name('dashboard');
