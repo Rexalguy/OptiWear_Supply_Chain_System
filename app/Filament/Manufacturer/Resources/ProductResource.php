@@ -82,9 +82,7 @@ class ProductResource extends Resource
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
-                    ->sortable()
-                    ->prefix('UGX'),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()
                     ->sortable(),

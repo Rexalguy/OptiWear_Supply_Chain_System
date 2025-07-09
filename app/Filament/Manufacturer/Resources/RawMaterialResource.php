@@ -87,7 +87,6 @@ class RawMaterialResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Unit Price')
-                    ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->default('Unknown Supplier')
