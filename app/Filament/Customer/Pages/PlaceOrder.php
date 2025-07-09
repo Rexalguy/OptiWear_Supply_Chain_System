@@ -21,7 +21,7 @@ class PlaceOrder extends Page
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
-        $this->products = Product::where('quantity_available', '>', 0)->get();
+        $this->products = Product::where('quantity_available', '>', 0)->get();//->reverse();
     }
 
     public function addToCart($productId): void
