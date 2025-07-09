@@ -16,6 +16,8 @@ return new class extends Migration
             $table->enum('status', ['pending','delivered', 'cancelled']);
             $table->foreignId('created_by')->constrained('users');
             $table->enum('delivery_option', ['pickup', 'door_delivery']);
+            $table->date('expected_fulfillment_date')->nullable();
+            $table->string('decline_reason')->nullable();
             $table->decimal('total', 12, 2);
             $table->timestamps();
         });

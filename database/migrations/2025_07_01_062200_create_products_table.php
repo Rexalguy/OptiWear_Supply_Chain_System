@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('sku');
-            $table->decimal('price', 10, 2);
+            $table->decimal('unit_price', 10, 2);
             $table->integer('quantity_available');
+            $table->unsignedBigInteger('manufacturer_id')->default(1);
             $table->timestamps();
         });
     }
