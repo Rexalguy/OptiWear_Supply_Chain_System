@@ -39,7 +39,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
         return Auth::user()?->role === 'manufacturer' || Auth::user()?->role === 'supplier';
     }
     public static function canCreate(): bool {
-        return auth()->user()?->role === 'manufacturer';
+        return Auth::user()?->role === 'manufacturer';
     }
     public static function getEloquentQuery(): Builder
     {
