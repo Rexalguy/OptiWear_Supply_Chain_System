@@ -17,6 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use App\Models\RawMaterialsPurchaseOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -38,7 +39,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
         return Auth::user()?->role === 'manufacturer' || Auth::user()?->role === 'supplier';
     }
     public static function canCreate(): bool {
-        return auth()->user()?->role === 'manufacturer';
+        return Auth::user()?->role === 'manufacturer';
     }
     public static function getEloquentQuery(): Builder
     {
@@ -93,7 +94,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 TextInput::make('price_per_unit')
                 ->numeric()
                 ->required()
-                ->prefix('$')
+                ->prefix('UGX')
                 ->reactive()
                 ->readonly()
                 ->disabled(fn ($get) => ! $get('raw_material_id'))
@@ -163,11 +164,14 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->numeric(2)
                 ->money('UGX')
                 ->sortable(),
-            Tables\Columns\TextColumn::make('order_date')
-                ->date()
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Order Date')
+                ->dateTime()
+                ->since()
                 ->sortable(),
             Tables\Columns\TextColumn::make('expected_delivery_date')
-                ->date()
+                ->dateTime()
+                ->since()
                 ->sortable(),
             Tables\Columns\TextColumn::make('status')
                 ->label('Status')
@@ -181,10 +185,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     default => 'gray',
                 }),
             Tables\Columns\TextColumn::make('delivery_option'),
-            Tables\Columns\TextColumn::make('created_at')
-                ->dateTime()
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
+            
             Tables\Columns\TextColumn::make('updated_at')
                 ->dateTime()
                 ->sortable()

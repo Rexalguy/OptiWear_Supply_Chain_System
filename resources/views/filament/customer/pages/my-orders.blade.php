@@ -28,7 +28,7 @@
                                         SKU: {{ $product->sku }}
                                     </div>
                                     <div class="text-sm ">
-                                        $ {{ number_format($product->price) }} × {{ $qty }}
+                                        UGX {{ number_format($product->price) }} × {{ $qty }}
                                     </div>
 
                                     <div class="mt-2 flex items-center space-x-2">
@@ -59,7 +59,7 @@
                                 </div>
 
                                 <div class="text-right font-semibold">
-                                    ${{ number_format($subtotal) }}
+                                    UGX{{ number_format($subtotal) }}
                                 </div>
                             </li>
                         @endif
@@ -68,13 +68,13 @@
 
                 <div class="border-t pt-4 mt-4 flex justify-between font-bold text-lg">
                     <span>Total:</span>
-                    <span>$ {{ number_format($total) }}</span>
+                    <span>UGX {{ number_format($total) }}</span>
                 </div>
                 <div class="mt-6">
     <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Delivery Option</label>
     <select id="deliveryOption" wire:model="deliveryOption" class="filament-forms-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
         <option value="pickup">Pickup</option>
-        <option value="door_delivery">Door Delivery</option>
+        <option value="delivery">Delivery</option>
     </select>
 </div>
 

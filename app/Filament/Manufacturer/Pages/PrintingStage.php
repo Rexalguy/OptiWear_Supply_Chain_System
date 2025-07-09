@@ -61,7 +61,7 @@ use InteractsWithTable;
                 ])
                 ->action(function (array $data, ProductionStage $record) {
                     $record->update([
-                        'workforce_id' => $data['workforce_id'],
+                        'workforces_id' => $data['workforce_id'],
                         'status' => 'in_progress',
                         'started_at' => now(),
                     ]);
