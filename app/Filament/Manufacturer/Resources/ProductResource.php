@@ -52,7 +52,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix('UGX'),
                 Forms\Components\TextInput::make('quantity_available')
                     ->required()
                     ->numeric(),
