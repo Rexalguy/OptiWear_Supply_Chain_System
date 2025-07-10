@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RawMaterialsPurchaseOrder extends Model
 {
     protected $fillable = [
-        'raw_material_id',
+        'raw_materials_id',
         'supplier_id',
         'quantity',
         'price_per_unit',
@@ -21,7 +21,7 @@ class RawMaterialsPurchaseOrder extends Model
 
     public function rawMaterial()
     {
-        return $this->belongsTo(RawMaterial::class);
+        return $this->belongsTo(RawMaterial::class, 'raw_materials_id');
     }
 
     public function supplier()
