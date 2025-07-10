@@ -69,6 +69,7 @@ class MyOrders extends Page implements HasTable
                     'product_id' => $product->id,
                     'SKU' => $product->sku,
                     'quantity' => $quantity,
+                    'unit_price' => $product->price,
                 ]);
             }
 

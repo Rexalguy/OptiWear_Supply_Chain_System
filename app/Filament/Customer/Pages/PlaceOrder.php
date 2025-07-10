@@ -70,61 +70,6 @@ class PlaceOrder extends Page
         }
     }
 
-    public function placeOrder(): void
-    {
-        if (empty($this->cart)) {
-            Notification::make()->title('Cart is empty')->danger()->send();
-            return;
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $total = 0;
-
-            foreach ($this->cart as $productId => $quantity) {
-                $product = Product::findOrFail($productId);
-                $total += $product->price * $quantity;
-            }
-
-            // Set expected delivery date to 3 days from now (example)
-            $expectedDate = now()->addDays(3);
-
-            $order = Order::create([
-                'created_by' => Auth::id(),
-                'status' => 'pending',
-                'delivery_option' => 'pickup',
-                'expected_delivery_date' => $expectedDate,
-                'total' => $total,
-            ]);
-
-            foreach ($this->cart as $productId => $quantity) {
-                $product = Product::findOrFail($productId);
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'SKU' => $product->sku,
-                    'quantity' => $quantity,
-                    'unit_price' => $product->price,
-                ]);
-            }
-
-            DB::commit();
-            $this->cart = [];
-            session()->forget('cart');
-
-            Notification::make()->title('Order placed successfully!')->success()->send();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Notification::make()
-                ->title('Failed to place order')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
-        }
-    }
-
     public function getCartCountProperty(): int
     {
         return array_sum($this->cart);
