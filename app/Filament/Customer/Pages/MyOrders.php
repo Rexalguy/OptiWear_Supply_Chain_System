@@ -155,111 +155,102 @@ class MyOrders extends Page implements HasTable
         }
     }
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
-            ->columns([
-                TextColumn::make('id')->label('Order #')->sortable(),
+   public function table(Table $table): Table
+{
+    return $table
+        ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
+        ->columns([
+            TextColumn::make('id')->label('Order #')->sortable(),
 
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'confirmed',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
+            TextColumn::make('status')
+                ->badge()
+                ->sortable()
+                ->colors([
+                    'warning' => 'pending',
+                    'info' => 'confirmed',
+                    'success' => 'delivered',
+                    'danger' => 'cancelled',
+                ]),
 
-                TextColumn::make('delivery_option')
-                    ->label('Delivery')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'pickup' => 'gray',
-                        'door_delivery' => 'info',
-                        default => 'secondary',
-                    }),
+            TextColumn::make('delivery_option')
+                ->label('Delivery')
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                    'pickup' => 'gray',
+                    'door_delivery' => 'info',
+                    default => 'secondary',
+                }),
 
-                TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
-                    ->dateTime('d M Y, h:i A')
-                    ->sortable(),
+            TextColumn::make('expected_delivery_date')
+                ->label('Expected Delivery Date')
+                ->dateTime('d M Y, h:i A')
+                ->sortable(),
 
-              TextColumn::make('total')
-    ->label('Total (UGX)')
-    ->formatStateUsing(fn ($state) => number_format($state, 0)),
+            TextColumn::make('total')
+                ->label('Total (UGX)')
+                ->formatStateUsing(fn ($state) => number_format($state, 0)),
 
-                TextColumn::make('created_at')
-                    ->label('Placed On')
-                    ->dateTime('d M Y H:i'),
+            TextColumn::make('created_at')
+                ->label('Placed On')
+                ->dateTime('d M Y H:i'),
 
-                TextColumn::make('orderItems')
-                    ->label('Items')
-                    ->formatStateUsing(fn ($state, $record) =>
-                        $record->orderItems->map(fn ($item) =>
-                            $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')'
-                        )->implode(', ')
-                    )
-                    ->wrap(),
+            TextColumn::make('orderItems')
+                ->label('Items')
+                ->formatStateUsing(fn ($state, $record) =>
+                    $record->orderItems->map(fn ($item) =>
+                        $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')'
+                    )->implode(', ')
+                )
+                ->wrap(),
+        ])
+        ->actions([
+            Action::make('cancel')
+                ->label('Cancel')
+                ->color('danger')
+                ->icon('heroicon-o-x-circle')
+                ->visible(fn (Order $record) => $record->status === 'pending')
+                ->requiresConfirmation()
+                ->action(function (Order $record) {
+                    $record->update(['status' => 'cancelled']);
+                    Notification::make()->title('Order cancelled')->danger()->send();
+                }),
 
-                TextColumn::make('rating')
-                    ->label('Rating')
-                    ->formatStateUsing(fn ($state) => $state ? str_repeat('⭐', $state) : '-'),
+            Action::make('rate_review')
+                ->label('Rate & Review')
+                ->icon('heroicon-o-star')
+                ->color('warning')
+                ->visible(fn (Order $record) =>
+                    $record->status === 'delivered' && is_null($record->rating)
+                )
+                ->form([
+                    \Filament\Forms\Components\Select::make('rating')
+                        ->label('Rating (1-5 Stars)')
+                        ->options([
+                            1 => '⭐️',
+                            2 => '⭐️⭐️',
+                            3 => '⭐️⭐️⭐️',
+                            4 => '⭐️⭐️⭐️⭐️',
+                            5 => '⭐️⭐️⭐️⭐️⭐️',
+                        ])
+                        ->required(),
 
-                TextColumn::make('review')
-                    ->label('Review')
-                    ->wrap()
-                    ->limit(50),
-            ])
-            ->actions([
-                Action::make('cancel')
-                    ->label('Cancel')
-                    ->color('danger')
-                    ->icon('heroicon-o-x-circle')
-                    ->visible(fn (Order $record) => $record->status === 'pending')
-                    ->requiresConfirmation()
-                    ->action(function (Order $record) {
-                        $record->update(['status' => 'cancelled']);
-                        Notification::make()->title('Order cancelled')->danger()->send();
-                    }),
+                    \Filament\Forms\Components\Textarea::make('review')
+                        ->label('Review')
+                        ->placeholder('Write your review here...')
+                        ->rows(4),
+                ])
+                ->action(function (Order $record, array $data) {
+                    $record->update([
+                        'rating' => $data['rating'],
+                        'review' => $data['review'],
+                    ]);
 
-                Action::make('rate_review')
-                    ->label('Rate & Review')
-                    ->icon('heroicon-o-star')
-                    ->color('warning')
-                    ->visible(fn (Order $record) =>
-                        $record->status === 'delivered' && is_null($record->rating)
-                    )
-                    ->form([
-                        \Filament\Forms\Components\Select::make('rating')
-                            ->label('Rating (1-5 Stars)')
-                            ->options([
-                                1 => '⭐️',
-                                2 => '⭐️⭐️',
-                                3 => '⭐️⭐️⭐️',
-                                4 => '⭐️⭐️⭐️⭐️',
-                                5 => '⭐️⭐️⭐️⭐️⭐️',
-                            ])
-                            ->required(),
-
-                        \Filament\Forms\Components\Textarea::make('review')
-                            ->label('Review')
-                            ->placeholder('Write your review here...')
-                            ->rows(4),
-                    ])
-                    ->action(function (Order $record, array $data) {
-                        $record->update([
-                            'rating' => $data['rating'],
-                            'review' => $data['review'],
-                        ]);
-
-                        Notification::make()
-                            ->title('Thank you for your feedback!')
-                            ->success()
-                            ->send();
-                    }),
-            ])
-            ->defaultSort('id', 'desc');
-    }
+                    Notification::make()
+                        ->title('Thank you for your feedback!')
+                        ->success()
+                        ->send();
+                }),
+        ])
+        ->defaultSort('id', 'desc');
+}
 }

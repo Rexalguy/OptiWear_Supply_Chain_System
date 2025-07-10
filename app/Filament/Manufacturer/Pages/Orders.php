@@ -16,7 +16,6 @@ class Orders extends Page implements HasTable
     use InteractsWithTable;
 
     protected static string $view = 'filament.manufacturer.pages.orders';
-    
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
 
     public function table(Tables\Table $table): Tables\Table
@@ -28,7 +27,7 @@ class Orders extends Page implements HasTable
                     ->label('Order #')
                     ->sortable(),
 
-                TextColumn::make('creator.name') 
+                TextColumn::make('creator.name')
                     ->label('Customer')
                     ->searchable()
                     ->sortable()
@@ -47,16 +46,18 @@ class Orders extends Page implements HasTable
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
+
                 TextColumn::make('expected_delivery_date')
                     ->label('Expected Delivery Date')
                     ->dateTime('d M Y H:i')
                     ->sortable()
-                    ->default(fn (Order $record) => $record->expected_delivery_date ? $record->expected_delivery_date->format('d M Y H:i') : 'N/A'),                   
+                    ->default(fn (Order $record) => $record->expected_delivery_date ? $record->expected_delivery_date->format('d M Y H:i') : 'N/A'),
 
-               TextColumn::make('total')
-    ->label('Total (UGX)')
-    ->formatStateUsing(fn ($state) => number_format($state, 0))
-    ->sortable(),
+                TextColumn::make('total')
+                    ->label('Total (UGX)')
+                    ->formatStateUsing(fn ($state) => number_format($state, 0))
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('Placed On')
                     ->dateTime('d M Y H:i')
@@ -70,18 +71,32 @@ class Orders extends Page implements HasTable
                         })->implode(', ');
                     })
                     ->wrap(),
+
+                TextColumn::make('rating')
+                    ->label('⭐ Rating')
+                    ->formatStateUsing(fn ($state) => $state ? str_repeat('⭐', $state) : '—')
+                    ->visible(fn ($record) => $record?->status === 'delivered'),
+
             ])
             ->actions([
+               Action::make('viewReview')
+    ->label('View Review')
+    ->color('gray')
+    ->icon('heroicon-o-eye')
+    ->visible(fn ($record) => !empty($record?->review) && $record?->status === 'delivered')
+    ->modalHeading('Customer Review')
+    ->modalDescription(fn ($record) => 'Order #' . $record->id)
+    ->modalContent(fn ($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
+    ->modalSubmitAction(false),
+
                 Action::make('markConfirmed')
                     ->label('Confirm')
                     ->color('info')
                     ->icon('heroicon-o-check-circle')
                     ->visible(fn (Order $record) => $record->status === 'pending')
                     ->action(function (Order $record) {
-                        // Reduce product quantities only if order is pending
                         foreach ($record->orderItems as $item) {
                             $product = $item->product;
-                            // Check if enough quantity is available before reducing
                             if ($product->quantity_available < $item->quantity) {
                                 Notification::make()
                                     ->title("Not enough stock for {$product->name}")
@@ -90,11 +105,13 @@ class Orders extends Page implements HasTable
                                 return;
                             }
                         }
+
                         foreach ($record->orderItems as $item) {
-                            $product = $item->product;
-                            $product->decrement('quantity_available', $item->quantity);
+                            $item->product->decrement('quantity_available', $item->quantity);
                         }
+
                         $record->update(['status' => 'confirmed']);
+
                         Notification::make()
                             ->title('Order confirmed and stock reduced')
                             ->success()
@@ -106,13 +123,7 @@ class Orders extends Page implements HasTable
                     ->color('success')
                     ->icon('heroicon-o-truck')
                     ->visible(fn (Order $record) => $record->status === 'confirmed')
-                    ->action(function (Order $record) {
-                        $record->update(['status' => 'delivered']);
-                        Notification::make()
-                            ->title('Order marked as delivered')
-                            ->success()
-                            ->send();
-                    }),
+                    ->action(fn (Order $record) => $record->update(['status' => 'delivered'])),
 
                 Action::make('markCancelled')
                     ->label('Cancel')
@@ -121,12 +132,12 @@ class Orders extends Page implements HasTable
                     ->visible(fn (Order $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
                     ->action(function (Order $record) {
-                        // Restore product quantities only if order is pending or confirmed
                         foreach ($record->orderItems as $item) {
-                            $product = $item->product;
-                            $product->increment('quantity_available', $item->quantity);
+                            $item->product->increment('quantity_available', $item->quantity);
                         }
+
                         $record->update(['status' => 'cancelled']);
+
                         Notification::make()
                             ->title('Order cancelled and stock restored')
                             ->danger()
