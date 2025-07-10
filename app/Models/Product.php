@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-     protected $fillable = ['name','image', 'sku', 'price', 'quantity_available'];
+     protected $fillable = ['name','image', 'sku', 'price', 'quantity_available','shirt_category_id'];
 
     public function billOfMaterials()
     {
@@ -30,6 +30,6 @@ class Product extends Model
 
     public function shirtCategory()
     {
-        return $this->hasOne(ShirtCategory::class);
+        return $this->belongsTo(ShirtCategory::class);
     }
 }

@@ -238,17 +238,31 @@ class ShirtSupplyChainSeeder extends Seeder
             'Children Wear' => ['Kids Polo', 'Kids Graphic Tee', 'Cartoon Shirt', 'Kids Long Sleeve', 'Toddler Tee', 'Baby Romper Shirt', 'Tiny Tank', 'Kids Hoodie'],
         ];
 
+        // 1. Create Shirt Categories once
+        $shirtCategories = [];
+        foreach (array_keys($categoryProductNames) as $categoryName) {
+            $shirtCategories[$categoryName] = ShirtCategory::firstOrCreate([
+                'category' => $categoryName,
+                'description' => "$categoryName shirt",
+            ]);
+        }
+
+        // 2. Create Products and attach to the category
         $products = [];
         $i = 1;
-        foreach ($categoryProductNames as $category => $names) {
-            foreach ($names as $productName) {
+        foreach ($categoryProductNames as $categoryName => $productNames) {
+            $category = $shirtCategories[$categoryName];
+
+            foreach ($productNames as $productName) {
                 $sku = 'OWSHIRT' . str_pad($i++, 4, '0', STR_PAD_LEFT);
                 $materials = collect($rawMaterials)->random(rand(2, 4));
                 $totalCost = 0;
+
                 foreach ($materials as $m) {
                     $qty = rand(2, 6);
                     $totalCost += $m->price * $qty;
                 }
+
                 $price = round($totalCost * 2.5, 2);
 
                 $product = Product::create([
@@ -256,14 +270,10 @@ class ShirtSupplyChainSeeder extends Seeder
                     'sku' => $sku,
                     'price' => $price,
                     'quantity_available' => rand(100, 600),
+                    'shirt_category_id' => $category->id, // new correct relationship
                 ]);
-                $products[] = $product;
 
-                ShirtCategory::create([
-                    'product_id' => $product->id,
-                    'category' => $category,
-                    'description' => "$category shirt",
-                ]);
+                $products[] = $product;
 
                 foreach ($materials as $m) {
                     BillOfMaterial::create([
