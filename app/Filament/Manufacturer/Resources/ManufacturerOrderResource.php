@@ -22,7 +22,7 @@ class ManufacturerOrderResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('manufacturer_id', \Illuminate\Support\Facades\Auth::user()->id);
+        return parent::getEloquentQuery();//->where('manufacturer_id', \Illuminate\Support\Facades\Auth::user()->id);
     }
     
 

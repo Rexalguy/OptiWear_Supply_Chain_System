@@ -39,6 +39,7 @@ class PlaceOrder extends Page
 
             Forms\Components\Placeholder::make('unit_price')
                 ->label('Unit Price')
+                ->inlineLabel() 
                 ->content(fn () => $this->getUnitPrice()),
 
             Forms\Components\TextInput::make('quantity')
@@ -50,6 +51,7 @@ class PlaceOrder extends Page
 
             Forms\Components\Placeholder::make('total')
                 ->label('Total Price')
+                ->inlineLabel() 
                 ->content(fn () => $this->calculateTotal()),
 
             Forms\Components\Textarea::make('notes')
@@ -67,7 +69,7 @@ class PlaceOrder extends Page
     {
         if (!$this->product_id) return '0 UGX';
         $product = Product::find($this->product_id);
-        return $product ? $product->unit_price . ' UGX' : '0 UGX'; 
+        return $product ? $product->unit_price . ' UGX' :'0 UGX'; 
     }
 
     public function calculateTotal()
