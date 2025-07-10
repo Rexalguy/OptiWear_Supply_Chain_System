@@ -17,20 +17,21 @@ class ShirtCategoryResource extends Resource
 {
     protected static ?string $model = ShirtCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Product';
+
+    protected static ?string $navigationIcon = 'heroicon-o-swatch';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('product.name')
-                    ->required()
-                    ->numeric(),
+                
                 Forms\Components\TextInput::make('category')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    
             ]);
     }
 
@@ -38,11 +39,13 @@ class ShirtCategoryResource extends Resource
     {
         return $table
             ->columns([
+                
+                Tables\Columns\TextColumn::make('category')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('product.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('category')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

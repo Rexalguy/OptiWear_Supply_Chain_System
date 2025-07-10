@@ -108,13 +108,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(ChatMessage::class, 'receiver_id');
     }
-    public function isVendor() 
-    {
-    return $this->role === 'vendor';
-   }
 
-    public function isManufacturer() 
+        public function manufacturingInfo()
     {
-    return $this->role === 'manufacturer';
+        return $this->hasOne(ManufacturingInfo::class);
+    }
+
+            public function vendorInfo()
+    {
+        return $this->hasOne(VendorInfo::class);
+    }
+
+            public function supplierInfo()
+    {
+        return $this->hasOne(SupplierInfo::class);
+    }
+
+        public function adminInfo()
+    {
+        return $this->hasOne(AdminInfo::class);
+    }
+
+        public function customerInfo()
+    {
+        return $this->hasOne(CustomerInfo::class);
     }
 }

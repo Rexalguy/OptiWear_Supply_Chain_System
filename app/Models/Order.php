@@ -7,14 +7,14 @@ use App\Models\Manufacturer;
 
 class Order extends Model
 {
-    protected $fillable = ['status', 'created_by', 'delivery_option', 'total','vendor_id',  'payment_method', 'delivery_method', 'expected_fulfillment_date', 'decline_reason'];
+    protected $fillable = ['status', 'created_by', 'delivery_option', 'expected_delivery_date', 'total', 'rating', 'review','vendor_id',  'payment_method', 'delivery_method', 'expected_fulfillment_date', 'decline_reason'];
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

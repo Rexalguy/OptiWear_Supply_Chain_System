@@ -8,8 +8,11 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use App\Filament\Customer\Pages\ChatPage;
 use Filament\Http\Middleware\Authenticate;
+use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -26,6 +29,19 @@ class VendorPanelProvider extends PanelProvider
         return $panel
             ->id('vendor')
             ->path('vendor')
+            ->login([RedirectController::class, 'toLogin'])
+            ->plugins([
+                EasyFooterPlugin::make()
+                    ->withGithub(showLogo: true, showUrl: true)
+                    ->withLoadTime('This page loaded in')
+                    ->withLinks([
+                        ['title' => 'About', 'url' => '#'],
+                        ['title' => 'FAQ', 'url' => '#'],
+                        ['title' => 'Privacy Policy', 'url' => '#']
+                    ])
+                    ->withBorder(false)
+                    ->withLoadTime('This page loaded in ')
+            ])
             ->colors([
                 'primary' => Color::Amber,    // Business-focused, marketplace feel
                 'info' => Color::Sky,
@@ -37,7 +53,7 @@ class VendorPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                ChatPage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
             ->widgets([
@@ -60,9 +76,9 @@ class VendorPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 MenuItem::make()
-                 ->label('Customer Panel')
-                 ->icon('heroicon-o-user-group')
-                 ->url('/customer'),
+                    ->label('Customer Panel')
+                    ->icon('heroicon-o-user-group')
+                    ->url('/customer'),
             ]);
     }
 }
