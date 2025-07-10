@@ -11,7 +11,7 @@
             @foreach ($products as $product)
                 <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800">
                     <div class="mb-4">
-                        <img src="/images/image.png" alt="{{ $product->name }}" class="w-full h-48 object-cover rounded">
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-48 object-cover rounded">
                     </div>                   
 
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
