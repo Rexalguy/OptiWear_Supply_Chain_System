@@ -5,4 +5,5 @@
         {{-- Render Filament Table --}}
         {{ $this->table }}
     </div>
+    
 </x-filament-panels::page>
