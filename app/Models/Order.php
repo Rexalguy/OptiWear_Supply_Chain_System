@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['status', 'created_by', 'delivery_option', 'expected_delivery_date', 'total'];
+    protected $fillable = ['status', 'created_by', 'delivery_option', 'expected_delivery_date', 'total', 'rating', 'review'];
 
     public function creator()
     {
