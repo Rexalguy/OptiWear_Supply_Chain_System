@@ -53,10 +53,10 @@ class Orders extends Page implements HasTable
                     ->sortable()
                     ->default(fn (Order $record) => $record->expected_delivery_date ? $record->expected_delivery_date->format('d M Y H:i') : 'N/A'),                   
 
-                TextColumn::make('total')
-                    ->money('UGX', true)
-                    ->sortable(),
-
+               TextColumn::make('total')
+    ->label('Total (UGX)')
+    ->formatStateUsing(fn ($state) => number_format($state, 0))
+    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Placed On')
                     ->dateTime('d M Y H:i')
