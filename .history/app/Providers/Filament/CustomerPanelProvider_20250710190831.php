@@ -37,14 +37,6 @@ class CustomerPanelProvider extends PanelProvider
             ->plugins([
                 EasyFooterPlugin::make()
                     ->withGithub(showLogo: true, showUrl: true)
-                    ->withLoadTime('This page loaded in')
-                    ->withLinks([
-                        ['title' => 'About', 'url' => '#'],
-                        ['title' => 'FAQ', 'url' => '#'],
-                        ['title' => 'Privacy Policy', 'url' => '#']
-                    ])
-                    ->withBorder(false)
-                    ->withLoadTime('This page loaded in ')
             ])
             ->colors([
                 'primary' => Color::Sky,

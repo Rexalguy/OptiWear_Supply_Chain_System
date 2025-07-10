@@ -43,7 +43,7 @@ class CustomerPanelProvider extends PanelProvider
                         ['title' => 'FAQ', 'url' => '#'],
                         ['title' => 'Privacy Policy', 'url' => '#']
                     ])
-                    ->withBorder(false)
+                    ->withBorder()
                     ->withLoadTime('This page loaded in ')
             ])
             ->colors([
