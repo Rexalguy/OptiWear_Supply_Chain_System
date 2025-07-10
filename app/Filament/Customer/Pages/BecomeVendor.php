@@ -32,50 +32,82 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
     protected static string $view = 'filament.customer.pages.become-vendor';
 
+                public static function canAccess(): bool
+        {
+            return Auth::user()?->role === 'customer';
+        }
+
+
+
         public function mount(): void
     {
         $this->form->fill();
 
-         // Get latest application — optional logic based on 'name'
-       $this->latestApplication = VendorValidation::whereNotNull('notified_at')
+         
+        $this->latestApplication = VendorValidation::where('user_id', Auth::id())
+        ->whereNotNull('notified_at')
         ->latest()
         ->first();
+
 
         
 
     }
 
-    public function submit(): void
-    {
-        try {
-        $pdf = $this->form->getState()['application_pdf'];
-        $pdfPath = Storage::disk('local')->path($pdf);
+        public function submit(): void
+        {
+            try {
+                $state = $this->form->getState();
 
-        // ✅ Get supporting documents from form state
-        $supportingDocs = $this->form->getState()['supporting_documents'] ?? [];
+                // Get the full local path for the uploaded application PDF (stored on 'local' disk)
+                $applicationPath = Storage::disk('local')->path($state['application_pdf']);
 
-        $response = Http::attach(
-            'file',
-            file_get_contents($pdfPath),
-            basename($pdfPath)
-        )->post('http://localhost:8080/validate-file');
+                // Get the full public path for the first supporting document PDF (stored on 'public' disk)
+                $supportingDocs = $state['supporting_documents'] ?? [];
+                $supportPath = count($supportingDocs) > 0
+                    ? Storage::disk('public')->path($supportingDocs[0])
+                    : null;
 
-        $results = $response->json();
+                // If no supporting document provided, notify and abort
+                if (empty($supportPath) || !file_exists($supportPath)) {
+                    Notification::make()
+                        ->title('Missing Supporting Documents')
+                        ->body('Please upload at least one PDF containing your tax certificate, business license, or other support materials.')
+                        ->danger()
+                        ->send();
+                    return;
+                }
 
-        foreach ($results as $result) {
-            $validation = VendorValidation::create([
-                'user_id' => Auth::id(),
-                'business_name' => $result['vendor'],
-                'is_valid' => $result['valid'],
-                'visit_date' => $result['visitDate'] ?? null,
-                'reasons' => is_array($result['reasons'] ?? []) 
-                    ? json_encode($result['reasons'])  // Convert array to JSON string
-                    : ($result['reasons'] ?? null),
-                'supporting_documents' => json_encode($supportingDocs),
-            ]);
+                // Send both PDFs as multipart/form-data to your Java validation API
+                $response = Http::asMultipart()
+                    ->attach('application_pdf', file_get_contents($applicationPath), basename($applicationPath))
+                    ->attach('supporting_documents', file_get_contents($supportPath), basename($supportPath))
+                    ->post('http://localhost:8080/validate-file');
 
-            $this->latestApplication = $validation;
-        }
+                // Parse JSON response from server
+                $results = $response->json();
+
+                foreach ($results as $result) {
+                    // Save the validation record including the stored supporting document(s) paths as JSON
+                    VendorValidation::create([
+                        'user_id' => Auth::id(),
+                        'business_name' => $result['vendor'],
+                        'is_valid' => $result['valid'],
+                        'visit_date' => $result['visitDate'] ?? null,
+                        'reasons' => is_array($result['reasons'] ?? [])
+                            ? json_encode($result['reasons'])
+                            : ($result['reasons'] ?? null),
+                        // Save all supporting documents as JSON array
+                        'supporting_documents' => json_encode($supportingDocs),
+                    ]);
+
+                    // Update latest application to show status in UI
+                    $this->latestApplication = VendorValidation::where('user_id', Auth::id())
+                    ->whereNotNull('notified_at')
+                    ->latest()
+                    ->first();
+
+                }
 
         Notification::make()
             ->title('Application submitted successfully!')
@@ -133,7 +165,8 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
         public function infolist(Infolist $infolist): Infolist
     {
-        $latest = VendorValidation::latest()->first();
+        $latest = VendorValidation::where('user_id', Auth::id())->latest()->first();
+
 
         if (!$this->latestApplication) {
         return $infolist->schema([]); // Return empty infolist
@@ -151,8 +184,8 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                 Section::make('Current Validation Status')
                                     ->schema([
                                         TextEntry::make('name')
-                                            ->label('Vendor Name')
-                                            ->default($latest?->name ?? 'N/A'),
+                                            ->label('Business Name')
+                                            ->default($latest?->business_name ?? 'N/A'),
 
                                         TextEntry::make('is_valid')
                                         ->label('Validation Status :')

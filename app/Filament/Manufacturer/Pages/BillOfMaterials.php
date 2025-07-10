@@ -36,7 +36,8 @@ class BillOfMaterials extends Page implements HasTable
                     ->searchable(),
                     TextColumn::make('rawMaterial.name')->label('Raw Material'),
                     TextColumn::make('quantity_required'),
-                    TextColumn::make('rawMaterial.unit_of_measure'),
+                    TextColumn::make('rawMaterial.unit_of_measure')
+                    ->label('Unit of measure'),
                 ])
                 ->actions([
                    //
