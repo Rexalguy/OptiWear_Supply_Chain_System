@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class CustomerInfo extends Model
 {
      use HasFactory;
-
+protected $table = 'customer_info';
     protected $fillable = [
         'user_id',
         'address',

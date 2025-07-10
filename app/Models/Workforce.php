@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Workforce extends Model
 {
-    protected $fillable = ['name', 'job'];
+    protected $fillable = ['name', 'job', 'is_available'];
 
-        public function productionStages(): HasMany
+       public function productionStages(): HasMany
     {
-        return $this->hasMany(ProductionStage::class);
+        return $this->hasMany(ProductionStage::class, 'workforces_id');
     }
+    
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Customer\Pages;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
+use App\Models\CustomerInfo;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,16 +26,33 @@ class MyOrders extends Page implements HasTable
 
     public array $cart = [];
     public string $deliveryOption = 'pickup';
+    public string $address = '';
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
+
+        // Load saved address for delivery
+        $customerInfo = CustomerInfo::where('user_id', Auth::id())->first();
+        if ($customerInfo) {
+            $this->address = $customerInfo->address;
+        }
     }
 
     public function placeOrder(): void
     {
         if (empty($this->cart)) {
             Notification::make()->title('Cart is empty')->danger()->send();
+            return;
+        }
+
+        // Validate address before placing delivery order
+        if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
+            Notification::make()
+                ->title('Address Required')
+                ->body('Please enter your delivery address.')
+                ->danger()
+                ->send();
             return;
         }
 
@@ -48,7 +66,6 @@ class MyOrders extends Page implements HasTable
                 $total += $product->price * $quantity;
             }
 
-            // Calculate estimated delivery date
             $expectedDate = now()->addHours(
                 $this->deliveryOption === 'delivery' ? 48 : 12
             );
@@ -73,7 +90,16 @@ class MyOrders extends Page implements HasTable
                 ]);
             }
 
+            // Save/update customer address if delivery
+            if ($this->deliveryOption === 'delivery') {
+                CustomerInfo::updateOrCreate(
+                    ['user_id' => Auth::id()],
+                    ['address' => $this->address],
+                );
+            }
+
             DB::commit();
+
             $this->cart = [];
             session()->forget('cart');
 
@@ -127,6 +153,7 @@ class MyOrders extends Page implements HasTable
             } else {
                 unset($this->cart[$productId]);
             }
+
             session()->put('cart', $this->cart);
         }
     }
@@ -190,5 +217,4 @@ class MyOrders extends Page implements HasTable
                     }),
             ])
             ->defaultSort('id', 'desc');
-    }
-}
+    } }
