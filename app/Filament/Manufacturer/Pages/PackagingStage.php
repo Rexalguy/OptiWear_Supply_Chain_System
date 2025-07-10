@@ -7,7 +7,6 @@ use Filament\Pages\Page;
 use App\Models\Workforce;
 use App\Models\ProductionOrder;
 use Filament\Tables\Actions\Action;
-use App\Models\ProductionStage;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
@@ -26,12 +25,12 @@ class PackagingStage extends Page implements HasTable
     public function getTableQuery(): Builder
     {
         return ProductionOrder::with('productionStages.workforce')
-            ->whereHas('productionStages', fn ($q) =>
-                $q->where('stage', 'printing')->where('status', 'completed')
-            )
-            ->whereHas('productionStages', fn ($q) =>
-                $q->where('stage', 'packaging')->whereIn('status', ['pending', 'in_progress'])
-            );
+            ->whereHas('productionStages', function ($query) {
+                $query->where('stage', 'printing')->where('status', 'completed');
+            })
+            ->whereHas('productionStages', function ($query) {
+                $query->where('stage', 'packaging')->whereIn('status', ['pending','in_progress']);
+            });
     }
 
     public function getTableColumns(): array
@@ -42,40 +41,29 @@ class PackagingStage extends Page implements HasTable
             Tables\Columns\TextColumn::make('packaging_status')
                 ->label('Packaging Status')
                 ->badge()
-                ->color(fn (string $state) => match ($state) {
+                ->color(fn (string $state): string => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
                     default => 'secondary',
                 })
-                ->getStateUsing(fn ($record) =>
-                    optional($record->productionStages->firstWhere('stage', 'packaging'))->status ?? '-'
-                ),
+                ->getStateUsing(fn ($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->status ?? '-'),
             Tables\Columns\TextColumn::make('packaging_worker')
                 ->label('Assigned To')
                 ->icon('heroicon-m-wrench')
-                ->getStateUsing(fn ($record) =>
-                    optional($record->productionStages->firstWhere('stage', 'packaging'))->workforce->name ?? 'Unassigned'
-                ),
+                ->getStateUsing(fn ($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->workforce->name ?? 'Unassigned'),
         ];
     }
 
     public function getTableActions(): array
     {
         return [
-            Action::make('assignWorkforce')
+            Tables\Actions\Action::make('assignWorkforce')
                 ->label('Assign Packaging Worker')
                 ->form([
                     Select::make('workforces_id')
                         ->label('Select Worker')
-                        ->options(
-                            Workforce::where('job', 'packaging')
-                                ->where('is_available', true)
-                                ->whereDoesntHave('productionStages', fn ($q) =>
-                                    $q->where('stage', 'packaging')->where('status', '!=', 'completed')
-                                )
-                                ->pluck('name', 'id')
-                        )
+                        ->options(Workforce::where('job', 'packaging')->pluck('name', 'id'))
                         ->searchable()
                         ->required(),
                 ])
@@ -95,14 +83,10 @@ class PackagingStage extends Page implements HasTable
                             'status' => 'in_progress',
                             'started_at' => now(),
                         ]);
-
-                        Workforce::where('id', $data['workforces_id'])->update([
-                            'is_available' => false,
-                        ]);
                     }
 
                     Notification::make()
-                        ->title('Packaging started and worker assigned.')
+                        ->title('Packaging started')
                         ->success()
                         ->send();
                 })
@@ -110,7 +94,7 @@ class PackagingStage extends Page implements HasTable
                     optional($record->productionStages->firstWhere('stage', 'packaging'))->status === 'pending'
                 ),
 
-            Action::make('completePackaging')
+            Tables\Actions\Action::make('completePackaging')
                 ->label('Mark as Completed')
                 ->color('success')
                 ->requiresConfirmation()
@@ -118,26 +102,49 @@ class PackagingStage extends Page implements HasTable
                     $packaging = $record->productionStages()->where('stage', 'packaging')->first();
 
                     if ($packaging && $packaging->status === 'in_progress') {
+                        // Complete packaging stage
                         $packaging->update([
                             'status' => 'completed',
                             'completed_at' => now(),
                         ]);
 
-                        // Free the worker
+                        // Free packaging worker
                         if ($packaging->workforce) {
                             $packaging->workforce->update(['is_available' => true]);
                         }
 
-                        // Move to delivery
-                        $record->productionStages()->create([
+                        // Create delivery stage with 'pending' status
+                        $deliveryStage = $record->productionStages()->create([
                             'stage' => 'delivery',
                             'status' => 'pending',
                         ]);
 
-                        Notification::make()
-                            ->title('Packaging completed. Moved to Delivery.')
-                            ->success()
-                            ->send();
+                        // Try to auto-assign available delivery worker
+                        $deliveryWorker = Workforce::where('job', 'delivery')
+                            ->where('is_available', true)
+                            ->first();
+
+                        if ($deliveryWorker) {
+                            // Assign and mark delivery stage in progress
+                            $deliveryStage->update([
+                                'workforces_id' => $deliveryWorker->id,
+                                'status' => 'in_progress',
+                                'started_at' => now(),
+                            ]);
+
+                            // Mark delivery worker as unavailable
+                            $deliveryWorker->update(['is_available' => false]);
+
+                            Notification::make()
+                                ->title("Packaging completed and delivery started. Assigned worker: {$deliveryWorker->name}")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Packaging completed. No available delivery worker to assign.')
+                                ->warning()
+                                ->send();
+                        }
                     }
                 })
                 ->visible(fn (ProductionOrder $record) =>
