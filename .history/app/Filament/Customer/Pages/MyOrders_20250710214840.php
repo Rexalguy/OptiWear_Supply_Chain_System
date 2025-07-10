@@ -161,6 +161,15 @@ class MyOrders extends Page implements HasTable
             ->columns([
                 TextColumn::make('id')->label('Order #')->sortable(),
 
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'confirmed',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
+                    ]),
 
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
@@ -197,15 +206,6 @@ class MyOrders extends Page implements HasTable
                         )->implode(', ')
                     )
                     ->wrap(),
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'confirmed',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
             ])
             ->actions([
                 Action::make('ResumeOrder')

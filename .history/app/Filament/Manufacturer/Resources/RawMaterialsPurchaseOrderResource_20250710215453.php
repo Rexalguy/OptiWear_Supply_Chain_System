@@ -147,7 +147,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(RawMaterialsPurchaseOrder::where('created_by', Auth::id())->latest())
+            ->query(RawMaterialsPurchaseOrder::with('orderItems.product')->where('created_by', Auth::id())->latest())
             ->columns([
                 Tables\Columns\TextColumn::make('rawMaterial.name')
                     ->label('Raw Material')

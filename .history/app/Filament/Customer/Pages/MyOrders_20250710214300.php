@@ -161,6 +161,15 @@ class MyOrders extends Page implements HasTable
             ->columns([
                 TextColumn::make('id')->label('Order #')->sortable(),
 
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'confirmed',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
+                    ]),
 
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
@@ -170,10 +179,6 @@ class MyOrders extends Page implements HasTable
                         'door_delivery' => 'info',
                         default => 'secondary',
                     }),
-                TextColumn::make('created_at')
-                    ->label('Placed On')
-                    ->dateTime()
-                    ->since(),
 
                 TextColumn::make('expected_delivery_date')
                     ->label('Expected Delivery Date')
@@ -183,9 +188,11 @@ class MyOrders extends Page implements HasTable
 
                 TextColumn::make('total')
                     ->label('Total (UGX)')
-                    ->formatStateUsing(fn($state) => number_format($state, 2)),
+                    ->formatStateUsing(fn($state) => number_format($state, 0)),
 
-
+                TextColumn::make('created_at')
+                    ->label('Placed On')
+                    ->dateTime('d M Y H:i'),
 
                 TextColumn::make('orderItems')
                     ->label('Items')
@@ -197,27 +204,8 @@ class MyOrders extends Page implements HasTable
                         )->implode(', ')
                     )
                     ->wrap(),
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'confirmed',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
             ])
             ->actions([
-                Action::make('ResumeOrder')
-                    ->color('warning')
-                    ->icon('heroicon-o-play')
-                    ->label('Resume Order')
-                    ->visible(fn(Order $record) => $record->status === 'cancelled')
-                    ->requiresConfirmation()
-                    ->action(function (Order $record) {
-                        $record->update(['status' => 'pending']);
-                        Notification::make()->title('Order resumed')->success()->send();
-                    }),
                 Action::make('cancel')
                     ->label('Cancel')
                     ->color('danger')
