@@ -8,10 +8,9 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 use Filament\Http\Middleware\Authenticate;
-use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -19,46 +18,55 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Container\Attributes\Auth as AttributesAuth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\View\View;
 
-class AdminPanelProvider extends PanelProvider
+class CustomerPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->login([RedirectController::class, 'toLogin'])
-            ->path('admin')
-            ->plugins([
-                EasyFooterPlugin::make()
-                    ->withGithub(showLogo: true, showUrl: true)
-                    ->withLoadTime('This page loaded in')
-                    ->withLinks([
-                        ['title' => 'About', 'url' => '#'],
-                        ['title' => 'FAQ', 'url' => '#'],
-                        ['title' => 'Privacy Policy', 'url' => '#']
-                    ])
-                    ->withBorder(false)
-                    ->withLoadTime('This page loaded in ')
-            ])
+            ->id('customer')
+            ->path('customer')           // URL prefix for this panel
+            ->default()                  // Make this the default panel
+            ->login()
+            ->profile()
+            ->registration()
+
             ->colors([
-                'primary' => Color::Gray,     // Neutral and authoritative
+                'primary' => Color::Sky,
                 'info' => Color::Blue,
                 'success' => Color::Emerald,
-                'warning' => Color::Amber,
+                'warning' => Color::Yellow,
                 'danger' => Color::Rose,
-                'gray' => Color::Zinc,
+                'gray' => Color::Gray,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+
+            ->discoverResources(
+                in: app_path('Filament/Customer/Resources'),
+                for: 'App\\Filament\\Customer\\Resources'
+            )
+
+            ->discoverPages(
+                in: app_path('Filament/Customer/Pages'),
+                for: 'App\\Filament\\Customer\\Pages'
+            )
+
             ->pages([
-                // Pages\Dashboard::class,
+                Pages\Dashboard::class,
+                \App\Filament\Customer\Pages\PlaceOrder::class,
+
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // Discover widgets automatically
+            ->discoverWidgets(
+                in: app_path('Filament/Customer/Widgets'),
+                for: 'App\\Filament\\Customer\\Widgets'
+            )
+            // Register key widgets explicitly
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -72,28 +80,32 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                Authenticate::class
             ])
             ->userMenuItems([
                 MenuItem::make()
-                    ->label('Suplier Panel')
+                    ->label('Admin Panel')
+                    ->icon('heroicon-o-cog')
+                    ->visible(fn() => Auth::user()->role === 'admin') // Only show if user is admin 
+                    ->url('/admin'),
+
+                MenuItem::make()
+                    ->label('Supplier Panel')      // Fixed typo here
                     ->icon('heroicon-o-truck')
+                    ->visible(fn() => Auth::user()->role === 'supplier') // Only show if user is supplier
                     ->url('/supplier'),
 
                 MenuItem::make()
                     ->label('Manufacturer Panel')
                     ->icon('heroicon-o-cog-6-tooth')
+                    ->visible(fn() => Auth::user()->role === 'manufacturer') // Only show if user is manufacturer
                     ->url('/manufacturer'),
 
                 MenuItem::make()
                     ->label('Vendor Panel')
                     ->icon('heroicon-o-building-storefront')
+                    ->visible(fn() => Auth::user()->role === 'vendor') // Only show if user is vendor
                     ->url('/vendor'),
-
-                MenuItem::make()
-                    ->label('Customer Panel')
-                    ->icon('heroicon-o-user-group')
-                    ->url('/customer'),
             ]);
     }
 }

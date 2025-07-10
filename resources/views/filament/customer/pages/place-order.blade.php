@@ -10,6 +10,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
                 <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800">
+                    
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm ">
                         SKU: {{ $product->sku }}
