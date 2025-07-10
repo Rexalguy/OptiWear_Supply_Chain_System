@@ -24,12 +24,8 @@
                             <li class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">{{ $product->name }}</div>
-                                    <div class="text-sm ">
-                                        SKU: {{ $product->sku }}
-                                    </div>
-                                    <div class="text-sm ">
-                                        UGX {{ number_format($product->price) }} × {{ $qty }}
-                                    </div>
+                                    <div class="text-sm">SKU: {{ $product->sku }}</div>
+                                    <div class="text-sm">UGX {{ number_format($product->price) }} × {{ $qty }}</div>
 
                                     <div class="mt-2 flex items-center space-x-2">
                                         <x-filament::button
@@ -70,13 +66,28 @@
                     <span>Total:</span>
                     <span>UGX {{ number_format($total) }}</span>
                 </div>
+
                 <div class="mt-6">
-    <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Delivery Option</label>
-    <select id="deliveryOption" wire:model="deliveryOption" class="filament-forms-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-        <option value="pickup">Pickup</option>
-        <option value="delivery">Delivery</option>
-    </select>
-</div>
+                    <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Delivery Option</label>
+                    <select id="deliveryOption" wire:model="deliveryOption" class="filament-forms-select w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                        <option value="pickup">Pickup</option>
+                        <option value="delivery">Delivery</option>
+                    </select>
+                </div>
+
+                {{-- Show address field if delivery is selected --}}
+                @if ($this->deliveryOption === 'delivery')
+                    <div class="mt-4">
+                        <label for="address" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">Delivery Address</label>
+                        <textarea
+                            id="address"
+                            wire:model.defer="address"
+                            rows="3"
+                            class="filament-forms-textarea w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                            placeholder="Enter your delivery address"
+                        ></textarea>
+                    </div>
+                @endif
 
                 <div class="text-right mt-4">
                     <x-filament::button

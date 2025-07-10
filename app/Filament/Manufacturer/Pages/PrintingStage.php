@@ -9,13 +9,12 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\Action;
-use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Notifications\Notification;
 
 class PrintingStage extends Page implements HasTable
 {
-use InteractsWithTable;
+    use InteractsWithTable;
 
     protected static ?string $title = 'Printing Stage';
     protected static ?string $navigationIcon = 'heroicon-o-printer';
@@ -26,7 +25,7 @@ use InteractsWithTable;
     {
         return ProductionStage::with(['productionOrder.product', 'workforce'])
             ->where('stage', 'printing')
-            ->where('status', '!=', 'completed');;
+            ->where('status', '!=', 'completed');
     }
 
     public function getTableColumns(): array
@@ -42,57 +41,63 @@ use InteractsWithTable;
                     'completed' => 'success',
                     default => 'secondary',
                 }),
-            Tables\Columns\TextColumn::make('workforce.name')->label('Assigned To')->placeholder('Unassigned')
-            ->icon('heroicon-m-wrench'),
+            Tables\Columns\TextColumn::make('workforce.name')
+                ->label('Assigned To')
+                ->placeholder('Unassigned')
+                ->icon('heroicon-m-wrench'),
         ];
     }
 
     public function getTableActions(): array
     {
         return [
-            Action::make('assign')
-                ->label('Assign Worker')
-                ->form([
-                    Select::make('workforces_id')
-                        ->label('Printing Workforce')
-                        ->options(Workforce::where('job', 'printing')->pluck('name', 'id'))
-                        ->searchable()
-                        ->required(),
-                ])
-                ->action(function (array $data, ProductionStage $record) {
-                    $record->update([
-                        'workforces_id' => $data['workforces_id'],
-                        'status' => 'in_progress',
-                        'started_at' => now(),
-                    ]);
-
-                    Notification::make()
-                        ->title('Worker assigned and printing started.')
-                        ->success()
-                        ->send();
-                })
-                ->visible(fn ($record) => $record->status === 'pending'),
-
             Action::make('complete')
                 ->label('Mark as Completed')
                 ->requiresConfirmation()
                 ->color('success')
                 ->action(function (ProductionStage $record) {
+                    // Complete current stage
                     $record->update([
                         'status' => 'completed',
                         'completed_at' => now(),
                     ]);
 
-                    // Move to Packaging Stage
-                    $record->productionOrder->productionStages()->create([
+                    // Free the current worker
+                    if ($record->workforce) {
+                        $record->workforce->update(['is_available' => true]);
+                    }
+
+                    // Create new packaging stage
+                    $packagingStage = $record->productionOrder->productionStages()->create([
                         'stage' => 'packaging',
                         'status' => 'pending',
                     ]);
 
-                    Notification::make()
-                        ->title('Printing completed. Moved to packaging.')
-                        ->success()
-                        ->send();
+                    // Try to auto-assign a packaging worker
+                    $packagingWorker = Workforce::where('job', 'packaging')
+                        ->where('is_available', true)
+                        ->first();
+
+                    if ($packagingWorker) {
+                        $packagingStage->update([
+                            'workforces_id' => $packagingWorker->id,
+                            'status' => 'in_progress',
+                            'started_at' => now(),
+                        ]);
+
+                        $packagingWorker->update(['is_available' => false]);
+
+                        Notification::make()
+                            ->title("Packaging started. Assigned to: {$packagingWorker->name}")
+                            ->success()
+                            ->send();
+                    } else {
+                        Notification::make()
+                            ->title('Printing completed.')
+                            ->body('Moved to packaging. No available packaging worker.')
+                            ->warning()
+                            ->send();
+                    }
                 })
                 ->visible(fn ($record) => $record->status === 'in_progress'),
         ];
