@@ -55,7 +55,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->description('Fill in the details for the raw materials purchase order.')
                 ->columns(2)
                 ->schema([
-                    Select::make('raw_material_id')
+                    Select::make('raw_materials_id')
                         ->label('Raw Material')
                         ->options(RawMaterial::all()->pluck('name', 'id'))
                         ->required()
@@ -85,7 +85,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->live()
                 ->numeric()
                 ->minValue(1)
-                ->suffix(fn ($get) => RawMaterial::find($get('raw_material_id'))?->unit_of_measure ?? 'units')
+                ->suffix(fn ($get) => RawMaterial::find($get('raw_materials_id'))?->unit_of_measure ?? 'units')
                 ->default(1)
                 ->afterStateUpdated(function ($state, callable $get, callable $set) {
                     $price = $get('price_per_unit') ?? 0;
@@ -97,11 +97,11 @@ class RawMaterialsPurchaseOrderResource extends Resource
                 ->prefix('UGX')
                 ->reactive()
                 ->readonly()
-                ->disabled(fn ($get) => ! $get('raw_material_id'))
+                ->disabled(fn ($get) => ! $get('raw_materials_id'))
                 ->dehydrated(true)
                 ->live()
                 ->extraAttributes(['readonly' => true])
-                ->visible(fn ($get) => $get('raw_material_id'))
+                ->visible(fn ($get) => $get('raw_materials_id'))
                 ->afterStateUpdated(function ($state, callable $get, callable $set) {
                     $quantity = $get('quantity') ?? 0;
                     $set('total_price', $quantity * $state);
@@ -212,7 +212,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
             ->icon('heroicon-o-truck')
             ->color('success')
             ->action(function ($record) {
-                $rawMaterial = RawMaterial::find($record->raw_material_id);
+                $rawMaterial = RawMaterial::find($record->raw_materials_id);
                 if ($rawMaterial) {
                     $rawMaterial->update([
                         'current_stock' => $rawMaterial->current_stock + $record->quantity
