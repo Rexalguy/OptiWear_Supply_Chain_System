@@ -13,9 +13,7 @@ use Filament\Notifications\Notification;
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    protected static ?string $navigationGroup = 'Customer Orders';
     protected static string $view = 'filament.customer.pages.place-order';
-    protected static ?int $navigationSort = 1;
 
     public array $cart = [];
     public $products;
@@ -23,7 +21,7 @@ class PlaceOrder extends Page
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
-        $this->products = Product::where('quantity_available', '>', 0)->get(); //->reverse();
+        $this->products = Product::where('quantity_available', '>', 0)->get();//->reverse();
     }
 
     public function addToCart($productId): void

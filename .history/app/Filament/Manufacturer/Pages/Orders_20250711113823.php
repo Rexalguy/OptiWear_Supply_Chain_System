@@ -18,7 +18,6 @@ class Orders extends Page implements HasTable
 
     protected static string $view = 'filament.manufacturer.pages.orders';
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
-    protected static ?int $navigationSort = 2;
 
     public function table(Tables\Table $table): Tables\Table
     {
@@ -49,27 +48,27 @@ class Orders extends Page implements HasTable
                     ->label('Delivery')
                     ->sortable(),
                 TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
-                    ->formatStateUsing(function ($state, $record) {
-                        if ($record->status === 'delivered') {
-                            return 'Done';
-                        }
+    ->label('Expected Delivery Date')
+    ->formatStateUsing(function ($state, $record) {
+        if ($record->status === 'delivered') {
+            return 'Done';
+        }
 
-                        if (empty($state)) {
-                            return 'N/A';
-                        }
+        if (empty($state)) {
+            return 'N/A';
+        }
 
-                        try {
-                            return Carbon::parse($state)->format('d M Y H:i');
-                        } catch (\Exception $e) {
-                            return 'Invalid Date';
-                        }
-                    })
-                    ->sortable(),
+        try {
+            return Carbon::parse($state)->format('d M Y H:i');
+        } catch (\Exception $e) {
+            return 'Invalid Date';
+        }
+    })
+    ->sortable(),
 
                 TextColumn::make('total')
                     ->label('Total (UGX)')
-                    ->formatStateUsing(fn($state) => number_format($state, 0))
+                    ->formatStateUsing(fn ($state) => number_format($state, 0))
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -88,26 +87,26 @@ class Orders extends Page implements HasTable
 
                 TextColumn::make('rating')
                     ->label('⭐ Rating')
-                    ->formatStateUsing(fn($state) => $state ? str_repeat('⭐', $state) : '—')
-                    ->visible(fn($record) => $record?->status === 'delivered'),
+                    ->formatStateUsing(fn ($state) => $state ? str_repeat('⭐', $state) : '—')
+                    ->visible(fn ($record) => $record?->status === 'delivered'),
 
             ])
             ->actions([
-                Action::make('viewReview')
-                    ->label('View Review')
-                    ->color('gray')
-                    ->icon('heroicon-o-eye')
-                    ->visible(fn($record) => !empty($record?->review) && $record?->status === 'delivered')
-                    ->modalHeading('Customer Review')
-                    ->modalDescription(fn($record) => 'Order #' . $record->id)
-                    ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
-                    ->modalSubmitAction(false),
+               Action::make('viewReview')
+    ->label('View Review')
+    ->color('gray')
+    ->icon('heroicon-o-eye')
+    ->visible(fn ($record) => !empty($record?->review) && $record?->status === 'delivered')
+    ->modalHeading('Customer Review')
+    ->modalDescription(fn ($record) => 'Order #' . $record->id)
+    ->modalContent(fn ($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
+    ->modalSubmitAction(false),
 
                 Action::make('markConfirmed')
                     ->label('Confirm')
                     ->color('info')
                     ->icon('heroicon-o-check-circle')
-                    ->visible(fn(Order $record) => $record->status === 'pending')
+                    ->visible(fn (Order $record) => $record->status === 'pending')
                     ->action(function (Order $record) {
                         foreach ($record->orderItems as $item) {
                             $product = $item->product;
@@ -136,14 +135,14 @@ class Orders extends Page implements HasTable
                     ->label('Deliver')
                     ->color('success')
                     ->icon('heroicon-o-truck')
-                    ->visible(fn(Order $record) => $record->status === 'confirmed')
-                    ->action(fn(Order $record) => $record->update(['status' => 'delivered'])),
+                    ->visible(fn (Order $record) => $record->status === 'confirmed')
+                    ->action(fn (Order $record) => $record->update(['status' => 'delivered'])),
 
                 Action::make('markCancelled')
                     ->label('Cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
-                    ->visible(fn(Order $record) => in_array($record->status, ['pending', 'confirmed']))
+                    ->visible(fn (Order $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
                     ->action(function (Order $record) {
                         foreach ($record->orderItems as $item) {
