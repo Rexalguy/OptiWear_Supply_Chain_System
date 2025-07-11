@@ -9,7 +9,6 @@ use App\Models\CustomerInfo;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
@@ -162,6 +161,15 @@ class MyOrders extends Page implements HasTable
             ->columns([
                 TextColumn::make('id')->label('Order #')->sortable(),
 
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'confirmed',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
+                    ]),
 
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
@@ -171,24 +179,20 @@ class MyOrders extends Page implements HasTable
                         'door_delivery' => 'info',
                         default => 'secondary',
                     }),
-                TextColumn::make('created_at')
-                    ->label('Placed On')
+
+                TextColumn::make('expected_delivery_date')
+                    ->label('Expected Delivery Date')
                     ->dateTime()
-                    ->since(),
-TextColumn::make('expected_delivery_date')
-    ->label('Expected Delivery Date')
-    ->formatStateUsing(fn ($state, $record) =>
-        $record->status === 'delivered'
-            ? 'Done'
-            : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
-    )
-    ->sortable(),
+                    ->since()
+                    ->sortable(),
 
                 TextColumn::make('total')
                     ->label('Total (UGX)')
                     ->formatStateUsing(fn($state) => number_format($state, 2)),
 
-
+                TextColumn::make('created_at')
+                    ->label('Placed On')
+                    ->dateTime('d M Y H:i'),
 
                 TextColumn::make('orderItems')
                     ->label('Items')
@@ -200,15 +204,6 @@ TextColumn::make('expected_delivery_date')
                         )->implode(', ')
                     )
                     ->wrap(),
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'confirmed',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
             ])
             ->actions([
                 Action::make('ResumeOrder')

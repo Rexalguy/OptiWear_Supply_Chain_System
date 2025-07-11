@@ -24,7 +24,7 @@
                     </p>
 
                     <div class="mt-4">
-                        <x-filament::button color="warning" wire:click="addToCart({{ $product->id }})">
+                        <x-filament::button wire:click="addToCart({{ $product->id }})">
                             Add to Cart
                         </x-filament::button>
                     </div>

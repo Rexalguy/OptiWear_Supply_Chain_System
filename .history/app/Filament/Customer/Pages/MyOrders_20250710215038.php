@@ -9,7 +9,6 @@ use App\Models\CustomerInfo;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Columns\TextColumn;
@@ -175,14 +174,12 @@ class MyOrders extends Page implements HasTable
                     ->label('Placed On')
                     ->dateTime()
                     ->since(),
-TextColumn::make('expected_delivery_date')
-    ->label('Expected Delivery Date')
-    ->formatStateUsing(fn ($state, $record) =>
-        $record->status === 'delivered'
-            ? 'Done'
-            : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
-    )
-    ->sortable(),
+
+                TextColumn::make('expected_delivery_date')
+                    ->label('Expected Delivery Date')
+                    ->dateTime()
+                    ->since()
+                    ->sortable(),
 
                 TextColumn::make('total')
                     ->label('Total (UGX)')
