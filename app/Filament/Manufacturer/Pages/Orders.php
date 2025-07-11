@@ -10,6 +10,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
+use Carbon\Carbon;
 
 class Orders extends Page implements HasTable
 {
@@ -46,12 +47,24 @@ class Orders extends Page implements HasTable
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
-
                 TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
-                    ->dateTime('d M Y H:i')
-                    ->sortable()
-                    ->default(fn (Order $record) => $record->expected_delivery_date ? $record->expected_delivery_date->format('d M Y H:i') : 'N/A'),
+    ->label('Expected Delivery Date')
+    ->formatStateUsing(function ($state, $record) {
+        if ($record->status === 'delivered') {
+            return 'Done';
+        }
+
+        if (empty($state)) {
+            return 'N/A';
+        }
+
+        try {
+            return Carbon::parse($state)->format('d M Y H:i');
+        } catch (\Exception $e) {
+            return 'Invalid Date';
+        }
+    })
+    ->sortable(),
 
                 TextColumn::make('total')
                     ->label('Total (UGX)')
