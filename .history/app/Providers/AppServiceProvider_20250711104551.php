@@ -21,11 +21,12 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     // In AuthServiceProvider.php
-    public function boot()
-    {
-        FilamentView::registerRenderHook(
+public function boot()
+{
+    FilamentView::registerRenderHook(
             PanelsRenderHook::FOOTER,
-            fn(): View => view('footer'),
+            fn (): View => view('footer'),
         );
-    }
+}
+
 }

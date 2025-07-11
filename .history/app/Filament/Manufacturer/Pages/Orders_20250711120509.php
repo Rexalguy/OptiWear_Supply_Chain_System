@@ -18,7 +18,7 @@ class Orders extends Page implements HasTable
 
     protected static string $view = 'filament.manufacturer.pages.orders';
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
-    protected static ?int $navigationSort = 2;
+    protected static int $sort = 2;
 
     public function table(Tables\Table $table): Tables\Table
     {

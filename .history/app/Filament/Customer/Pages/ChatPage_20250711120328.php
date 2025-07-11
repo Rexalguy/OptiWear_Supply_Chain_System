@@ -9,5 +9,5 @@ class ChatPage extends Page
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
 
     protected static string $view = 'filament.customer.pages.chat-page';
-    protected static ?int $navigationSort = 1;
+    protected int $sort = 0;
 }
