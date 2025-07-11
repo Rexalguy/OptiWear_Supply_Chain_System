@@ -6,13 +6,11 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
-use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -31,19 +29,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->login([RedirectController::class, 'toLogin'])
-            ->path('admin')
-            ->plugins([
-                EasyFooterPlugin::make()
-                    ->withGithub(showLogo: true, showUrl: true)
-                    ->withLoadTime('This page loaded in')
-                    ->withLinks([
-                        ['title' => 'About', 'url' => '#'],
-                        ['title' => 'FAQ', 'url' => '#'],
-                        ['title' => 'Privacy Policy', 'url' => '#']
-                    ])
-                    ->withBorder(false)
-                    ->withLoadTime('This page loaded in ')
-            ])
+            ->path('admin') // URL prefix for this panel
             ->colors([
                 'primary' => Color::Amber,
             ])
