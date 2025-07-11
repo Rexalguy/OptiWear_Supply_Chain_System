@@ -73,18 +73,20 @@ class Orders extends Page implements HasTable
                     ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->label('Placed On')
+                    ->label('Placed')
                     ->dateTime('d M Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->since()
+                    ->dateTooltip(),
 
                 TextColumn::make('orderItems')
                     ->label('Items')
                     ->formatStateUsing(function ($state, $record) {
                         return $record->orderItems->map(function ($item) {
-                            return $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')';
+                            return $item->product->name . ' (x' . $item->quantity . ')';
                         })->implode(', ');
                     })
-                    ->wrap(),
+                    ,
 
                 TextColumn::make('rating')
                     ->label('⭐ Rating')
@@ -137,7 +139,20 @@ class Orders extends Page implements HasTable
                     ->color('success')
                     ->icon('heroicon-o-truck')
                     ->visible(fn(Order $record) => $record->status === 'confirmed')
-                    ->action(fn(Order $record) => $record->update(['status' => 'delivered'])),
+                        ->action(function (Order $record) {
+                    $record->update(['status' => 'delivered']);
+
+                    if ($record->total >= 50000) {
+                        $tokens = floor($record->total / 15000);
+                        $record->creator->increment('tokens', $tokens);
+                        
+                    }
+
+                    Notification::make()
+                        ->title('Order marked as delivered and tokens awarded')
+                        ->success()
+                        ->send();
+                }),
 
                 Action::make('markCancelled')
                     ->label('Cancel')

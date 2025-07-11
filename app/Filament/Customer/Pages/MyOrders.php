@@ -27,18 +27,34 @@ class MyOrders extends Page implements HasTable
     protected static ?int $navigationSort = 2;
     protected static string $view = 'filament.customer.pages.my-orders';
 
+    public int $potentialTokens = 0;
+
+
     public array $cart = [];
     public string $deliveryOption = 'pickup';
     public string $address = '';
+
+    public int $userTokens = 0;
+    public int $discount = 0;
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
 
+         $user = Auth::user();
+            $this->userTokens = $user->tokens;
+
+            if ($this->userTokens >= 200) {
+                $this->discount = 10000;
+            }
+
         $customerInfo = CustomerInfo::where('user_id', Auth::id())->first();
         if ($customerInfo) {
             $this->address = $customerInfo->address;
         }
+
+        $this->calculatePotentialTokens();
+
     }
 
     public function placeOrder(): void
@@ -71,13 +87,34 @@ class MyOrders extends Page implements HasTable
                 $this->deliveryOption === 'delivery' ? 48 : 12
             );
 
+            $tokensAvailable = Auth::user()->tokens ?? 0;
+            $discount = 0;
+            $tokensToUse = 0;
+
+            if ($tokensAvailable >= 200) {
+                $discount = 10000;
+                $tokensToUse = 200;
+            } elseif ($tokensAvailable > 0) {
+                $tokensToUse = min($tokensAvailable, floor($total / 100));
+                $discount = $tokensToUse * 100;
+            }
+
+            $netTotal = max(0, $total - $discount);
+
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
                 'delivery_option' => $this->deliveryOption,
                 'expected_delivery_date' => $expectedDate,
-                'total' => $total,
+                'total' => $netTotal,
             ]);
+
+            if ($tokensToUse > 0) {
+                $user = Auth::user();
+                if ($user instanceof \Illuminate\Database\Eloquent\Model) {
+                    $user->decrement('tokens', $tokensToUse);
+                }
+            }
 
             foreach ($this->cart as $productId => $quantity) {
                 $product = Product::findOrFail($productId);
@@ -102,6 +139,9 @@ class MyOrders extends Page implements HasTable
 
             $this->cart = [];
             session()->forget('cart');
+
+            $this->calculatePotentialTokens();
+
 
             Notification::make()
                 ->title('Order placed successfully!')
@@ -142,6 +182,9 @@ class MyOrders extends Page implements HasTable
 
         $this->cart[$productId] = $currentQty + 1;
         session()->put('cart', $this->cart);
+
+        $this->calculatePotentialTokens();
+
     }
 
     public function decreaseQuantity($productId): void
@@ -155,7 +198,29 @@ class MyOrders extends Page implements HasTable
 
             session()->put('cart', $this->cart);
         }
+
+        $this->calculatePotentialTokens();
+
     }
+
+    public function getFinalAmountProperty()
+{
+    $total = 0;
+    foreach ($this->cart as $productId => $qty) {
+        $product = Product::find($productId);
+        if ($product) {
+            $total += $product->price * $qty;
+        }
+    }
+
+    $discount = 0;
+    if ($this->userTokens >= 200) {
+        $discount = 10000;
+    }
+
+    return max(0, $total - $discount);
+}
+
 
     public function table(Table $table): Table
     {
@@ -199,10 +264,10 @@ class MyOrders extends Page implements HasTable
                         fn($state, $record) =>
                         $record->orderItems->map(
                             fn($item) =>
-                            $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')'
+                            $item->product->name . ' (x' . $item->quantity . ' )'
                         )->implode(', ')
                     )
-                    ->wrap(),
+                    ,
                 TextColumn::make('status')
                     ->badge()
                     ->sortable()
@@ -253,6 +318,7 @@ class MyOrders extends Page implements HasTable
                                 4 => '⭐️⭐️⭐️⭐️',
                                 5 => '⭐️⭐️⭐️⭐️⭐️',
                             ])
+                            ->native(false)
                             ->required(),
 
                         \Filament\Forms\Components\Textarea::make('review')
@@ -274,4 +340,19 @@ class MyOrders extends Page implements HasTable
             ])
             ->defaultSort('id', 'desc');
     }
+
+            public function calculatePotentialTokens(): void
+        {
+            $total = 0;
+
+            foreach ($this->cart as $productId => $qty) {
+                $product = Product::find($productId);
+                if ($product) {
+                    $total += $product->price * $qty;
+                }
+            }
+
+            $this->potentialTokens = $total >= 50000 ? floor($total / 15000) : 0;
+        }
+
 }

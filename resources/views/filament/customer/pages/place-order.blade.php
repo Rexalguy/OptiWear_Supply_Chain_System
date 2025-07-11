@@ -3,6 +3,17 @@
 
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🛍️ Available Products</h2>
 <div class="mt-6 text-right">
+
+    @if ($potentialTokens > 0)
+    <div class="text-sm text-green-600 dark:text-green-400 text-right">
+        🎁 You will earn <strong>{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
+    </div>
+    @else
+    <div class="text-sm text-green-600 dark:text-green-400 text-right">
+        Make a purchase above <strong>UGX 50,000</strong> to earn tokens 🎁
+    </div>
+    @endif
+
    <x-filament::button color="primary" tag="a" href="{{ url('/customer/my-orders') }}">
     View cart ({{ $this->cartCount }})
 </x-filament::button>
