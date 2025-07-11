@@ -5,12 +5,14 @@ namespace App\Providers\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use Illuminate\View\View;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Illuminate\Support\Facades\Auth;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
+use Devonab\FilamentEasyFooter\EasyFooterPlugin;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -18,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Container\Attributes\Auth as AttributesAuth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class CustomerPanelProvider extends PanelProvider
@@ -33,6 +36,19 @@ class CustomerPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->registration()
+            ->plugins([
+                EasyFooterPlugin::make()
+
+                    ->withGithub(showLogo: true, showUrl: true)
+                    ->withLoadTime('This page loaded in')
+                    ->withLinks([
+                        ['title' => 'About', 'url' => '#'],
+                        ['title' => 'FAQ', 'url' => '#'],
+                        ['title' => 'Privacy Policy', 'url' => '#']
+                    ])
+                    ->withBorder(false)
+                    ->withLoadTime()
+            ])
             ->colors([
                 'primary' => Color::Sky,
                 'info' => Color::Blue,
