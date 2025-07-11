@@ -2,10 +2,7 @@
 
 namespace App\Providers;
 
-use Filament\View\PanelsRenderHook;
 use Illuminate\Support\ServiceProvider;
-use Filament\Support\Facades\FilamentView;
-use Illuminate\View\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,11 +18,8 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     // In AuthServiceProvider.php
-    public function boot()
-    {
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::FOOTER,
-            fn(): View => view('footer'),
-        );
-    }
+public function boot()
+{
+}
+
 }
