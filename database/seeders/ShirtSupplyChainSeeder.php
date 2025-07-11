@@ -271,6 +271,7 @@ class ShirtSupplyChainSeeder extends Seeder
                     'price' => $price,
                     'quantity_available' => rand(100, 600),
                     'shirt_category_id' => $category->id, // new correct relationship
+                    'low_stock_threshold' => rand(80, 120),
                 ]);
 
                 $products[] = $product;

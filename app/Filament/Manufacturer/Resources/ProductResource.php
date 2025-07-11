@@ -85,6 +85,12 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()
+                    ->badge()
+                        ->colors([
+                            'danger' => fn ($record) => $record->quantity_available < $record->low_stock_threshold,
+                            'warning' => fn ($record) => $record->quantity_available == $record->low_stock_threshold,
+                            'success' => fn ($record) => $record->quantity_available > $record->low_stock_threshold,
+                        ])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
