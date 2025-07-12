@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Helper\CustomSignup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -32,7 +33,7 @@ class CustomerPanelProvider extends PanelProvider
             ->default()                  // Make this the default panel
             ->login()
             ->profile()
-            ->registration()
+            ->registration(CustomSignup::class)
             ->colors([
                 'primary' => Color::Sky,
                 'info' => Color::Blue,
