@@ -16,6 +16,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
@@ -26,6 +27,11 @@ class ManufacturerPanelProvider extends PanelProvider
         return $panel
             ->id('manufacturer')
             ->path('manufacturer')
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
             ->colors([
                 'primary' => Color::Indigo,   // Bold, industrial
@@ -38,7 +44,7 @@ class ManufacturerPanelProvider extends PanelProvider
 
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
-                ChatPage::class,
+                ChatPage::class, Dashboard::class
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')

@@ -11,7 +11,7 @@ use Filament\Notifications\Notification;
 class WishlistPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-heart';
-    protected static ?string $navigationGroup = 'Customer Orders';
+    
     protected static ?int $navigationSort = 3;
     protected static string $view = 'filament.customer.pages.wishlist-page';
     protected static ?string $title = '❤️ My Wishlist';

@@ -7,11 +7,14 @@ use App\Models\Wishlist;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
+use App\Filament\Customer\Widgets\MyStatsWidget;
 
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    protected static ?string $navigationGroup = 'Customer Orders';
+    
+
+    protected static ?int $navigationGroupSort = 1;
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
@@ -29,6 +32,13 @@ class PlaceOrder extends Page
 
         $this->updateTokenCount();
         $this->loadWishlistProductIds();
+    }
+
+        public  function getHeaderWidgets(): array
+    {
+        return [
+            MyStatsWidget::class,
+        ];
     }
 
     protected function loadWishlistProductIds(): void

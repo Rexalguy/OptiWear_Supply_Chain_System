@@ -19,9 +19,34 @@ class VendorValidations extends Page implements HasTable
 
     protected static ?string $model = VendorValidation::class;
     protected static ?string $title = 'Vendor Validation';
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+
+
+
 
     protected static string $view = 'filament.pages.vendor-validation';
+
+    
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) VendorValidation::count();
+    }
+
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return VendorValidation::count() > 10 ? 'warning' : 'info';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'The number of Applications';
+    }
+
+
+
+
 
     public function table(Table $table): Table
     {
