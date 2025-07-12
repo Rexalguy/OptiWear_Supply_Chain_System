@@ -3,10 +3,8 @@
 namespace App\Filament\Customer\Pages;
 
 use App\Models\Product;
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Wishlist;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
@@ -18,9 +16,11 @@ class PlaceOrder extends Page
     protected static ?int $navigationSort = 1;
 
     public int $potentialTokens = 0;
-
     public array $cart = [];
     public $products;
+
+    // Holds product IDs in wishlist for quick lookup
+    public array $wishlistProductIds = [];
 
     public function mount(): void
     {
@@ -28,6 +28,14 @@ class PlaceOrder extends Page
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
         $this->updateTokenCount();
+        $this->loadWishlistProductIds();
+    }
+
+    protected function loadWishlistProductIds(): void
+    {
+        $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
+            ->pluck('product_id')
+            ->toArray();
     }
 
     public function addToCart($productId): void
@@ -116,5 +124,27 @@ class PlaceOrder extends Page
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+    }
+
+    public function toggleWishlist($productId): void
+    {
+        $user = Auth::user();
+        $existing = Wishlist::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            Notification::make()->title('Removed from wishlist')->success()->send();
+        } else {
+            Wishlist::create([
+                'user_id' => $user->id,
+                'product_id' => $productId,
+            ]);
+            Notification::make()->title('Added to wishlist')->success()->send();
+        }
+
+        // Refresh wishlist product IDs so UI updates heart color
+        $this->loadWishlistProductIds();
     }
 }

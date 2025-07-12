@@ -32,4 +32,8 @@ class Product extends Model
     {
         return $this->belongsTo(ShirtCategory::class);
     }
+    public function wishlistedBy()
+{
+    return $this->hasMany(Wishlist::class);
+}
 }

@@ -35,22 +35,26 @@
                         </p>
                     </div>
 
-                    <div class="mt-4">
+                    <div class="mt-4 flex items-center space-x-2">
                         @if (isset($cart[$product->id]))
-                            <div class="flex items-center space-x-2">
-                                <x-filament::button icon="heroicon-o-minus" size="sm" wire:click="decrementQuantity({{ $product->id }})" />
-                                <span class="text-sm font-semibold">{{ $cart[$product->id] }}</span>
-                                <x-filament::button icon="heroicon-o-plus" size="sm" wire:click="incrementQuantity({{ $product->id }})" />
-
-                                <x-filament::button color="danger" size="sm" wire:click="removeFromCart({{ $product->id }})">
-                                    Remove
-                                </x-filament::button>
-                            </div>
+                            <x-filament::button icon="heroicon-o-minus" size="sm" wire:click="decrementQuantity({{ $product->id }})" />
+                            <span class="text-sm font-semibold">{{ $cart[$product->id] }}</span>
+                            <x-filament::button icon="heroicon-o-plus" size="sm" wire:click="incrementQuantity({{ $product->id }})" />
+                            <x-filament::button color="danger" size="sm" wire:click="removeFromCart({{ $product->id }})">
+                                Remove
+                            </x-filament::button>
                         @else
                             <x-filament::button color="warning" wire:click="addToCart({{ $product->id }})">
                                 Add to Cart
                             </x-filament::button>
                         @endif
+
+                        <x-filament::button
+                            :color="in_array($product->id, $wishlistProductIds) ? 'danger' : 'gray'"
+                            :icon="in_array($product->id, $wishlistProductIds) ? 'heroicon-s-heart' : 'heroicon-o-heart'"
+                            wire:click="toggleWishlist({{ $product->id }})"
+                            tooltip="Add/Remove from Wishlist"
+                        />
                     </div>
                 </div>
             @endforeach
