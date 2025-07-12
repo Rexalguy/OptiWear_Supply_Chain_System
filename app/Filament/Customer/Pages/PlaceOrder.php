@@ -19,17 +19,15 @@ class PlaceOrder extends Page
 
     public int $potentialTokens = 0;
 
-
     public array $cart = [];
     public $products;
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
-        $this->products = Product::where('quantity_available', '>', 0)->get(); //->reverse();
+        $this->products = Product::where('quantity_available', '>', 0)->get();
 
-            $total = $this->calculateCartTotal();
-            $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+        $this->updateTokenCount();
     }
 
     public function addToCart($productId): void
@@ -53,8 +51,18 @@ class PlaceOrder extends Page
 
         Notification::make()->title('Added to cart')->success()->send();
 
-            $total = $this->calculateCartTotal();
-            $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+        $this->updateTokenCount();
+    }
+
+    public function removeFromCart($productId): void
+    {
+        if (isset($this->cart[$productId])) {
+            unset($this->cart[$productId]);
+            session()->put('cart', $this->cart);
+
+            Notification::make()->title('Removed from cart')->success()->send();
+            $this->updateTokenCount();
+        }
     }
 
     public function incrementQuantity($productId): void
@@ -67,8 +75,7 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
         }
 
-            $total = $this->calculateCartTotal();
-            $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+        $this->updateTokenCount();
     }
 
     public function decrementQuantity($productId): void
@@ -83,9 +90,7 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
         }
 
-            $total = $this->calculateCartTotal();
-            $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        
+        $this->updateTokenCount();
     }
 
     public function getCartCountProperty(): int
@@ -93,7 +98,7 @@ class PlaceOrder extends Page
         return array_sum($this->cart);
     }
 
-        public function calculateCartTotal(): int
+    public function calculateCartTotal(): int
     {
         $total = 0;
 
@@ -107,4 +112,9 @@ class PlaceOrder extends Page
         return $total;
     }
 
+    protected function updateTokenCount(): void
+    {
+        $total = $this->calculateCartTotal();
+        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+    }
 }
