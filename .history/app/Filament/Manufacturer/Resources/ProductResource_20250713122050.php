@@ -78,11 +78,11 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // Tables\Columns\ImageColumn::make('image')
-                //     ->label('Product Image')
-                //     ->disk('public')
-                //     ->height(80)
-                //     ->width(80),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Product Image')
+                    ->directory('images/products')
+                    ->height(80)
+                    ->width(80),
 
 
                 Tables\Columns\TextInputColumn::make('sku')

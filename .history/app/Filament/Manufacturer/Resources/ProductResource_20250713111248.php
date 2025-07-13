@@ -62,9 +62,7 @@ class ProductResource extends Resource
                     ->image()
                     ->nullable()
                     ->maxSize(1024) // 1MB
-                    ->disk('public') // Must match the ImageColumn disk
-                    ->directory('images/products') // Storage path
-                    ->visibility('public')
+                    ->directory('images/products')
                     ->placeholder('Drag and drop an image here')
                     ->columnSpanFull(),
             ]);
@@ -77,14 +75,6 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-
-                // Tables\Columns\ImageColumn::make('image')
-                //     ->label('Product Image')
-                //     ->disk('public')
-                //     ->height(80)
-                //     ->width(80),
-
-
                 Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
