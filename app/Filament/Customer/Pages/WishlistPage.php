@@ -26,6 +26,11 @@ class WishlistPage extends Page
         $this->refreshWishlist();
         $this->updateTokens();
     }
+     public function getCartCountProperty(): int
+    {
+        return array_sum($this->cart);
+    }
+
 
     public function refreshWishlist(): void
     {
@@ -91,5 +96,42 @@ class WishlistPage extends Page
             }
         }
         return $total;
+    }
+    public function removeFromCart($productId): void
+{
+    if (isset($this->cart[$productId])) {
+        unset($this->cart[$productId]);
+        session()->put('cart', $this->cart);
+
+        $this->updateTokens();
+
+        Notification::make()->title('Removed from cart')->success()->send();
+    }
+}
+
+    public function incrementQuantity($productId): void
+    {
+        $product = Product::find($productId);
+        $qty = $this->cart[$productId] ?? 0;
+
+        if ($product && $qty < min(50, $product->quantity_available)) {
+            $this->cart[$productId]++;
+            session()->put('cart', $this->cart);
+            $this->updateTokens();
+        }
+    }
+
+    public function decrementQuantity($productId): void
+    {
+        if (isset($this->cart[$productId])) {
+            $this->cart[$productId]--;
+
+            if ($this->cart[$productId] < 1) {
+                unset($this->cart[$productId]);
+            }
+
+            session()->put('cart', $this->cart);
+            $this->updateTokens();
+        }
     }
 }
