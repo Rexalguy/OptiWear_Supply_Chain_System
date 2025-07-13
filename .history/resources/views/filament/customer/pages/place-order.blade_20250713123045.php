@@ -1,5 +1,6 @@
 <x-filament-panels::page>
     <div class="p-6 space-y-6">
+
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🛍️ Available Products</h2>
 
         <div class="mt-6 text-right">
@@ -20,12 +21,12 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800">
-                    <div class="mb-4">
-                        <img style="height: 350px; object-fit: cover;" src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="w-full h-64 object-cover rounded">
-                    </div>
-                    
+                <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800 flex flex-col justify-between">
                     <div>
+                        <div class="mb-4">
+                            <img src="/images/image.png" alt="{{ $product->name }}" class="w-full h-48 object-cover rounded">
+                        </div>
+
                         <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">SKU: {{ $product->sku }}</p>
                         <p class="text-sm font-semibold mt-1">UGX {{ number_format($product->price) }}</p>
@@ -58,5 +59,6 @@
                 </div>
             @endforeach
         </div>
+
     </div>
 </x-filament-panels::page>

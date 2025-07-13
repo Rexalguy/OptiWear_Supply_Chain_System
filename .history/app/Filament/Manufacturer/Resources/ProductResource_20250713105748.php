@@ -40,6 +40,12 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
 
+                Forms\Components\FileUpload::make('image')
+                    ->label('Image')
+                    ->url()
+                    ->placeholder('https://example.com/image.webp')
+                    ->required(),
+
 
 
                 Forms\Components\TextInput::make('sku')
@@ -57,16 +63,6 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('low_stock_threshold')
                     ->numeric()
                     ->default(10),
-                Forms\Components\FileUpload::make('image')
-                    ->label('Image')
-                    ->image()
-                    ->nullable()
-                    ->maxSize(1024) // 1MB
-                    ->disk('public') // Must match the ImageColumn disk
-                    ->directory('images/products') // Storage path
-                    ->visibility('public')
-                    ->placeholder('Drag and drop an image here')
-                    ->columnSpanFull(),
             ]);
     }
 
@@ -78,18 +74,17 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // Tables\Columns\ImageColumn::make('image')
-                //     ->label('Product Image')
-                //     ->disk('public')
-                //     ->height(80)
-                //     ->width(80),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Product Image')
+                    ->height(80)
+                    ->width(80)
+                    ->circular(), // important!
 
 
-                Tables\Columns\TextColumn::make('sku')
+                Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (UGX)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()

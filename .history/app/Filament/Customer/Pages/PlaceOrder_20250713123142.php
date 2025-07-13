@@ -12,7 +12,7 @@ use App\Filament\Customer\Widgets\MyStatsWidget;
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    
+
 
     protected static ?int $navigationGroupSort = 1;
     protected static string $view = 'filament.customer.pages.place-order';
@@ -30,13 +30,11 @@ class PlaceOrder extends Page
         $this->cart = session()->get('cart', []);
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
         $this->loadWishlistProductIds();
     }
 
-        public  function getHeaderWidgets(): array
+    public  function getHeaderWidgets(): array
     {
         return [
             MyStatsWidget::class,
@@ -71,8 +69,6 @@ class PlaceOrder extends Page
 
         Notification::make()->title('Added to cart')->success()->send();
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
     }
 
@@ -97,8 +93,6 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
         }
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
     }
 
@@ -114,8 +108,6 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
         }
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
     }
 
@@ -137,6 +129,7 @@ class PlaceOrder extends Page
 
         return $total;
     }
+
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();

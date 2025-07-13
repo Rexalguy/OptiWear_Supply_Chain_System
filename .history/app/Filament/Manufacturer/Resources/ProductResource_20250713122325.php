@@ -85,11 +85,10 @@ class ProductResource extends Resource
                 //     ->width(80),
 
 
-                Tables\Columns\TextColumn::make('sku')
+                Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (UGX)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()

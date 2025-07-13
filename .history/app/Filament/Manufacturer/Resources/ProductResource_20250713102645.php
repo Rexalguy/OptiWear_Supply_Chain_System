@@ -40,7 +40,13 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-
+                Forms\Components\TextInput::make('image')
+                    ->label('Image URL')
+                    ->url()
+                    ->placeholder('https://example.com/image.webp')
+                    ->required(),
+                    
+                    
 
                 Forms\Components\TextInput::make('sku')
                     ->label('SKU')
@@ -50,23 +56,13 @@ class ProductResource extends Resource
                     ->label('Price (UGX)')
                     ->required()
                     ->numeric(),
-
+                    
                 Forms\Components\TextInput::make('quantity_available')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('low_stock_threshold')
                     ->numeric()
                     ->default(10),
-                Forms\Components\FileUpload::make('image')
-                    ->label('Image')
-                    ->image()
-                    ->nullable()
-                    ->maxSize(1024) // 1MB
-                    ->disk('public') // Must match the ImageColumn disk
-                    ->directory('images/products') // Storage path
-                    ->visibility('public')
-                    ->placeholder('Drag and drop an image here')
-                    ->columnSpanFull(),
             ]);
     }
 
@@ -78,28 +74,27 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // Tables\Columns\ImageColumn::make('image')
-                //     ->label('Product Image')
-                //     ->disk('public')
-                //     ->height(80)
-                //     ->width(80),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Product Image')
+                    ->height(80)
+                    ->width(80)
+                    ->circular(), // important!
+                
 
-
-                Tables\Columns\TextColumn::make('sku')
+                Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (UGX)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()
                     ->alignCenter()
                     ->badge()
-                    ->colors([
-                        'danger' => fn($record) => $record->quantity_available < $record->low_stock_threshold,
-                        'warning' => fn($record) => $record->quantity_available <= $record->low_stock_threshold + 100,
-                        'success' => fn($record) => $record->quantity_available > $record->low_stock_threshold + 100,
-                    ])
+                        ->colors([
+                            'danger' => fn ($record) => $record->quantity_available < $record->low_stock_threshold,
+                            'warning' => fn ($record) => $record->quantity_available <= $record->low_stock_threshold + 100,
+                            'success' => fn ($record) => $record->quantity_available > $record->low_stock_threshold + 100,
+                        ])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -122,7 +117,7 @@ class ProductResource extends Resource
                     ->iconButton()
                     ->color('warning')
                     ->tooltip('Auto reorder products')
-                    ->visible(fn(Product $record) => $record->quantity_available <= $record->low_stock_threshold + 100)
+                    ->visible(fn (Product $record) => $record->quantity_available <= $record->low_stock_threshold + 100)
                     ->form(function (Product $record): array {
                         $suggestedQuantity = max(
                             ($record->low_stock_threshold * 2) - $record->quantity_available,
@@ -155,7 +150,7 @@ class ProductResource extends Resource
 
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -78,18 +78,17 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // Tables\Columns\ImageColumn::make('image')
-                //     ->label('Product Image')
-                //     ->disk('public')
-                //     ->height(80)
-                //     ->width(80),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Product Image')
+                    ->directory('images/products')
+                    ->height(80)
+                    ->width(80),
 
 
-                Tables\Columns\TextColumn::make('sku')
+                Tables\Columns\TextInputColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (UGX)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
                     ->numeric()

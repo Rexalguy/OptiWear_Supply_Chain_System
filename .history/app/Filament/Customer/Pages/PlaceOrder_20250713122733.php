@@ -3,51 +3,33 @@
 namespace App\Filament\Customer\Pages;
 
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
-use App\Filament\Customer\Widgets\MyStatsWidget;
 
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    
-
-    protected static ?int $navigationGroupSort = 1;
+    protected static ?string $navigationGroup = 'Customer Orders';
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
     public int $potentialTokens = 0;
+
+
     public array $cart = [];
     public $products;
-
-    // Holds product IDs in wishlist for quick lookup
-    public array $wishlistProductIds = [];
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
-        $this->products = Product::where('quantity_available', '>', 0)->get();
+        $this->products = Product::where('quantity_available', '>', 0)->get(); //->reverse();
 
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        $this->updateTokenCount();
-        $this->loadWishlistProductIds();
-    }
-
-        public  function getHeaderWidgets(): array
-    {
-        return [
-            MyStatsWidget::class,
-        ];
-    }
-
-    protected function loadWishlistProductIds(): void
-    {
-        $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
-            ->pluck('product_id')
-            ->toArray();
     }
 
     public function addToCart($productId): void
@@ -73,18 +55,6 @@ class PlaceOrder extends Page
 
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        $this->updateTokenCount();
-    }
-
-    public function removeFromCart($productId): void
-    {
-        if (isset($this->cart[$productId])) {
-            unset($this->cart[$productId]);
-            session()->put('cart', $this->cart);
-
-            Notification::make()->title('Removed from cart')->success()->send();
-            $this->updateTokenCount();
-        }
     }
 
     public function incrementQuantity($productId): void
@@ -99,7 +69,6 @@ class PlaceOrder extends Page
 
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        $this->updateTokenCount();
     }
 
     public function decrementQuantity($productId): void
@@ -116,7 +85,6 @@ class PlaceOrder extends Page
 
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        $this->updateTokenCount();
     }
 
     public function getCartCountProperty(): int
@@ -136,32 +104,5 @@ class PlaceOrder extends Page
         }
 
         return $total;
-    }
-    protected function updateTokenCount(): void
-    {
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-    }
-
-    public function toggleWishlist($productId): void
-    {
-        $user = Auth::user();
-        $existing = Wishlist::where('user_id', $user->id)
-            ->where('product_id', $productId)
-            ->first();
-
-        if ($existing) {
-            $existing->delete();
-            Notification::make()->title('Removed from wishlist')->success()->send();
-        } else {
-            Wishlist::create([
-                'user_id' => $user->id,
-                'product_id' => $productId,
-            ]);
-            Notification::make()->title('Added to wishlist')->success()->send();
-        }
-
-        // Refresh wishlist product IDs so UI updates heart color
-        $this->loadWishlistProductIds();
     }
 }
