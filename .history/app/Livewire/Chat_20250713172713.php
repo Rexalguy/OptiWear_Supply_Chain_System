@@ -3,132 +3,140 @@
 namespace App\Livewire;
 
 use App\Models\User;
-use Livewire\Component;
-use App\Events\MessageSent;
 use App\Models\ChatMessage;
+use App\Events\MessageSent;
+use App\Events\UserTyping;
+use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
 class Chat extends Component
 {
     protected static ?int $navigationSort = 3;
+
     protected $listeners = [
-        'refreshUsers' => 'refreshUserList', // New event listener
+        'refreshUsers' => 'refreshUserList',
     ];
 
-    public $users;
+    public $users = [];
     public $selectedUser;
     public $newMessage;
-    public $messages;
+    public $messages = [];
     public $loginId;
-    protected $rules = [
-        'newMessage' => 'required|string|max:500',
-        'selectedUser.id' => 'required|exists:users,id'
-    ];
 
     public function mount()
     {
         $this->loginId = Auth::id();
         $this->refreshUserList();
         $this->loadInitialUser();
-        $this->loadUsers();
-
-        if ($this->users->isNotEmpty()) {
-            $this->selectedUser = $this->users->first();
-            $this->loadMessages();
-        }
     }
 
     public function submit()
     {
-        // Validate only the message field
-        $this->validateOnly('newMessage');
-
-        if (!$this->selectedUser) {
-            $this->addError('newMessage', 'Please select a recipient');
-            return;
-        }
+        $this->validate([
+            'newMessage' => 'required|string|max:500',
+            'selectedUser' => 'required|exists:users,id'
+        ]);
 
         try {
             $message = ChatMessage::create([
-                'sender_id' => Auth::id(),
+                'sender_id' => $this->loginId,
                 'receiver_id' => $this->selectedUser->id,
                 'message' => $this->newMessage,
             ]);
 
-            $this->messages[] = $message;
+            $message->load('sender', 'receiver');
+
+            $this->messages[] = $message; // ✅ Array append
             $this->newMessage = '';
 
             broadcast(new MessageSent($message))->toOthers();
+
+            return ['status' => 'Message sent'];
         } catch (\Exception $e) {
             $this->addError('newMessage', 'Failed to send message');
+            return ['status' => 'error'];
         }
     }
+
     public function getListeners()
     {
         return [
             "echo-private:chat.{$this->loginId},MessageSent" => 'newChatMessageNotification',
+            "echo-private:chat.{$this->loginId},UserTyping" => 'showTypingIndicator',
         ];
     }
+
     public function newChatMessageNotification($message)
     {
         if ($message['sender_id'] == $this->selectedUser->id) {
-            $messageObj = ChatMessage::find($message['id']);
-            $this->messages->push($messageObj);
+            $msg = ChatMessage::find($message['id']);
+            if ($msg) {
+                $this->messages[] = $msg->load('sender', 'receiver'); // ✅ Array append
+            }
         }
     }
-    protected function loadUsers()
-    {
-        $this->users = match (Auth::user()->role) {
-            'customer', 'vendor', 'supplier' => User::where('role', 'manufacturer')
-                ->where('id', '!=', $this->loginId)
-                ->get(),
-            default => User::whereNot('role', 'manufacturer')
-                ->where('id', '!=', $this->loginId)
-                ->get()
-        };
-    }
+
     public function selectUser($id)
     {
         $this->selectedUser = User::find($id);
         $this->loadMessages();
     }
+
     public function refreshUserList()
     {
         $this->users = match (Auth::user()->role) {
             'customer', 'vendor', 'supplier' => User::where('role', 'manufacturer')
                 ->where('id', '!=', $this->loginId)
-                ->get(),
+                ->get()
+                ->toArray(),
             default => User::whereNot('role', 'manufacturer')
                 ->where('id', '!=', $this->loginId)
                 ->get()
-        } ?? collect();
+                ->toArray(),
+        };
     }
+
     protected function loadInitialUser()
     {
-        $this->selectedUser = $this->users->first();
+        $this->selectedUser = collect($this->users)->first();
         if ($this->selectedUser) {
+            $this->selectedUser = User::find($this->selectedUser['id']); // reload model
             $this->loadMessages();
         }
     }
+
     public function loadMessages()
     {
         $this->messages = ChatMessage::with(['sender', 'receiver'])
             ->where(function ($q) {
-                $q->where('sender_id', Auth::id())
-                    ->where('receiver_id', $this->selectedUser->id);
+                $q->where('sender_id', $this->loginId)
+                  ->where('receiver_id', $this->selectedUser->id);
             })
             ->orWhere(function ($q) {
                 $q->where('sender_id', $this->selectedUser->id)
-                    ->where('receiver_id', Auth::id());
+                  ->where('receiver_id', $this->loginId);
             })
             ->latest()
             ->take(100)
             ->get()
             ->reverse()
             ->values()
-            ->all(); // <--- convert to plain array
-
+            ->toArray(); // ✅ Important!
     }
+
+    // Optional: called on keydown/input
+    // public function typing()
+    // {
+    //     broadcast(new UserTyping($this->selectedUser->id, $this->loginId))->toOthers();
+    // }
+
+    // Optional: show “typing...” in the UI
+    public function showTypingIndicator()
+    {
+        // Implement a simple flash indicator or set a public property like:
+        // $this->isTyping = true;
+    }
+
     public function render()
     {
         return view('livewire.chat');

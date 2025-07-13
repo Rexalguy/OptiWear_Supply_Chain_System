@@ -15,38 +15,28 @@ class Chat extends Component
         'refreshUsers' => 'refreshUserList', // New event listener
     ];
 
+
+    #[Rule('required|string|max:500')] ;// Add validation rule
+    public $newMessage;
     public $users;
     public $selectedUser;
     public $newMessage;
     public $messages;
     public $loginId;
-    protected $rules = [
-        'newMessage' => 'required|string|max:500',
-        'selectedUser.id' => 'required|exists:users,id'
-    ];
-
     public function mount()
     {
         $this->loginId = Auth::id();
-        $this->refreshUserList();
+        $this->refreshUserList(); 
         $this->loadInitialUser();
-        $this->loadUsers();
-
-        if ($this->users->isNotEmpty()) {
-            $this->selectedUser = $this->users->first();
-            $this->loadMessages();
-        }
     }
 
     public function submit()
     {
-        // Validate only the message field
-        $this->validateOnly('newMessage');
-
-        if (!$this->selectedUser) {
-            $this->addError('newMessage', 'Please select a recipient');
-            return;
-        }
+        // Add proper validation rules
+        $this->validate([
+            'newMessage' => 'required|string|max:500',
+            'selectedUser' => 'required|exists:users,id'
+        ]);
 
         try {
             $message = ChatMessage::create([
@@ -55,12 +45,16 @@ class Chat extends Component
                 'message' => $this->newMessage,
             ]);
 
-            $this->messages[] = $message;
+            $this->messages->push($message);
             $this->newMessage = '';
 
             broadcast(new MessageSent($message))->toOthers();
+
+            // Return success response
+            return ['status' => 'Message sent'];
         } catch (\Exception $e) {
             $this->addError('newMessage', 'Failed to send message');
+            return ['status' => 'error'];
         }
     }
     public function getListeners()
@@ -75,17 +69,6 @@ class Chat extends Component
             $messageObj = ChatMessage::find($message['id']);
             $this->messages->push($messageObj);
         }
-    }
-    protected function loadUsers()
-    {
-        $this->users = match (Auth::user()->role) {
-            'customer', 'vendor', 'supplier' => User::where('role', 'manufacturer')
-                ->where('id', '!=', $this->loginId)
-                ->get(),
-            default => User::whereNot('role', 'manufacturer')
-                ->where('id', '!=', $this->loginId)
-                ->get()
-        };
     }
     public function selectUser($id)
     {
@@ -122,12 +105,9 @@ class Chat extends Component
                     ->where('receiver_id', Auth::id());
             })
             ->latest()
-            ->take(100)
+            ->take(100) // Prevent overload
             ->get()
-            ->reverse()
-            ->values()
-            ->all(); // <--- convert to plain array
-
+            ->reverse(); // Show newest at bottom
     }
     public function render()
     {

@@ -55,7 +55,7 @@ class Chat extends Component
                 'message' => $this->newMessage,
             ]);
 
-            $this->messages[] = $message;
+            $this->messages[] = $message;;
             $this->newMessage = '';
 
             broadcast(new MessageSent($message))->toOthers();

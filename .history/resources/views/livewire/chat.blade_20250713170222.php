@@ -1,5 +1,4 @@
-<div>
-    <div class="chat-container">
+<div class="chat-container">
     <!-- Main Chat Layout -->
     <div class="chat-wrapper">
         <!-- Users List Sidebar -->
@@ -431,4 +430,3 @@
         }
     }
 </style>
-</div>

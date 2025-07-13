@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Events\MessageSent;
 use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class Chat extends Component
 {
@@ -20,11 +21,7 @@ class Chat extends Component
     public $newMessage;
     public $messages;
     public $loginId;
-    protected $rules = [
-        'newMessage' => 'required|string|max:500',
-        'selectedUser.id' => 'required|exists:users,id'
-    ];
-
+    #[Rule('required|string|max:500')]
     public function mount()
     {
         $this->loginId = Auth::id();
@@ -55,7 +52,7 @@ class Chat extends Component
                 'message' => $this->newMessage,
             ]);
 
-            $this->messages[] = $message;
+            $this->messages->push($message);
             $this->newMessage = '';
 
             broadcast(new MessageSent($message))->toOthers();
@@ -122,12 +119,9 @@ class Chat extends Component
                     ->where('receiver_id', Auth::id());
             })
             ->latest()
-            ->take(100)
+            ->take(100) // Prevent overload
             ->get()
-            ->reverse()
-            ->values()
-            ->all(); // <--- convert to plain array
-
+            ->reverse(); // Show newest at bottom
     }
     public function render()
     {
