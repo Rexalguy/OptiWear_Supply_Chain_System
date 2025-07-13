@@ -4,8 +4,10 @@ namespace App\Providers\Filament;
 
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Pages\Dashboard;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Filament\Navigation\NavigationGroup;
 use App\Filament\Customer\Pages\ChatPage;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
@@ -16,7 +18,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
@@ -41,10 +42,27 @@ class ManufacturerPanelProvider extends PanelProvider
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
             ])
+                    ->navigationGroups([
+            NavigationGroup::make()
+                ->label('Product')
+                ->icon('heroicon-o-cube')
+                ,
+
+            NavigationGroup::make()
+                ->label('Production Workflow')
+                ->icon('heroicon-o-chart-bar')
+                ,
+
+            NavigationGroup::make()
+                ->label('Raw Materials')
+                ->icon('heroicon-o-table-cells')
+                ->collapsed(),
+            ])
 
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
-                ChatPage::class, Dashboard::class
+                ChatPage::class, 
+                // Dashboard::class
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')

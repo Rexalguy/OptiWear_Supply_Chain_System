@@ -12,19 +12,37 @@ use App\Models\ProductionOrder;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
+use Filament\Infolists\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\Manufacturer\Resources\ProductionOrderResource\Pages;
-use Filament\Tables\Actions\ActionGroup;
+use App\Filament\Manufacturer\Resources\ProductionOrderResource\Widgets\ProductionStats;
 
 class ProductionOrderResource extends Resource
 {
     protected static ?string $model = ProductionOrder::class;
     protected static ?string $navigationGroup = 'Product';
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
+
+        public static function getNavigationBadge(): ?string
+    {
+        return (string) ProductionOrder::where('status', 'pending')->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $count = ProductionOrder::where('status', 'pending')->count();
+
+        return $count > 0 ? 'warning' : 'gray'; // yellow if pending, gray if none
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pending production orders';
+    }
 
     public static function form(Form $form): Form
     {
@@ -47,6 +65,7 @@ class ProductionOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')->label('Product')->searchable()->sortable()->grow(false),
                 Tables\Columns\TextColumn::make('quantity')->label('Quantity')->numeric(),
@@ -58,6 +77,7 @@ class ProductionOrderResource extends Resource
                 }),
                 Tables\Columns\TextColumn::make('created_at')->label('Created')->since()->sortable()->dateTimeTooltip(),
             ])
+
             ->filters([
                 Tables\Filters\SelectFilter::make('status')->label('Status')->options([
                     'pending' => 'Pending',
@@ -214,6 +234,13 @@ class ProductionOrderResource extends Resource
     {
         return [
             'index' => Pages\ListProductionOrders::route('/'),
+        ];
+    }
+
+        public static function getWidgets(): array
+    {
+        return [
+            ProductionStats::class,
         ];
     }
 }

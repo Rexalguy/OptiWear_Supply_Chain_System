@@ -2,15 +2,16 @@
 
 namespace App\Filament\Manufacturer\Pages;
 
-use Filament\Pages\Page;
-use App\Models\ProductionStage;
-use App\Models\Workforce;
 use Filament\Tables;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Pages\Page;
+use App\Models\Workforce;
+use App\Models\ProductionStage;
 use Filament\Tables\Actions\Action;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Concerns\InteractsWithTable;
+use App\Filament\Manufacturer\Widgets\StageStatsWidget;
 
 class PrintingStage extends Page implements HasTable
 {
@@ -19,7 +20,31 @@ class PrintingStage extends Page implements HasTable
     protected static ?string $title = 'Printing Stage';
     protected static ?string $navigationIcon = 'heroicon-o-printer';
     protected static ?string $navigationGroup = 'Production Workflow';
+
+    protected static ?int $navigationSort = 1;
+
     protected static string $view = 'filament.manufacturer.pages.printing-stage';
+
+    public static function getNavigationBadge(): ?string
+{
+    return (string) ProductionStage::where('stage', 'printing')
+        ->where('status', 'in_progress')
+        ->count();
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    $count = ProductionStage::where('stage', 'printing')
+        ->where('status', 'in_progress')
+        ->count();
+
+    return $count > 0 ? 'info' : 'gray';
+}
+
+public static function getNavigationBadgeTooltip(): ?string
+{
+    return 'Printing tasks in progress';
+}
 
     public function getTableQuery(): Builder
     {
@@ -102,4 +127,11 @@ class PrintingStage extends Page implements HasTable
                 ->visible(fn ($record) => $record->status === 'in_progress'),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+{
+    return [
+        StageStatsWidget::make(['stage' => 'printing']),
+    ];
+}
 }

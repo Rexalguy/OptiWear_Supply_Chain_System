@@ -23,6 +23,8 @@ class RawMaterialResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-table-cells';
 
     protected static ?string $navigationGroup = 'Raw Materials';
+
+    
     public static function canViewAny(): bool
     {
         $user = Auth::user();

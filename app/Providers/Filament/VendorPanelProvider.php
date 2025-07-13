@@ -27,6 +27,11 @@ class VendorPanelProvider extends PanelProvider
         return $panel
             ->id('vendor')
             ->path('vendor')
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
             ->colors([
                 'primary' => Color::Amber,    // Business-focused, marketplace feel

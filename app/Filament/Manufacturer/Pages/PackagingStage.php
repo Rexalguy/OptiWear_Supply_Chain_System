@@ -6,12 +6,14 @@ use Filament\Tables;
 use Filament\Pages\Page;
 use App\Models\Workforce;
 use App\Models\ProductionOrder;
+use App\Models\ProductionStage;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
+use App\Filament\Manufacturer\Widgets\StageStatsWidget;
 
 class PackagingStage extends Page implements HasTable
 {
@@ -19,8 +21,31 @@ class PackagingStage extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $navigationGroup = 'Production Workflow';
+
+    protected static ?int $navigationSort = 2;
     protected static ?string $title = 'Packaging';
     protected static string $view = 'filament.manufacturer.pages.packaging-stage';
+
+    public static function getNavigationBadge(): ?string
+{
+    return (string) ProductionStage::where('stage', 'packaging')
+        ->where('status', 'in_progress')
+        ->count();
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    $count = ProductionStage::where('stage', 'packaging')
+        ->where('status', 'in_progress')
+        ->count();
+
+    return $count > 0 ? 'info' : 'gray';
+}
+
+public static function getNavigationBadgeTooltip(): ?string
+{
+    return 'packaging tasks in progress';
+}
 
     public function getTableQuery(): Builder
     {
@@ -152,4 +177,12 @@ class PackagingStage extends Page implements HasTable
                 ),
         ];
     }
+
+        protected function getHeaderWidgets(): array
+{
+    return [
+        StageStatsWidget::make(['stage' => 'packaging']),
+    ];
+}
+
 }
