@@ -8,8 +8,10 @@ use App\Events\MessageSent;
 use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Auth;
 
-class Chat extends Component
+class Chat extends Component 
 {
+    protected static ?int $navigationSort = 3;
+
     public $users;
     public $selectedUser;
     public $newMessage;

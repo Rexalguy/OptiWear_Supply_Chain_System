@@ -23,9 +23,32 @@ class MyOrders extends Page implements HasTable
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
-    protected static ?string $navigationGroup = 'Customer Orders';
+    
     protected static ?int $navigationSort = 2;
     protected static string $view = 'filament.customer.pages.my-orders';
+
+public static function getNavigationBadge(): ?string
+{
+    return (string) Order::where('created_by', Auth::id())
+        ->where('status', 'pending')
+        ->count();
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    $count = Order::where('created_by', Auth::id())
+        ->where('status', 'pending')
+        ->count();
+
+    return $count > 5 ? 'warning' : 'primary';
+}
+
+public static function getNavigationBadgeTooltip(): ?string
+{
+    return 'Your pending orders';
+}
+
+
 
     public int $potentialTokens = 0;
 

@@ -30,6 +30,9 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
     public ?VendorValidation $latestApplication = null;
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
+    protected static ?int $navigationSort = 4;
+
+
     protected static string $view = 'filament.customer.pages.become-vendor';
 
                 public static function canAccess(): bool

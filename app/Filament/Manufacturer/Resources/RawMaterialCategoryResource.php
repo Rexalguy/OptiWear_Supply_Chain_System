@@ -20,6 +20,8 @@ class RawMaterialCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-arrow-down';
     protected static ?string $navigationGroup ='Raw Materials';
+
+    protected static ?int $navigationSort = 4;
     public static function canViewAny(): bool
     {
         return Auth::user()?->role === 'manufacturer';

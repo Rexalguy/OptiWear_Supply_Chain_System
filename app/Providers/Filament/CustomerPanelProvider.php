@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Helper\CustomSignup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -25,14 +26,18 @@ class CustomerPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->brandLogo(asset('images/logo.jpg'))
-            ->brandName('Customer Panel')        // Set the brand name for the panel
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
+            // ->brandLogo(asset('images/logo.jpg'))
             ->id('customer')
             ->path('customer')           // URL prefix for this panel
             ->default()                  // Make this the default panel
             ->login()
             ->profile()
-            ->registration()
+            ->registration(CustomSignup::class)
             ->colors([
                 'primary' => Color::Sky,
                 'info' => Color::Blue,
