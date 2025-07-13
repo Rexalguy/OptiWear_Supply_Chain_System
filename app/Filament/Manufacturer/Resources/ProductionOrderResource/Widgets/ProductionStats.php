@@ -36,10 +36,10 @@ class ProductionStats extends BaseWidget
                 ->color($lowStockCount > 0 ? 'danger' : 'success'),
 
             Stat::make('Biggest Order', $biggestOrder
-                ? $biggestOrder->product->name . ' [' . $biggestOrder->quantity . ']'
+                ? $biggestOrder->product->name 
                 : 'No orders')
                 ->icon('heroicon-o-chart-bar')
-                ->description('Highest quantity ordered')
+                ->description('Highest quantity ordered'. ' ['. $biggestOrder->quantity .']')
                 ->chart([5, 8, 12, 27, 35, 40, 49])
                 ->color('success'),
         ];
