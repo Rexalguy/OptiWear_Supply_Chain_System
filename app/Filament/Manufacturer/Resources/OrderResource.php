@@ -16,6 +16,7 @@ use Filament\Infolists\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -139,64 +140,8 @@ class OrderResource extends Resource
             ])
             ->actions([
 
-             Tables\Actions\ViewAction::make(),
-                
-        Action::make('viewItems')
-            ->iconButton()
-            ->tooltip('View all items in this order')
-            ->icon('heroicon-o-list-bullet')
-            ->color('gray')
-            ->modalHeading('Order Items')
-            ->infolist(function ($record) {
-                $items = OrderItem::with('product')
-                    ->where('order_id', $record->id)
-                    ->get();
-
-                if ($items->isEmpty()) {
-                    return [
-                        Section::make()
-                            ->schema([
-                                TextEntry::make('none')
-                                    ->default('No items found for this order.')
-                                    ->color('danger')
-                                    ->columnSpanFull(),
-                            ]),
-                    ];
-                }
-
-                return [
-                    Section::make('Items')
-                        ->schema(
-                            $items->map(function ($item) {
-                                return Grid::make(3)->schema([
-                                    TextEntry::make('product')
-                                        ->label('Product')
-                                        ->default($item->product->name),
-
-                                    TextEntry::make('quantity')
-                                        ->label('Quantity')
-                                        ->default($item->quantity),
-
-                                    TextEntry::make('total')
-                                        ->label('Total (UGX)')
-                                        ->default('UGX ' . number_format($item->quantity * $item->product->price)),
-                                ]);
-                            })->toArray()
-                        ),
-                ];
-            })
-            ->modalSubmitAction(false)
-            ->modalCancelActionLabel('Close'),
-
-                            Action::make('viewReview')
-                            ->label('View Review')
-                            ->color('gray')
-                            ->icon('heroicon-o-eye')
-                            ->visible(fn($record) =>  $record?->status === 'delivered')
-                            ->modalHeading('Customer Review')
-                            ->modalDescription(fn($record) => 'Order #' . $record->id)
-                            ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
-                            ->modalSubmitAction(false),
+             
+          
 
                         Action::make('markConfirmed')
                             ->label('Confirm')
@@ -265,6 +210,68 @@ class OrderResource extends Resource
                                     ->danger()
                                     ->send();
                             }),
+
+                            ActionGroup::make([
+            Tables\Actions\ViewAction::make(),
+            Action::make('viewItems')
+            ->label('View Items')
+            ->icon('heroicon-o-list-bullet')
+            ->color('gray')
+            ->modalHeading('Order Items')
+            ->infolist(function ($record) {
+                $items = OrderItem::with('product')
+                    ->where('order_id', $record->id)
+                    ->get();
+
+                if ($items->isEmpty()) {
+                    return [
+                        Section::make()
+                            ->schema([
+                                TextEntry::make('none')
+                                    ->default('No items found for this order.')
+                                    ->color('danger')
+                                    ->columnSpanFull(),
+                            ]),
+                    ];
+                }
+
+                return [
+                    Section::make('Items')
+                        ->schema(
+                            $items->map(function ($item) {
+                                return Grid::make(3)->schema([
+                                    TextEntry::make('product')
+                                        ->label('Product')
+                                        ->default($item->product->name),
+
+                                    TextEntry::make('quantity')
+                                        ->label('Quantity')
+                                        ->default($item->quantity),
+
+                                    TextEntry::make('total')
+                                        ->label('Total (UGX)')
+                                        ->default('UGX ' . number_format($item->quantity * $item->product->price)),
+                                ]);
+                            })->toArray()
+                        ),
+                ];
+            })
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close'),
+
+                            Action::make('viewReview')
+                            ->label('Review')
+                            ->color('gray')
+                            ->icon('heroicon-o-eye')
+                            ->visible(fn($record) =>  $record?->status === 'delivered')
+                            ->modalHeading('Customer Review')
+                            ->modalDescription(fn($record) => 'Order #' . $record->id)
+                            ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
+                            ->modalSubmitAction(false),
+            ])->iconButton()
+            ->color('info')
+            ->tooltip('Details'),     
+
                     ])
                     ->defaultSort('id', 'desc')
             
