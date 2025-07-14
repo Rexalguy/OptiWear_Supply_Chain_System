@@ -13,7 +13,6 @@ class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = "View Orders";
     protected static ?string $navigationGroup = 'Orders';
     protected static string $view = 'filament.vendor.pages.place-order';
 

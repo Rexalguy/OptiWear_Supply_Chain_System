@@ -11,10 +11,7 @@ use Filament\Notifications\Notification;
 
 class PlaceOrder extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = "View Orders";
-    protected static ?string $navigationGroup = 'Orders';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.vendor.pages.place-order';
 
     use Forms\Concerns\InteractsWithForms;
@@ -37,25 +34,25 @@ class PlaceOrder extends Page
                 ->options(Product::pluck('name', 'id'))
                 ->reactive()
                 ->searchable()
-                ->afterStateUpdated(fn() => $this->dispatch('refresh'))
+                ->afterStateUpdated(fn () => $this->dispatch('refresh'))
                 ->required(),
 
             Forms\Components\Placeholder::make('unit_price')
                 ->label('Unit Price')
-                ->inlineLabel()
-                ->content(fn() => $this->getUnitPrice()),
+                ->inlineLabel() 
+                ->content(fn () => $this->getUnitPrice()),
 
             Forms\Components\TextInput::make('quantity')
                 ->numeric()
                 ->minValue(200)
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(fn() => $this->dispatch('refresh')),
+                ->afterStateUpdated(fn () => $this->dispatch('refresh')),
 
             Forms\Components\Placeholder::make('total')
                 ->label('Total Price')
-                ->inlineLabel()
-                ->content(fn() => $this->calculateTotal()),
+                ->inlineLabel() 
+                ->content(fn () => $this->calculateTotal()),
 
             Forms\Components\Textarea::make('notes')
                 ->label('Extra Notes About Product')
@@ -72,14 +69,14 @@ class PlaceOrder extends Page
     {
         if (!$this->product_id) return '0 UGX';
         $product = Product::find($this->product_id);
-        return $product ? $product->unit_price . ' UGX' : '0 UGX';
+        return $product ? $product->unit_price . ' UGX' :'0 UGX'; 
     }
 
     public function calculateTotal()
     {
         if (!$this->product_id || !$this->quantity) return '0 UGX';
         $product = Product::find($this->product_id);
-        return $product ? ($product->unit_price * $this->quantity) . ' UGX' : '0 UGX';
+        return $product ? ($product->unit_price * $this->quantity) . ' UGX' : '0 UGX'; 
     }
 
     public function placeOrder()
