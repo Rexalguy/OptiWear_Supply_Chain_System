@@ -50,13 +50,10 @@
             </div>
 
             <!-- Messages Container -->
-            <div
-                wire:poll.5m="refreshMessages"
-                class="messages-container"
-                x-data="{ atBottom: true }"
-                x-init="$watch('atBottom', value => value && $el.scrollTo({ top: $el.scrollHeight }))"
-                @scroll.debounce="atBottom = Math.abs($el.scrollHeight - $el.scrollTop - $el.clientHeight) < 50"
-            >
+            <div wire::poll.5s class="messages-container" 
+                 x-data="{ atBottom: true }"
+                 x-init="$watch('atBottom', value => value && $el.scrollTo({ top: $el.scrollHeight }))"
+                 @scroll.debounce="atBottom = Math.abs($el.scrollHeight - $el.scrollTop - $el.clientHeight) < 50">
                 @forelse($messages as $message)
                     <div class="message {{ $message->sender_id === auth()->id() ? 'sent' : 'received' }}">
                         <div class="message-bubble">
@@ -90,10 +87,8 @@
                        @keydown.enter.prevent="$wire.submit()">
                 <button type="submit" 
                         wire:loading.attr="disabled"
-                        wire:loading.class="loading"
-                        wire:target="submit"
                         class="send-button">
-                    <span>Send</span>
+                    <span wire:loading.remove>Send</span>
                     <span wire:loading wire:target="submit">
                         <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -118,6 +113,14 @@
                 }, 50);
             });
         });
+
+        // Play sound notification for new messages
+        window.Echo?.private(`chat.${@js(auth()->id())}`)
+            .listen('.message.sent', (e) => {
+                if (e.sender.id !== @js(auth()->id())) {
+                    new Audio('/notification.mp3').play().catch(() => {});
+                }
+            });
     });
 </script>
 @endscript

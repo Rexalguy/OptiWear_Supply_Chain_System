@@ -130,10 +130,6 @@ class Chat extends Component
             ->all(); // <--- convert to plain array
 
     }
-    public function refreshMessages()
-    {
-        $this->loadMessages();
-    }
     public function render()
     {
         return view('livewire.chat');
