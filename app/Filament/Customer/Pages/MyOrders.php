@@ -249,13 +249,12 @@ class MyOrders extends Page implements HasTable
                     ->formatStateUsing(fn($state) => number_format($state, 2)),
                 TextColumn::make('orderItems')
                     ->label('Items')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
-                            $record->orderItems->map(
-                                fn($item) =>
-                                    $item->product->name . ' (x' . $item->quantity . ' )'
-                            )->implode(', ')
-                    ),
+                    ->html()
+                    ->formatStateUsing(function ($state, $record) {
+                        return $record->orderItems
+                            ->map(fn($item) => e($item->product->name) . ' (x' . $item->quantity . ')')
+                            ->implode('<br>');
+                    }),
                 TextColumn::make('status')
                     ->badge()
                     ->sortable()
@@ -288,7 +287,7 @@ class MyOrders extends Page implements HasTable
                     ->visible(fn(Order $record) => $record->status === 'delivered' && is_null($record->rating))
                     ->form([
                         \Filament\Forms\Components\Select::make('rating')
-                            ->label('Rating (1–5 Stars)')
+                            ->label('Rating (1-5 Stars)')
                             ->options([
                                 1 => '⭐️',
                                 2 => '⭐️⭐️',

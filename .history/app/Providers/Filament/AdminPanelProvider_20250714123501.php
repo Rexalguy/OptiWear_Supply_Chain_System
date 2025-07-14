@@ -2,29 +2,30 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Widgets;
-// Removed duplicate import of Widgets
-// Removed duplicate import of PanelProvider
-use App\Http\Controllers\RedirectController;
-// Removed duplicate import of MenuItem
+use Filament\Panel;
+use Filament\Widgets;
+use Filament\PanelProvider;
+use Filament\Pages\Dashboard;
+use Filament\Navigation\MenuItem;
+use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-// Removed duplicate import of PanelProvider
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Http\Controllers\RedirectController;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Widgets\AccountWidget;
-use Widgets\FilamentInfoWidget;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Filament\Navigation\MenuItem;
+use App\Filament\Admin\Widgets;
+use App\Filament\Admin\Widgets\FilamentInfoWidget;
+use App\Filament\Admin\Widgets\AccountWidget;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -52,8 +53,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
