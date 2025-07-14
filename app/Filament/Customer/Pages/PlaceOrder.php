@@ -12,8 +12,6 @@ use App\Filament\Customer\Widgets\MyStatsWidget;
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
-    
-
     protected static ?int $navigationGroupSort = 1;
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
@@ -21,8 +19,6 @@ class PlaceOrder extends Page
     public int $potentialTokens = 0;
     public array $cart = [];
     public $products;
-
-    // Holds product IDs in wishlist for quick lookup
     public array $wishlistProductIds = [];
 
     public function mount(): void
@@ -30,17 +26,20 @@ class PlaceOrder extends Page
         $this->cart = session()->get('cart', []);
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
         $this->loadWishlistProductIds();
     }
 
-        public  function getHeaderWidgets(): array
+    public function getHeaderWidgets(): array
     {
         return [
             MyStatsWidget::class,
         ];
+    }
+
+    protected function notify(string $message, string $type = 'success'): void
+    {
+        Notification::make()->title($message)->{$type}()->send();
     }
 
     protected function loadWishlistProductIds(): void
@@ -53,27 +52,22 @@ class PlaceOrder extends Page
     public function addToCart($productId): void
     {
         $product = Product::find($productId);
-
         if (!$product || $product->quantity_available < 1) {
-            Notification::make()->title('Product out of stock')->danger()->send();
+            $this->notify('Product out of stock', 'danger');
             return;
         }
 
         $qty = $this->cart[$productId] ?? 0;
-
         if ($qty >= 50) {
-            Notification::make()->title('Maximum 50 items per product allowed')->warning()->send();
+            $this->notify('Maximum 50 items per product allowed', 'warning');
             return;
         }
 
         $this->cart[$productId] = $qty + 1;
         session()->put('cart', $this->cart);
 
-        Notification::make()->title('Added to cart')->success()->send();
-
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
         $this->updateTokenCount();
+        $this->notify('Added to cart');
     }
 
     public function removeFromCart($productId): void
@@ -81,9 +75,8 @@ class PlaceOrder extends Page
         if (isset($this->cart[$productId])) {
             unset($this->cart[$productId]);
             session()->put('cart', $this->cart);
-
-            Notification::make()->title('Removed from cart')->success()->send();
             $this->updateTokenCount();
+            $this->notify('Removed from cart');
         }
     }
 
@@ -95,73 +88,63 @@ class PlaceOrder extends Page
         if ($product && $qty < min(50, $product->quantity_available)) {
             $this->cart[$productId]++;
             session()->put('cart', $this->cart);
+            $this->updateTokenCount();
         }
-
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-        $this->updateTokenCount();
     }
 
     public function decrementQuantity($productId): void
     {
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId]--;
-
-            if ($this->cart[$productId] < 1) {
-                unset($this->cart[$productId]);
-            }
-
-            session()->put('cart', $this->cart);
+        if (!isset($this->cart[$productId])) {
+            return;
         }
 
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+        $this->cart[$productId]--;
+        if ($this->cart[$productId] < 1) {
+            unset($this->cart[$productId]);
+        }
+
+        session()->put('cart', $this->cart);
         $this->updateTokenCount();
-    }
-
-    public function getCartCountProperty(): int
-    {
-        return array_sum($this->cart);
-    }
-
-    public function calculateCartTotal(): int
-    {
-        $total = 0;
-
-        foreach ($this->cart as $productId => $quantity) {
-            $product = Product::find($productId);
-            if ($product) {
-                $total += $product->price * $quantity;
-            }
-        }
-
-        return $total;
-    }
-    protected function updateTokenCount(): void
-    {
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
     public function toggleWishlist($productId): void
     {
         $user = Auth::user();
+
         $existing = Wishlist::where('user_id', $user->id)
             ->where('product_id', $productId)
             ->first();
 
         if ($existing) {
             $existing->delete();
-            Notification::make()->title('Removed from wishlist')->success()->send();
+            $this->notify('Removed from wishlist');
         } else {
             Wishlist::create([
                 'user_id' => $user->id,
                 'product_id' => $productId,
             ]);
-            Notification::make()->title('Added to wishlist')->success()->send();
+            $this->notify('Added to wishlist');
         }
 
-        // Refresh wishlist product IDs so UI updates heart color
         $this->loadWishlistProductIds();
+    }
+
+    protected function updateTokenCount(): void
+    {
+        $total = $this->calculateCartTotal();
+        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
+    }
+
+    public function calculateCartTotal(): int
+    {
+        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
+            $product = Product::find($productId);
+            return $product ? $total + ($product->price * $qty) : $total;
+        }, 0);
+    }
+
+    public function getCartCountProperty(): int
+    {
+        return array_sum($this->cart);
     }
 }
