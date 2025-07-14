@@ -1,3 +1,3 @@
 <x-filament-panels::page>
- <livewire:product-list />
+<livewire: />
 </x-filament-panels::page>

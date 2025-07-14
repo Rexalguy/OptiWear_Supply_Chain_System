@@ -24,14 +24,9 @@ class Product extends Page
     {
         $this->products = ProductModel::all();
     }
-    public function openProductModal($productId)
+    public function openModal($productId)
     {
         $this->clickedProduct = ProductModel::find($productId);
         $this->selectedProduct = true;
-    }
-    public function closeProductModal()
-    {
-        $this->selectedProduct = false;
-        $this->clickedProduct = null;
     }
 }

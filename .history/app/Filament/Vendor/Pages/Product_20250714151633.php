@@ -26,7 +26,7 @@ class Product extends Page
     }
     public function openProductModal($productId)
     {
-        $this->clickedProduct = ProductModel::find($productId);
+        $this->clickedProduct = Product::find($productId);
         $this->selectedProduct = true;
     }
     public function closeProductModal()

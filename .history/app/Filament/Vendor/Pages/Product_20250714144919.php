@@ -8,8 +8,7 @@ use Filament\Pages\Page;
 class Product extends Page
 
 {
-    public $clickedProduct;
-    public $selectedProduct = false;
+    public $selectedProduct;
     public $products;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
@@ -23,15 +22,5 @@ class Product extends Page
     public function mount()
     {
         $this->products = ProductModel::all();
-    }
-    public function openProductModal($productId)
-    {
-        $this->clickedProduct = ProductModel::find($productId);
-        $this->selectedProduct = true;
-    }
-    public function closeProductModal()
-    {
-        $this->selectedProduct = false;
-        $this->clickedProduct = null;
     }
 }
