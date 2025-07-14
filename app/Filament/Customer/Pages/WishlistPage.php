@@ -11,7 +11,6 @@ use Filament\Notifications\Notification;
 class WishlistPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-heart';
-    
     protected static ?int $navigationSort = 3;
     protected static string $view = 'filament.customer.pages.wishlist-page';
     protected static ?string $title = '❤️ My Wishlist';
@@ -26,11 +25,19 @@ class WishlistPage extends Page
         $this->refreshWishlist();
         $this->updateTokens();
     }
-     public function getCartCountProperty(): int
+
+    public function getCartCountProperty(): int
     {
         return array_sum($this->cart);
     }
 
+    protected function notify(string $message, string $type = 'success'): void
+    {
+        Notification::make()
+            ->title($message)
+            ->{$type}()
+            ->send();
+    }
 
     public function refreshWishlist(): void
     {
@@ -47,12 +54,7 @@ class WishlistPage extends Page
 
         if ($item) {
             $item->delete();
-
-            Notification::make()
-                ->title('Removed from Wishlist')
-                ->success()
-                ->send();
-
+            $this->notify('Removed from Wishlist');
             $this->refreshWishlist();
         }
     }
@@ -63,12 +65,12 @@ class WishlistPage extends Page
         $qty = $this->cart[$productId] ?? 0;
 
         if (!$product || $product->quantity_available < 1) {
-            Notification::make()->title('Product out of stock')->danger()->send();
+            $this->notify('Product out of stock', 'danger');
             return;
         }
 
         if ($qty >= 50) {
-            Notification::make()->title('Maximum 50 items per product allowed')->warning()->send();
+            $this->notify('Maximum 50 items per product allowed', 'warning');
             return;
         }
 
@@ -76,38 +78,19 @@ class WishlistPage extends Page
         session()->put('cart', $this->cart);
 
         $this->updateTokens();
-
-        Notification::make()->title('Added to cart')->success()->send();
+        $this->notify('Added to cart');
     }
 
-    public function updateTokens(): void
-    {
-        $total = $this->calculateCartTotal();
-        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
-    }
-
-    public function calculateCartTotal(): int
-    {
-        $total = 0;
-        foreach ($this->cart as $productId => $qty) {
-            $product = Product::find($productId);
-            if ($product) {
-                $total += $product->price * $qty;
-            }
-        }
-        return $total;
-    }
     public function removeFromCart($productId): void
-{
-    if (isset($this->cart[$productId])) {
-        unset($this->cart[$productId]);
-        session()->put('cart', $this->cart);
+    {
+        if (isset($this->cart[$productId])) {
+            unset($this->cart[$productId]);
+            session()->put('cart', $this->cart);
 
-        $this->updateTokens();
-
-        Notification::make()->title('Removed from cart')->success()->send();
+            $this->updateTokens();
+            $this->notify('Removed from cart');
+        }
     }
-}
 
     public function incrementQuantity($productId): void
     {
@@ -123,15 +106,31 @@ class WishlistPage extends Page
 
     public function decrementQuantity($productId): void
     {
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId]--;
-
-            if ($this->cart[$productId] < 1) {
-                unset($this->cart[$productId]);
-            }
-
-            session()->put('cart', $this->cart);
-            $this->updateTokens();
+        if (!isset($this->cart[$productId])) {
+            return;
         }
+
+        $this->cart[$productId]--;
+        if ($this->cart[$productId] < 1) {
+            unset($this->cart[$productId]);
+        }
+
+        session()->put('cart', $this->cart);
+        $this->updateTokens();
+    }
+
+    protected function updateTokens(): void
+    {
+        $this->potentialTokens = $this->calculateCartTotal() > 50000
+            ? floor($this->calculateCartTotal() / 15000)
+            : 0;
+    }
+
+    protected function calculateCartTotal(): int
+    {
+        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
+            $product = Product::find($productId);
+            return $product ? $total + ($product->price * $qty) : $total;
+        }, 0);
     }
 }
