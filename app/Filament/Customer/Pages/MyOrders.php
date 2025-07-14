@@ -23,22 +23,95 @@ class MyOrders extends Page implements HasTable
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
-    protected static ?string $navigationGroup = 'Customer Orders';
     protected static ?int $navigationSort = 2;
     protected static string $view = 'filament.customer.pages.my-orders';
 
+    public int $potentialTokens = 0;
     public array $cart = [];
     public string $deliveryOption = 'pickup';
     public string $address = '';
+    public int $userTokens = 0;
+    public int $discount = 0;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Order::where('created_by', Auth::id())
+            ->where('status', 'pending')
+            ->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $count = Order::where('created_by', Auth::id())
+            ->where('status', 'pending')
+            ->count();
+
+        return $count > 5 ? 'warning' : 'primary';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Your pending orders';
+    }
 
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
+        $this->userTokens = Auth::user()->tokens;
+        $this->discount = $this->calculateDiscount($this->userTokens);
+        $this->address = $this->getCustomerAddress();
+        $this->calculatePotentialTokens();
+    }
 
-        $customerInfo = CustomerInfo::where('user_id', Auth::id())->first();
-        if ($customerInfo) {
-            $this->address = $customerInfo->address;
+    protected function getCustomerAddress(): string
+    {
+        return CustomerInfo::where('user_id', Auth::id())->value('address') ?? '';
+    }
+
+    protected function calculateDiscount(int $tokens): int
+    {
+        return $tokens >= 200 ? 10000 : 0;
+    }
+
+    protected function getCartTotal(): int
+    {
+        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
+            $product = Product::find($productId);
+            return $product ? $total + ($product->price * $qty) : $total;
+        }, 0);
+    }
+
+    public function getFinalAmountProperty(): int
+    {
+        return max(0, $this->getCartTotal() - $this->discount);
+    }
+
+    public function calculatePotentialTokens(): void
+    {
+        $total = $this->getCartTotal();
+        $this->potentialTokens = $total >= 50000 ? floor($total / 15000) : 0;
+    }
+
+    protected function deductUserTokensIfApplicable(): int
+    {
+        $user = Auth::user();
+        $availableTokens = $user->tokens ?? 0;
+        $discount = 0;
+        $tokensUsed = 0;
+
+        if ($availableTokens >= 200) {
+            $tokensUsed = 200;
+            $discount = 10000;
+        } elseif ($availableTokens > 0) {
+            $tokensUsed = min($availableTokens, floor($this->getCartTotal() / 100));
+            $discount = $tokensUsed * 100;
         }
+
+        if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
+            $user->decrement('tokens', $tokensUsed);
+        }
+
+        return $discount;
     }
 
     public function placeOrder(): void
@@ -49,39 +122,28 @@ class MyOrders extends Page implements HasTable
         }
 
         if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
-            Notification::make()
-                ->title('Address Required')
-                ->body('Please enter your delivery address.')
-                ->danger()
-                ->send();
+            Notification::make()->title('Address Required')->body('Please enter your delivery address.')->danger()->send();
             return;
         }
 
         DB::beginTransaction();
 
         try {
-            $total = 0;
-
-            foreach ($this->cart as $productId => $quantity) {
-                $product = Product::findOrFail($productId);
-                $total += $product->price * $quantity;
-            }
-
-            $expectedDate = now()->addHours(
-                $this->deliveryOption === 'delivery' ? 48 : 12
-            );
+            $total = $this->getCartTotal();
+            $expectedDate = now()->addHours($this->deliveryOption === 'delivery' ? 48 : 12);
+            $discount = $this->deductUserTokensIfApplicable();
+            $netTotal = max(0, $total - $discount);
 
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
                 'delivery_option' => $this->deliveryOption,
                 'expected_delivery_date' => $expectedDate,
-                'total' => $total,
+                'total' => $netTotal,
             ]);
 
             foreach ($this->cart as $productId => $quantity) {
                 $product = Product::findOrFail($productId);
-
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
@@ -102,6 +164,7 @@ class MyOrders extends Page implements HasTable
 
             $this->cart = [];
             session()->forget('cart');
+            $this->calculatePotentialTokens();
 
             Notification::make()
                 ->title('Order placed successfully!')
@@ -110,19 +173,13 @@ class MyOrders extends Page implements HasTable
                 ->send();
         } catch (\Exception $e) {
             DB::rollBack();
-
-            Notification::make()
-                ->title('Failed to place order')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
+            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
         }
     }
 
     public function increaseQuantity($productId): void
     {
         $product = Product::find($productId);
-
         if (!$product) {
             Notification::make()->title('Product not found')->danger()->send();
             return;
@@ -142,6 +199,8 @@ class MyOrders extends Page implements HasTable
 
         $this->cart[$productId] = $currentQty + 1;
         session()->put('cart', $this->cart);
+
+        $this->calculatePotentialTokens();
     }
 
     public function decreaseQuantity($productId): void
@@ -154,6 +213,7 @@ class MyOrders extends Page implements HasTable
             }
 
             session()->put('cart', $this->cart);
+            $this->calculatePotentialTokens();
         }
     }
 
@@ -163,8 +223,6 @@ class MyOrders extends Page implements HasTable
             ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
             ->columns([
                 TextColumn::make('id')->label('Order #')->sortable(),
-
-
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->badge()
@@ -181,28 +239,22 @@ class MyOrders extends Page implements HasTable
                     ->label('Expected Delivery Date')
                     ->formatStateUsing(
                         fn($state, $record) =>
-                        $record->status === 'delivered'
-                            ? 'Done'
-                            : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
+                            $record->status === 'delivered'
+                                ? 'Done'
+                                : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
                     )
                     ->sortable(),
-
                 TextColumn::make('total')
                     ->label('Total (UGX)')
                     ->formatStateUsing(fn($state) => number_format($state, 2)),
-
-
-
                 TextColumn::make('orderItems')
                     ->label('Items')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
-                        $record->orderItems->map(
-                            fn($item) =>
-                            $item->product->name . ' (x' . $item->quantity . ' ' . $item->product->sku . ')'
-                        )->implode(', ')
-                    )
-                    ->wrap(),
+                    ->html()
+                    ->formatStateUsing(function ($state, $record) {
+                        return $record->orderItems
+                            ->map(fn($item) => e($item->product->name) . ' (x' . $item->quantity . ')')
+                            ->implode('<br>');
+                    }),
                 TextColumn::make('status')
                     ->badge()
                     ->sortable()
@@ -220,29 +272,19 @@ class MyOrders extends Page implements HasTable
                     ->label('Resume Order')
                     ->visible(fn(Order $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
-                    ->action(function (Order $record) {
-                        $record->update(['status' => 'pending']);
-                        Notification::make()->title('Order resumed')->success()->send();
-                    }),
+                    ->action(fn(Order $record) => $record->update(['status' => 'pending'])),
                 Action::make('cancel')
                     ->label('Cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
                     ->visible(fn(Order $record) => $record->status === 'pending')
                     ->requiresConfirmation()
-                    ->action(function (Order $record) {
-                        $record->update(['status' => 'cancelled']);
-                        Notification::make()->title('Order cancelled')->danger()->send();
-                    }),
-
+                    ->action(fn(Order $record) => $record->update(['status' => 'cancelled'])),
                 Action::make('rate_review')
                     ->label('Rate & Review')
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(
-                        fn(Order $record) =>
-                        $record->status === 'delivered' && is_null($record->rating)
-                    )
+                    ->visible(fn(Order $record) => $record->status === 'delivered' && is_null($record->rating))
                     ->form([
                         \Filament\Forms\Components\Select::make('rating')
                             ->label('Rating (1-5 Stars)')
@@ -254,7 +296,6 @@ class MyOrders extends Page implements HasTable
                                 5 => '⭐️⭐️⭐️⭐️⭐️',
                             ])
                             ->required(),
-
                         \Filament\Forms\Components\Textarea::make('review')
                             ->label('Review')
                             ->placeholder('Write your review here...')
@@ -265,11 +306,7 @@ class MyOrders extends Page implements HasTable
                             'rating' => $data['rating'],
                             'review' => $data['review'],
                         ]);
-
-                        Notification::make()
-                            ->title('Thank you for your feedback!')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Thank you for your feedback!')->success()->send();
                     }),
             ])
             ->defaultSort('id', 'desc');

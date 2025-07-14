@@ -28,6 +28,11 @@ class SupplierPanelProvider extends PanelProvider
         return $panel
             ->id('supplier')
             ->path('supplier')
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
             ->colors([
                 'primary' => Color::Teal,     // Clean and supply-related

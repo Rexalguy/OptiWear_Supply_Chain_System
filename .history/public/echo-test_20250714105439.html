@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Echo Reverb Test</title>
+    <script type="module">
+        import Echo from 'laravel-echo';
+        window.Echo = new Echo({
+            broadcaster: 'reverb',
+            key: 'uwsz74wtqjy3qxddvfhk',
+            wsHost: 'localhost',
+            wsPort: 8080,
+            wssPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+        });
+        window.Echo.connector.socket.on('connect', () => {
+            console.log('[Echo Test] WebSocket connected');
+        });
+        window.Echo.connector.socket.on('disconnect', () => {
+            console.warn('[Echo Test] WebSocket disconnected');
+        });
+        window.Echo.connector.socket.on('error', (err) => {
+            console.error('[Echo Test] WebSocket error:', err);
+        });
+    </script>
+</head>
+<body>
+    <h1>Echo Reverb WebSocket Test</h1>
+    <p>Open the browser console to see connection status.</p>
+</body>
+</html>

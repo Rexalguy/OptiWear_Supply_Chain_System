@@ -6,6 +6,7 @@ use Filament\Tables;
 use Filament\Pages\Page;
 use App\Models\Workforce;;
 use App\Models\ProductionOrder;
+use App\Models\ProductionStage;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Contracts\HasTable;
@@ -19,8 +20,32 @@ class DeliveryStage extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
     protected static ?string $navigationGroup = 'Production Workflow';
+
+   
+    protected static ?int $navigationSort = 3;
     protected static ?string $title = 'Delivery';
     protected static string $view = 'filament.manufacturer.pages.delivery-stage';
+
+    public static function getNavigationBadge(): ?string
+{
+    return (string) ProductionStage::where('stage', 'delivery')
+        ->where('status', 'in_progress')
+        ->count();
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    $count = ProductionStage::where('stage', 'delivery')
+        ->where('status', 'in_progress')
+        ->count();
+
+    return $count > 0 ? 'info' : 'gray';
+}
+
+public static function getNavigationBadgeTooltip(): ?string
+{
+    return 'delivery tasks in progress';
+}
 
     public function getTableQuery(): Builder
     {

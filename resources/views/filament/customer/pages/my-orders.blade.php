@@ -14,6 +14,16 @@
                     <span class="text-sm text-gray-500 dark:text-gray-400">({{ count($this->cart) }} {{ Str::plural('item', count($this->cart)) }})</span>
                 </h2>
 
+                        @if ($potentialTokens > 0)
+            <div class="text-sm text-green-600 dark:text-green-400 text-right">
+                🎁 You will earn <strong>{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
+            </div>
+            @else
+            <div class="text-sm text-green-600 dark:text-green-400 text-right">
+                Make a purchase above <strong>UGX 50,000</strong> to earn tokens 🎁
+            </div>
+            @endif
+
                 <ul class="space-y-5">
                     @foreach ($this->cart as $productId => $qty)
                         @php
@@ -67,10 +77,16 @@
                     @endforeach
                 </ul>
 
-                <div class="border-t pt-5 mt-6 flex justify-between font-bold text-xl">
-                    <span>Total(UGX):</span>
-                    <span> {{ number_format($total) }}</span>
+            @if ($this->userTokens >= 200)
+                <div class="text-green-600 mt-1">
+                    🎉 Discount applied: UGX 10,000 (Redeemed 200 tokens)
                 </div>
+
+                <div class="text-xl font-extrabold mt-2">
+                    Amount to pay: UGX {{ number_format($this->finalAmount) }}
+                </div>
+            @endif
+
 
                 <div class="mt-6">
                     <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Delivery Option</label>
