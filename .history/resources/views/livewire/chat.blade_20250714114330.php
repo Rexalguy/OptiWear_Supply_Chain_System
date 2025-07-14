@@ -57,6 +57,10 @@
                 x-init="$watch('atBottom', value => value && $el.scrollTo({ top: $el.scrollHeight }))"
                 @scroll.debounce="atBottom = Math.abs($el.scrollHeight - $el.scrollTop - $el.clientHeight) < 50"
             >
+                <script>
+                    // This script will log to the console every time the section is rerendered
+                    console.log('Messages section rerendered at', new Date().toLocaleTimeString());
+                </script>
                 @forelse($messages as $message)
                     <div class="message {{ $message->sender_id === auth()->id() ? 'sent' : 'received' }}">
                         <div class="message-bubble">
@@ -118,6 +122,14 @@
                 }, 50);
             });
         });
+
+        // Play sound notification for new messages
+        window.Echo?.private(`chat.${@js(auth()->id())}`)
+            .listen('.message.sent', (e) => {
+                if (e.sender.id !== @js(auth()->id())) {
+                    new Audio('/notification.mp3').play().catch(() => {});
+                }
+            });
     });
 </script>
 @endscript

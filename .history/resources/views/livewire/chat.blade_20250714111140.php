@@ -50,13 +50,10 @@
             </div>
 
             <!-- Messages Container -->
-            <div
-                wire:poll.5m="refreshMessages"
-                class="messages-container"
-                x-data="{ atBottom: true }"
-                x-init="$watch('atBottom', value => value && $el.scrollTo({ top: $el.scrollHeight }))"
-                @scroll.debounce="atBottom = Math.abs($el.scrollHeight - $el.scrollTop - $el.clientHeight) < 50"
-            >
+            <div wire:poll.5m class="messages-container" 
+                 x-data="{ atBottom: true }"
+                 x-init="$watch('atBottom', value => value && $el.scrollTo({ top: $el.scrollHeight }))"
+                 @scroll.debounce="atBottom = Math.abs($el.scrollHeight - $el.scrollTop - $el.clientHeight) < 50">
                 @forelse($messages as $message)
                     <div class="message {{ $message->sender_id === auth()->id() ? 'sent' : 'received' }}">
                         <div class="message-bubble">
@@ -78,6 +75,9 @@
                         No messages yet. Start the conversation!
                     </div>
                 @endforelse
+                <script>
+                    console.log('Component rerendered at', new Date().toLocaleTimeString());
+                </script>
             </div>
 
             <!-- Message Input Form -->
@@ -118,6 +118,14 @@
                 }, 50);
             });
         });
+
+        // Play sound notification for new messages
+        window.Echo?.private(`chat.${@js(auth()->id())}`)
+            .listen('.message.sent', (e) => {
+                if (e.sender.id !== @js(auth()->id())) {
+                    new Audio('/notification.mp3').play().catch(() => {});
+                }
+            });
     });
 </script>
 @endscript

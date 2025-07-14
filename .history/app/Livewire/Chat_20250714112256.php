@@ -28,10 +28,10 @@ class Chat extends Component
     public function mount()
     {
         $this->loginId = Auth::id();
+        $this->loadMessages();
         $this->refreshUserList();
         $this->loadInitialUser();
         $this->loadUsers();
-        $this->loadMessages();
 
         if ($this->users->isNotEmpty()) {
             $this->selectedUser = $this->users->first();
@@ -129,10 +129,6 @@ class Chat extends Component
             ->values()
             ->all(); // <--- convert to plain array
 
-    }
-    public function refreshMessages()
-    {
-        $this->loadMessages();
     }
     public function render()
     {
