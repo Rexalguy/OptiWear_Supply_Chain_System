@@ -25,11 +25,7 @@ class Product extends Page
     {
         return __('Bulk purchase Page');
     }
-    //description
-    public function getSubHeading(): string | Htmlable
-    {
-        return __('Purchase products in bulk at discounted rates. Choose from a wide range of products and enjoy exclusive bulk pricing inclusive of chance to order beyond current stock levels');
-    }
+    //descri
     public function mount()
     {
         $this->products = ProductModel::all();

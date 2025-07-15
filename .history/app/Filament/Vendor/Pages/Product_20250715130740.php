@@ -28,7 +28,7 @@ class Product extends Page
     //description
     public function getSubHeading(): string | Htmlable
     {
-        return __('Purchase products in bulk at discounted rates. Choose from a wide range of products and enjoy exclusive bulk pricing inclusive of chance to order beyond current stock levels');
+        return __('Purchase products in bulk at discounted rates.');
     }
     public function mount()
     {

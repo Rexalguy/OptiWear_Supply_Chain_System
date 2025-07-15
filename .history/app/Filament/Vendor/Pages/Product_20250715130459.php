@@ -2,9 +2,8 @@
 
 namespace App\Filament\Vendor\Pages;
 
-use Filament\Pages\Page;
 use App\Models\Product as ProductModel;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Pages\Page;
 
 class Product extends Page
 
@@ -21,15 +20,7 @@ class Product extends Page
 
     protected static string $view = 'filament.vendor.pages.product';
 
-    public function getTitle(): string | Htmlable
-    {
-        return __('Bulk purchase Page');
-    }
-    //description
-    public function getSubHeading(): string | Htmlable
-    {
-        return __('Purchase products in bulk at discounted rates. Choose from a wide range of products and enjoy exclusive bulk pricing inclusive of chance to order beyond current stock levels');
-    }
+    
     public function mount()
     {
         $this->products = ProductModel::all();
