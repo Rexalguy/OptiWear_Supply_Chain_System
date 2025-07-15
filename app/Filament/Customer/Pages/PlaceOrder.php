@@ -17,9 +17,20 @@ class PlaceOrder extends Page
     protected static ?int $navigationSort = 1;
 
     public int $potentialTokens = 0;
+
+    /**
+     * Cart stores entries keyed by productId-size (e.g. "12-L"),
+     * with value ['product_id' => int, 'size' => string, 'quantity' => int].
+     */
     public array $cart = [];
+
     public $products;
     public array $wishlistProductIds = [];
+
+    // Size selection state per product (for dropdown UI)
+    public array $showSizeDropdown = [];
+    public array $selectedSize = [];
+    public array $sizes = ['S', 'M', 'L', 'XL'];
 
     public function mount(): void
     {
@@ -49,65 +60,142 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
-    public function addToCart($productId): void
+    /**
+     * Show size dropdown for product when user clicks "Add to Cart".
+     */
+    public function addToCart(int $productId): void
     {
         $product = Product::find($productId);
+
         if (!$product || $product->quantity_available < 1) {
             $this->notify('Product out of stock', 'danger');
             return;
         }
 
-        $qty = $this->cart[$productId] ?? 0;
-        if ($qty >= 50) {
-            $this->notify('Maximum 50 items per product allowed', 'warning');
+        $this->showSizeDropdown[$productId] = true;
+    }
+
+    /**
+     * ✅ Triggered when user clicks "➕ Add Another Size"
+     */
+    public function requestNewSize(int $productId): void
+    {
+        $this->showSizeDropdown[$productId] = true;
+    }
+
+    /**
+     * Confirm size selection and add item to cart (or increment quantity if exists).
+     */
+    public function confirmAddToCart(int $productId): void
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
-        $this->cart[$productId] = $qty + 1;
+        $size = $this->selectedSize[$productId] ?? null;
+
+        if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
+            return;
+        }
+
+        // Create unique cart key combining product ID and size
+        $cartKey = $productId . '-' . $size;
+
+        if (isset($this->cart[$cartKey])) {
+            // Increment quantity for existing product-size entry
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            // Add new entry for product-size
+            $this->cart[$cartKey] = [
+                'product_id' => $productId,
+                'size' => $size,
+                'quantity' => 1,
+            ];
+        }
+
         session()->put('cart', $this->cart);
 
+        // Clean up UI states
+        unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
+
         $this->updateTokenCount();
-        $this->notify('Added to cart');
+
+        $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
-    public function removeFromCart($productId): void
+    /**
+     * Remove a specific product+size entry from cart.
+     */
+    public function removeFromCart(string $cartKey): void
     {
-        if (isset($this->cart[$productId])) {
-            unset($this->cart[$productId]);
+        if (isset($this->cart[$cartKey])) {
+            unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->updateTokenCount();
             $this->notify('Removed from cart');
         }
     }
 
-    public function incrementQuantity($productId): void
+    /**
+     * Increment quantity for a specific product+size.
+     */
+    public function incrementQuantity(string $cartKey): void
     {
-        $product = Product::find($productId);
-        $qty = $this->cart[$productId] ?? 0;
-
-        if ($product && $qty < min(50, $product->quantity_available)) {
-            $this->cart[$productId]++;
-            session()->put('cart', $this->cart);
-            $this->updateTokenCount();
-        }
-    }
-
-    public function decrementQuantity($productId): void
-    {
-        if (!isset($this->cart[$productId])) {
+        if (!isset($this->cart[$cartKey])) {
             return;
         }
 
-        $this->cart[$productId]--;
-        if ($this->cart[$productId] < 1) {
-            unset($this->cart[$productId]);
+        $productId = $this->cart[$cartKey]['product_id'];
+        $product = Product::find($productId);
+
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
+            return;
+        }
+
+        $currentQty = $this->cart[$cartKey]['quantity'];
+
+        // Limit to stock or max 50 units
+        $maxQty = min(50, $product->quantity_available);
+
+        if ($currentQty >= $maxQty) {
+            $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
+            return;
+        }
+
+        $this->cart[$cartKey]['quantity']++;
+        session()->put('cart', $this->cart);
+        $this->updateTokenCount();
+    }
+
+    /**
+     * Decrement quantity for a specific product+size.
+     * Remove the entry if quantity falls below 1.
+     */
+    public function decrementQuantity(string $cartKey): void
+    {
+        if (!isset($this->cart[$cartKey])) {
+            return;
+        }
+
+        $this->cart[$cartKey]['quantity']--;
+
+        if ($this->cart[$cartKey]['quantity'] < 1) {
+            unset($this->cart[$cartKey]);
         }
 
         session()->put('cart', $this->cart);
         $this->updateTokenCount();
     }
 
-    public function toggleWishlist($productId): void
+    /**
+     * Toggle wishlist state for a product.
+     */
+    public function toggleWishlist(int $productId): void
     {
         $user = Auth::user();
 
@@ -129,22 +217,34 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
+    /**
+     * Calculate and update token rewards based on cart total.
+     */
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
+    /**
+     * Calculate total cart price.
+     */
     public function calculateCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
-            $product = Product::find($productId);
-            return $product ? $total + ($product->price * $qty) : $total;
+        return collect($this->cart)->reduce(function ($total, $item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                return $total;
+            }
+            return $total + ($product->price * ($item['quantity'] ?? 0));
         }, 0);
     }
 
+    /**
+     * Count total quantity of items in cart.
+     */
     public function getCartCountProperty(): int
     {
-        return array_sum($this->cart);
+        return collect($this->cart)->sum('quantity');
     }
 }
