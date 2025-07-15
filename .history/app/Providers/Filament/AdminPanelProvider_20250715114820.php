@@ -82,5 +82,3 @@ class AdminPanelProvider extends PanelProvider
                  ->icon('heroicon-o-user-group')
                  ->url('/customer'),
             ]);
-    }
-}

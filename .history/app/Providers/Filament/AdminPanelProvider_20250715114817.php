@@ -83,4 +83,4 @@ class AdminPanelProvider extends PanelProvider
                  ->url('/customer'),
             ]);
     }
-}
+}c

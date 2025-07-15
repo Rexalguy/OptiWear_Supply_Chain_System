@@ -8,5 +8,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('getstarted');
 })->name('home');
-Route::fallback(fn () => redirect('customer'))
-    ->name('login');

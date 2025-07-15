@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use Filament\Pages\Dashboard;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
@@ -25,10 +27,16 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
+            
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->profile()
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
             ->id('admin')
             ->login([RedirectController::class, 'toLogin'])
-            ->path('admin')
+            ->path('admin') // URL prefix for this panel
             ->colors([
                 'primary' => Color::Gray,     // Neutral and authoritative
                 'info' => Color::Blue,
@@ -40,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                // Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -63,24 +71,24 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 MenuItem::make()
-                 ->label('Suplier Panel')
-                 ->icon('heroicon-o-truck')
-                 ->url('/supplier'),
+                    ->label('Suplier Panel')
+                    ->icon('heroicon-o-truck')
+                    ->url('/supplier'),
 
                 MenuItem::make()
-                 ->label('Manufacturer Panel')
-                 ->icon('heroicon-o-cog-6-tooth')
-                 ->url('/manufacturer'),
-
-                   MenuItem::make()
-                 ->label('Vendor Panel')
-                 ->icon('heroicon-o-building-storefront')
-                 ->url('/vendor'),
+                    ->label('Manufacturer Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/manufacturer'),
 
                 MenuItem::make()
-                 ->label('Customer Panel')
-                 ->icon('heroicon-o-user-group')
-                 ->url('/customer'),
+                    ->label('Vendor Panel')
+                    ->icon('heroicon-o-building-storefront')
+                    ->url('/vendor'),
+
+                MenuItem::make()
+                    ->label('Customer Panel')
+                    ->icon('heroicon-o-user-group')
+                    ->url('/customer'),
             ]);
     }
 }
