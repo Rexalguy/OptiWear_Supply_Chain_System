@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
@@ -29,7 +28,12 @@ class SupplierPanelProvider extends PanelProvider
         return $panel
             ->id('supplier')
             ->path('supplier')
-            ->login([RedirectController::class, 'toLogin']) // Redirect to login page
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
+            ->login([RedirectController::class, 'toLogin'])
             ->colors([
                 'primary' => Color::Teal,     // Clean and supply-related
                 'info' => Color::Cyan,
@@ -67,9 +71,9 @@ class SupplierPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 MenuItem::make()
-                 ->label('Customer Panel')
-                 ->icon('heroicon-o-user-group')
-                 ->url('/customer'),
+                    ->label('Customer Panel')
+                    ->icon('heroicon-o-user-group')
+                    ->url('/customer'),
             ]);
     }
 }

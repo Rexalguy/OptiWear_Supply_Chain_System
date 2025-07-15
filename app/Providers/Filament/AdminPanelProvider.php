@@ -2,23 +2,29 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
-use Filament\Navigation\MenuItem;
-use Filament\Support\Colors\Color;
-use Filament\Http\Middleware\Authenticate;
+use App\Filament\Admin\Widgets;
+// Removed duplicate import of Widgets
+// Removed duplicate import of PanelProvider
 use App\Http\Controllers\RedirectController;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
+// Removed duplicate import of MenuItem
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Navigation\MenuItem;
+// Removed duplicate import of PanelProvider
+use Filament\Pages\Dashboard;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Widgets\AccountWidget;
+use Widgets\FilamentInfoWidget;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -26,27 +32,28 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
+
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('13rem')
+            ->profile()
+            ->brandName('OptiWear')
+            ->font('Poppins')
+            ->sidebarWidth('20rem')
             ->id('admin')
             ->login([RedirectController::class, 'toLogin'])
-            ->path('admin')
+            ->path('admin') // URL prefix for this panel
             ->colors([
-                'primary' => Color::Gray,     // Neutral and authoritative
-                'info' => Color::Blue,
-                'success' => Color::Emerald,
-                'warning' => Color::Amber,
-                'danger' => Color::Rose,
-                'gray' => Color::Zinc,
+                'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                // Pages\Dashboard::class,
+                Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -64,24 +71,24 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 MenuItem::make()
-                 ->label('Suplier Panel')
-                 ->icon('heroicon-o-truck')
-                 ->url('/supplier'),
+                    ->label('Suplier Panel')
+                    ->icon('heroicon-o-truck')
+                    ->url('/supplier'),
 
                 MenuItem::make()
-                 ->label('Manufacturer Panel')
-                 ->icon('heroicon-o-cog-6-tooth')
-                 ->url('/manufacturer'),
-
-                   MenuItem::make()
-                 ->label('Vendor Panel')
-                 ->icon('heroicon-o-building-storefront')
-                 ->url('/vendor'),
+                    ->label('Manufacturer Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/manufacturer'),
 
                 MenuItem::make()
-                 ->label('Customer Panel')
-                 ->icon('heroicon-o-user-group')
-                 ->url('/customer'),
+                    ->label('Vendor Panel')
+                    ->icon('heroicon-o-building-storefront')
+                    ->url('/vendor'),
+
+                MenuItem::make()
+                    ->label('Customer Panel')
+                    ->icon('heroicon-o-user-group')
+                    ->url('/customer'),
             ])
             ->plugins([
                 FilamentApexChartsPlugin::make(),

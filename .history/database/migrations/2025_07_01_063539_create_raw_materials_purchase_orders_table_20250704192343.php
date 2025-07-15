@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('raw_materials_purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table  ->unsignedBigInteger('raw_material_id');
+            $table->unsignedBigInteger('raw_material_id');
             $table->unsignedBigInteger('supplier_id');
             $table->decimal('quantity', 10, 2); // Quantity of raw material ordered
             $table->decimal('price_per_unit', 10, 2); // Price per unit of raw material
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('expected_delivery_date'); // Expected delivery date for the order
             $table->enum('status', ['pending', 'confirmed', 'delivered', 'cancelled'])->default('pending'); // Status of the order
             $table->string('notes')->nullable(); // Additional notes for the order
-            $table->enum('delivery_option', ['delivery', 'pickup'])->default('standard');
+            $table->enum('delivery_option', ['delivery', 'pickup'])->default('delivery'); // Delivery option for the order
             $table->decimal('total_price', 10,2); // Delivery option for the order
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // User who created the order
             
