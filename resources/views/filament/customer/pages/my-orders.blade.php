@@ -4,7 +4,9 @@
         {{-- ✅ CART SUMMARY --}}
         @if (!empty($this->cart))
             @php
-                $products = \App\Models\Product::whereIn('id', array_keys($this->cart))->get()->keyBy('id');
+                // Extract unique product IDs from cart items
+                $productIds = collect($this->cart)->pluck('product_id')->unique()->toArray();
+                $products = \App\Models\Product::whereIn('id', $productIds)->get()->keyBy('id');
                 $total = 0;
             @endphp
 
@@ -29,9 +31,9 @@
 
                 {{-- ✅ CART ITEMS LIST --}}
                 <ul class="space-y-5 mt-4">
-                    @foreach ($this->cart as $productId => $item)
+                    @foreach ($this->cart as $cartKey => $item)
                         @php
-                            $product = $products->get($productId);
+                            $product = $products->get($item['product_id']);
                             $quantity = $item['quantity'] ?? 0;
                             $size = $item['size'] ?? '-';
                             $subtotal = $product ? $product->price * $quantity : 0;
@@ -40,7 +42,7 @@
 
                         @if ($product)
                             <li class="flex justify-between items-center border-b pb-4 last:border-b-0">
-                                {{--  Left side: Product info --}}
+                                {{-- Left side: Product info --}}
                                 <div class="flex flex-col">
                                     <div class="font-semibold text-lg">{{ $product->name }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300">SKU: {{ $product->sku }}</div>
@@ -48,12 +50,12 @@
                                         Size: <strong>{{ $size }}</strong> | UGX {{ number_format($product->price) }} × {{ $quantity }}
                                     </div>
 
-                                    {{--  Remove button only --}}
+                                    {{-- Remove button --}}
                                     <div class="mt-3">
                                         <x-filament::button
                                             size="sm"
                                             color="danger"
-                                            wire:click="removeFromCart({{ $productId }})"
+                                            wire:click="removeFromCart('{{ $cartKey }}')"
                                             wire:loading.attr="disabled"
                                             aria-label="Remove from cart"
                                         >
@@ -62,7 +64,7 @@
                                     </div>
                                 </div>
 
-                                {{--  Right side: Subtotal --}}
+                                {{-- Right side: Subtotal --}}
                                 <div class="text-right font-semibold text-lg whitespace-nowrap">
                                     UGX {{ number_format($subtotal) }}
                                 </div>
@@ -71,7 +73,7 @@
                     @endforeach
                 </ul>
 
-                {{--  Discount Info --}}
+                {{-- Discount Info --}}
                 @if ($this->userTokens >= 200)
                     <div class="text-green-600 mt-4">
                         🎉 Discount applied: UGX 10,000 (Redeemed 200 tokens)
@@ -82,7 +84,7 @@
                     </div>
                 @endif
 
-                {{--  Delivery Option --}}
+                {{-- Delivery Option --}}
                 <div class="mt-6">
                     <label for="deliveryOption" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Delivery Option</label>
                     <select
@@ -95,7 +97,7 @@
                     </select>
                 </div>
 
-                {{--  Show Address only if delivery --}}
+                {{-- Show Address only if delivery --}}
                 @if ($this->deliveryOption === 'delivery')
                     <div class="mt-4">
                         <label for="address" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Delivery Address</label>
@@ -109,14 +111,14 @@
                     </div>
                 @endif
 
-                {{--  Place Order --}}
+                {{-- Place Order --}}
                 <div class="text-right mt-6">
                     <x-filament::button
                         color="success"
                         wire:click="placeOrder"
                         wire:loading.attr="disabled"
                     >
-                         Place Order
+                        Place Order
                     </x-filament::button>
                 </div>
             </section>
@@ -128,7 +130,7 @@
             </div>
         @endif
 
-        {{--  PAST ORDERS TABLE --}}
+        {{-- PAST ORDERS TABLE --}}
         <section>
             <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">📦 Previous Orders</h2>
 

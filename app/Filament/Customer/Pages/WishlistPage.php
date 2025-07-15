@@ -13,11 +13,17 @@ class WishlistPage extends Page
     protected static ?string $navigationIcon = 'heroicon-o-heart';
     protected static ?int $navigationSort = 3;
     protected static string $view = 'filament.customer.pages.wishlist-page';
-    protected static ?string $title = '❤️ My Wishlist';
+    protected static ?string $title = ' My Wishlist';
 
     public $wishlistItems = [];
+
     public array $cart = [];
     public int $potentialTokens = 0;
+
+    //  New for size selection dropdown (like PlaceOrder)
+    public array $showSizeDropdown = [];
+    public array $selectedSize = [];
+    public array $sizes = ['S', 'M', 'L', 'XL'];
 
     public function mount(): void
     {
@@ -28,15 +34,12 @@ class WishlistPage extends Page
 
     public function getCartCountProperty(): int
     {
-        return array_sum($this->cart);
+        return collect($this->cart)->sum('quantity');
     }
 
     protected function notify(string $message, string $type = 'success'): void
     {
-        Notification::make()
-            ->title($message)
-            ->{$type}()
-            ->send();
+        Notification::make()->title($message)->{$type}()->send();
     }
 
     public function refreshWishlist(): void
@@ -59,78 +62,150 @@ class WishlistPage extends Page
         }
     }
 
-    public function addToCart($productId): void
+    /**
+     *  Show size dropdown for product when user clicks "Add to Cart"
+     */
+    public function addToCart(int $productId): void
     {
         $product = Product::find($productId);
-        $qty = $this->cart[$productId] ?? 0;
 
         if (!$product || $product->quantity_available < 1) {
             $this->notify('Product out of stock', 'danger');
             return;
         }
 
-        if ($qty >= 50) {
-            $this->notify('Maximum 50 items per product allowed', 'warning');
+        // Always trigger size selection dropdown
+        $this->showSizeDropdown[$productId] = true;
+    }
+
+    /**
+     * Confirm size → Add or increment product-size entry
+     */
+    public function confirmAddToCart(int $productId): void
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
-        $this->cart[$productId] = $qty + 1;
+        $size = $this->selectedSize[$productId] ?? null;
+
+        if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
+            return;
+        }
+
+        //  Create unique cart key combining product ID and size
+        $cartKey = $productId . '-' . $size;
+
+        if (isset($this->cart[$cartKey])) {
+            // Increment quantity for existing product-size entry
+            $currentQty = $this->cart[$cartKey]['quantity'];
+
+            $maxQty = min(50, $product->quantity_available);
+            if ($currentQty >= $maxQty) {
+                $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
+                return;
+            }
+
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            // Add new entry for product-size
+            $this->cart[$cartKey] = [
+                'product_id' => $productId,
+                'size'       => $size,
+                'quantity'   => 1,
+            ];
+        }
+
         session()->put('cart', $this->cart);
 
+        // Hide dropdown after confirming
+        unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
+
         $this->updateTokens();
-        $this->notify('Added to cart');
+        $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
-    public function removeFromCart($productId): void
+    /**
+     *  Remove a specific product+size entry from cart
+     */
+    public function removeFromCart(string $cartKey): void
     {
-        if (isset($this->cart[$productId])) {
-            unset($this->cart[$productId]);
+        if (isset($this->cart[$cartKey])) {
+            unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
-
             $this->updateTokens();
             $this->notify('Removed from cart');
         }
     }
 
-    public function incrementQuantity($productId): void
+    /**
+     *  Increment quantity for a specific product+size
+     */
+    public function incrementQuantity(string $cartKey): void
     {
-        $product = Product::find($productId);
-        $qty = $this->cart[$productId] ?? 0;
+        if (!isset($this->cart[$cartKey])) return;
 
-        if ($product && $qty < min(50, $product->quantity_available)) {
-            $this->cart[$productId]++;
-            session()->put('cart', $this->cart);
-            $this->updateTokens();
-        }
-    }
+        $productId = $this->cart[$cartKey]['product_id'];
+        $product   = Product::find($productId);
 
-    public function decrementQuantity($productId): void
-    {
-        if (!isset($this->cart[$productId])) {
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
-        $this->cart[$productId]--;
-        if ($this->cart[$productId] < 1) {
-            unset($this->cart[$productId]);
+        $currentQty = $this->cart[$cartKey]['quantity'];
+        $maxQty     = min(50, $product->quantity_available);
+
+        if ($currentQty >= $maxQty) {
+            $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
+            return;
+        }
+
+        $this->cart[$cartKey]['quantity']++;
+        session()->put('cart', $this->cart);
+        $this->updateTokens();
+    }
+
+    /**
+     *  Decrement quantity for a specific product+size
+     */
+    public function decrementQuantity(string $cartKey): void
+    {
+        if (!isset($this->cart[$cartKey])) return;
+
+        $this->cart[$cartKey]['quantity']--;
+
+        if ($this->cart[$cartKey]['quantity'] < 1) {
+            unset($this->cart[$cartKey]);
         }
 
         session()->put('cart', $this->cart);
         $this->updateTokens();
     }
 
+    /**
+     *  Allow user to add another size of same product
+     */
+    public function requestNewSize(int $productId): void
+    {
+        $this->showSizeDropdown[$productId] = true;
+    }
+
     protected function updateTokens(): void
     {
-        $this->potentialTokens = $this->calculateCartTotal() > 50000
-            ? floor($this->calculateCartTotal() / 15000)
-            : 0;
+        $total = $this->calculateCartTotal();
+        $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
     protected function calculateCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
-            $product = Product::find($productId);
-            return $product ? $total + ($product->price * $qty) : $total;
+        return collect($this->cart)->reduce(function ($total, $item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) return $total;
+            return $total + ($product->price * ($item['quantity'] ?? 0));
         }, 0);
     }
 }
