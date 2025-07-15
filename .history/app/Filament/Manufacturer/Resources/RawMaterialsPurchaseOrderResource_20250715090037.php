@@ -163,16 +163,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(
-
-                function () {
-                    if (Auth::user()->role == 'supplier') {
-                        return RawMaterialsPurchaseOrder::query()->where('supplier_id', Auth::id())->latest();
-                    } else {
-                        return RawMaterialsPurchaseOrder::query()->where('created_by', Auth::id())->latest();
-                    }
-                }
-            )
+            ->query(function () {})
             ->columns([
                 Tables\Columns\TextColumn::make('rawMaterial.name')
                     ->label('Raw Material')

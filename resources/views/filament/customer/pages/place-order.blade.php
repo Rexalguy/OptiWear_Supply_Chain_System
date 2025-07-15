@@ -22,18 +22,9 @@
         {{-- Products Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                @php
-                    // Collect all cart entries for this product (different sizes)
-                    $productCartItems = collect($cart)->filter(fn($item) => $item['product_id'] === $product->id);
-                @endphp
-
-                <div class="border p-4 rounded-lg shadow bg-white dark:bg-gray-800">
-                    {{-- Product Image --}}
-                    <div class="mb-4">
-                        <img style="height: 350px; object-fit: cover;"
-                             src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}"
-                             alt="{{ $product->name }}"
-                             class="w-full h-64 object-cover rounded">
+                <div class=" p-4 rounded-lg shadow bg-white dark:bg-gray-800">
+                    <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
+                        <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
                     </div>
 
                     {{-- Product Info --}}
