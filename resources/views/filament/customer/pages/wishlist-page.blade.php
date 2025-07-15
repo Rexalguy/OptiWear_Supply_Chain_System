@@ -97,7 +97,7 @@
                                     wire:model.defer="selectedSize.{{ $product->id }}" 
                                     class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                 >
-                                    <option value="">-- Choose Size --</option>
+                                    <option value="">Select size</option>
                                     @foreach($sizes as $size)
                                         <option value="{{ $size }}">{{ $size }}</option>
                                     @endforeach
