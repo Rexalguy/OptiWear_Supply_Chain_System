@@ -22,9 +22,11 @@
         {{-- Products Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <div class=" p-4 rounded-lg shadow bg-white dark:bg-gray-800">
+                <div class="p-4 rounded-lg shadow bg-white dark:bg-gray-800">
                     <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                        <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
+                        <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}"
+                             alt="{{ $product->name }}"
+                             class="h-full w-auto object-contain">
                     </div>
 
                     {{-- Product Info --}}
@@ -39,11 +41,18 @@
 
                     {{-- Actions --}}
                     <div class="mt-4 space-y-3">
-                        {{--  Show ALL cart entries for this product (different sizes) --}}
-                        @foreach ($productCartItems as $cartKey => $item)
+                        @php
+                            // Filter cart items belonging to this product only (match product->id)
+                            $cartItemsForProduct = collect($this->productCartItems)
+                                ->filter(fn($item) => $item['product']->id === $product->id);
+                        @endphp
+
+                        {{-- Show all existing cart entries for this product (different sizes) --}}
+                        @foreach ($cartItemsForProduct as $cartKey => $cartItem)
                             <div class="flex items-center justify-between border p-2 rounded bg-gray-50 dark:bg-gray-700">
-                                <div>
-                                    <span class="text-xs text-gray-500">Size: {{ $item['size'] }}</span>
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-500">Size: {{ $cartItem['size'] }}</span>
+                                    <span class="text-xs text-gray-400">Qty: {{ $cartItem['quantity'] }}</span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     {{-- Decrement --}}
@@ -52,10 +61,10 @@
 
                                     {{-- Quantity --}}
                                     <span class="text-sm font-semibold">
-                                        {{ $item['quantity'] }}
+                                        {{ $cartItem['quantity'] }}
                                     </span>
 
-                                    {{-- Increment same size --}}
+                                    {{-- Increment --}}
                                     <x-filament::button icon="heroicon-o-plus" size="sm"
                                         wire:click="incrementQuantity('{{ $cartKey }}')" />
 
@@ -68,18 +77,18 @@
                             </div>
                         @endforeach
 
-                        {{--  Button to add NEW size for this product --}}
-                        @if ($productCartItems->count() > 0)
+                        {{-- Show "Add Another Size" if already has cart entries --}}
+                        @if ($cartItemsForProduct->count() > 0)
                             <x-filament::button color="secondary" wire:click="requestNewSize({{ $product->id }})">
                                 + Add Another Size
                             </x-filament::button>
                         @endif
 
-                        {{--  Show size dropdown if requested --}}
+                        {{-- Show size dropdown if requested --}}
                         @if (isset($showSizeDropdown[$product->id]) && $showSizeDropdown[$product->id])
                             <div class="space-y-2">
                                 <select wire:model="selectedSize.{{ $product->id }}"
-                                    class="w-full border rounded p-2 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700">
+                                        class="w-full border rounded p-2 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700">
                                     <option value="">Select Size</option>
                                     @foreach ($sizes as $size)
                                         <option value="{{ $size }}">{{ $size }}</option>
@@ -88,19 +97,19 @@
 
                                 <x-filament::button color="success"
                                     wire:click="confirmAddToCart({{ $product->id }})">
-                                     Confirm & Add
+                                    Confirm & Add
                                 </x-filament::button>
                             </div>
                         @endif
 
-                        {{--  Show main Add-to-cart only if no sizes exist yet --}}
-                        @if ($productCartItems->isEmpty() && !isset($showSizeDropdown[$product->id]))
+                        {{-- Show main Add-to-cart button if no cart entries & no size dropdown --}}
+                        @if ($cartItemsForProduct->isEmpty() && !isset($showSizeDropdown[$product->id]))
                             <x-filament::button color="warning" wire:click="addToCart({{ $product->id }})">
                                 Add to Cart
                             </x-filament::button>
                         @endif
 
-                        {{--  Wishlist Toggle --}}
+                        {{-- Wishlist Toggle --}}
                         <x-filament::button
                             :color="in_array($product->id, $wishlistProductIds) ? 'danger' : 'gray'"
                             :icon="in_array($product->id, $wishlistProductIds) ? 'heroicon-s-heart' : 'heroicon-o-heart'"

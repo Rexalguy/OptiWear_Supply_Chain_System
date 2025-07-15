@@ -225,4 +225,23 @@ class PlaceOrder extends Page
     {
         return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
     }
+
+
+    // Return cart items keyed by cartKey, merged with product details for easier access in Blade
+    public function getProductCartItemsProperty()
+    {
+        return collect($this->cart)->mapWithKeys(function ($item, $key) {
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                return [];
+            }
+            return [
+                $key => [
+                    'product' => $product,
+                    'size' => $item['size'],
+                    'quantity' => $item['quantity'],
+                ],
+            ];
+        });
+    }
 }
