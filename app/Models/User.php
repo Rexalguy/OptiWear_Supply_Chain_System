@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use App\Models\RawMaterialPurchaseOrder;
+use App\Models\RawMaterial;
+use App\Models\ProductionOrder;
+use App\Models\Order;
+use App\Models\VendorOrder;
+use App\Models\VendorValidation;
+use App\Models\ChatMessage;
 
 class User extends Authenticatable
 {

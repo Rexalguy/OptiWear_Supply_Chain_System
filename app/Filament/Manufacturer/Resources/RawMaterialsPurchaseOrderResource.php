@@ -33,7 +33,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-scale';
     protected static ?string $navigationGroup = 'Raw Materials';
 
-        public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
         return RawMaterialsPurchaseOrder::where('status', 'pending')->count();
     }
@@ -171,7 +171,16 @@ public static function form(Form $form): Form
     public static function table(Table $table): Table
     {
         return $table
-            ->query(fn () => RawMaterialsPurchaseOrder::query()->where('created_by', Auth::id())->latest())
+            ->query(
+
+                function () {
+                    if (Auth::user()->role == 'supplier') {
+                        return RawMaterialsPurchaseOrder::query()->where('supplier_id', Auth::id())->latest();
+                    } else {
+                        return RawMaterialsPurchaseOrder::query()->where('created_by', Auth::id())->latest();
+                    }
+                }
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('rawMaterial.name')
                     ->label('Raw Material')

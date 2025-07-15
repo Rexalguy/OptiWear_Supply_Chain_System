@@ -73,12 +73,24 @@ class MyOrders extends Page implements HasTable
         return $tokens >= 200 ? 10000 : 0;
     }
 
+    /**
+     * ✅ Calculate total for all cart items
+     */
     protected function getCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
-            $product = Product::find($productId);
+        return collect($this->cart)->reduce(function ($total, $item) {
+            $product = Product::find($item['product_id']);
+            $qty = $item['quantity'] ?? 1;
             return $product ? $total + ($product->price * $qty) : $total;
         }, 0);
+    }
+
+    /**
+     * ✅ Add computed property for total cart quantity
+     */
+    public function getCartCountProperty(): int
+    {
+        return collect($this->cart)->sum('quantity');
     }
 
     public function getFinalAmountProperty(): int
@@ -114,201 +126,238 @@ class MyOrders extends Page implements HasTable
         return $discount;
     }
 
-    public function placeOrder(): void
-    {
-        if (empty($this->cart)) {
-            Notification::make()->title('Cart is empty')->danger()->send();
-            return;
-        }
+    /**
+     * ✅ Place order
+     */public function placeOrder(): void
+{
+    if (empty($this->cart)) {
+        Notification::make()->title('Cart is empty')->danger()->send();
+        return;
+    }
 
-        if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
-            Notification::make()->title('Address Required')->body('Please enter your delivery address.')->danger()->send();
-            return;
-        }
+    if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
+        Notification::make()
+            ->title('Address Required')
+            ->body('Please enter your delivery address.')
+            ->danger()
+            ->send();
+        return;
+    }
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-            $total = $this->getCartTotal();
-            $expectedDate = now()->addHours($this->deliveryOption === 'delivery' ? 48 : 12);
-            $discount = $this->deductUserTokensIfApplicable();
-            $netTotal = max(0, $total - $discount);
+    try {
+        // ✅ Calculate subtotal from cart
+        $subtotal = $this->getCartTotal();
 
-            $order = Order::create([
-                'created_by' => Auth::id(),
-                'status' => 'pending',
-                'delivery_option' => $this->deliveryOption,
-                'expected_delivery_date' => $expectedDate,
-                'total' => $netTotal,
+        // ✅ Calculate token-based discount
+        $discount = $this->deductUserTokensIfApplicable();
+
+        // ✅ Delivery fee only if user selects delivery
+        $deliveryFee = $this->deliveryOption === 'delivery' ? 5000 : 0;
+
+        // ✅ Final amount = subtotal - discount + delivery fee
+        $finalTotal = max(0, $subtotal - $discount + $deliveryFee);
+
+        $expectedDate = now()->addHours($this->deliveryOption === 'delivery' ? 48 : 12);
+
+        // ✅ Create the order with correct total
+        $order = Order::create([
+            'created_by' => Auth::id(),
+            'status' => 'pending',
+            'delivery_option' => $this->deliveryOption,
+            'expected_delivery_date' => $expectedDate,
+            'total' => $finalTotal, // ✅ Save correct total including delivery fee
+        ]);
+
+        // ✅ Save each cart item with its unique size
+        foreach ($this->cart as $cartKey => $item) {
+            $product = Product::findOrFail($item['product_id']);
+            $quantity = $item['quantity'] ?? 1;
+            $size = $item['size'] ?? null;
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'SKU' => $product->sku,
+                'quantity' => $quantity,
+                'unit_price' => $product->price,
+                'size' => $size,
             ]);
-
-            foreach ($this->cart as $productId => $quantity) {
-                $product = Product::findOrFail($productId);
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'SKU' => $product->sku,
-                    'quantity' => $quantity,
-                    'unit_price' => $product->price,
-                ]);
-            }
-
-            if ($this->deliveryOption === 'delivery') {
-                CustomerInfo::updateOrCreate(
-                    ['user_id' => Auth::id()],
-                    ['address' => $this->address],
-                );
-            }
-
-            DB::commit();
-
-            $this->cart = [];
-            session()->forget('cart');
-            $this->calculatePotentialTokens();
-
-            Notification::make()
-                ->title('Order placed successfully!')
-                ->body('🕒 Expected delivery: ' . $expectedDate->format('d M Y, h:i A'))
-                ->success()
-                ->send();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Notification::make()->title('Failed to place order')->body($e->getMessage())->danger()->send();
-        }
-    }
-
-    public function increaseQuantity($productId): void
-    {
-        $product = Product::find($productId);
-        if (!$product) {
-            Notification::make()->title('Product not found')->danger()->send();
-            return;
         }
 
-        $currentQty = $this->cart[$productId] ?? 0;
-
-        if ($currentQty >= 50) {
-            Notification::make()->title('Limit: Max 50 units per product')->warning()->send();
-            return;
+        // ✅ Save/Update customer address only if delivery selected
+        if ($this->deliveryOption === 'delivery') {
+            CustomerInfo::updateOrCreate(
+                ['user_id' => Auth::id()],
+                ['address' => $this->address]
+            );
         }
 
-        if ($currentQty >= $product->quantity_available) {
-            Notification::make()->title("Only {$product->quantity_available} units available for {$product->name}")->danger()->send();
-            return;
-        }
+        DB::commit();
 
-        $this->cart[$productId] = $currentQty + 1;
-        session()->put('cart', $this->cart);
-
+        // ✅ Clear cart session
+        $this->cart = [];
+        session()->forget('cart');
         $this->calculatePotentialTokens();
+
+        Notification::make()
+            ->title('Order placed successfully!')
+            ->body("🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}")
+            ->success()
+            ->send();
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Notification::make()
+            ->title('Failed to place order')
+            ->body($e->getMessage())
+            ->danger()
+            ->send();
     }
+}
 
-    public function decreaseQuantity($productId): void
+    public function removeFromCart($cartKey): void
     {
-        if (isset($this->cart[$productId])) {
-            if ($this->cart[$productId] > 1) {
-                $this->cart[$productId]--;
-            } else {
-                unset($this->cart[$productId]);
-            }
-
+        if (isset($this->cart[$cartKey])) {
+            unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
+            Notification::make()->title('Removed from cart')->success()->send();
         }
     }
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
-            ->columns([
-                TextColumn::make('id')->label('Order #')->sortable(),
-                TextColumn::make('delivery_option')
-                    ->label('Delivery')
-                    ->badge()
-                    ->color(fn($state) => match ($state) {
-                        'pickup' => 'gray',
-                        'door_delivery' => 'info',
-                        default => 'secondary',
-                    }),
-                TextColumn::make('created_at')
-                    ->label('Placed On')
-                    ->dateTime()
-                    ->since(),
-                TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
-                            $record->status === 'delivered'
-                                ? 'Done'
-                                : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
-                    )
-                    ->sortable(),
-                TextColumn::make('total')
-                    ->label('Total (UGX)')
-                    ->formatStateUsing(fn($state) => number_format($state, 2)),
-                TextColumn::make('orderItems')
-                    ->label('Items')
-                    ->html()
-                    ->formatStateUsing(function ($state, $record) {
-                        return $record->orderItems
-                            ->map(fn($item) => e($item->product->name) . ' (x' . $item->quantity . ')')
-                            ->implode('<br>');
-                    }),
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'confirmed',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                    ]),
-            ])
-            ->actions([
-                Action::make('ResumeOrder')
-                    ->color('warning')
-                    ->icon('heroicon-o-play')
-                    ->label('Resume Order')
-                    ->visible(fn(Order $record) => $record->status === 'cancelled')
-                    ->requiresConfirmation()
-                    ->action(fn(Order $record) => $record->update(['status' => 'pending'])),
-                Action::make('cancel')
-                    ->label('Cancel')
-                    ->color('danger')
-                    ->icon('heroicon-o-x-circle')
-                    ->visible(fn(Order $record) => $record->status === 'pending')
-                    ->requiresConfirmation()
-                    ->action(fn(Order $record) => $record->update(['status' => 'cancelled'])),
-                Action::make('rate_review')
-                    ->label('Rate & Review')
-                    ->icon('heroicon-o-star')
-                    ->color('warning')
-                    ->visible(fn(Order $record) => $record->status === 'delivered' && is_null($record->rating))
-                    ->form([
-                        \Filament\Forms\Components\Select::make('rating')
-                            ->label('Rating (1-5 Stars)')
-                            ->options([
-                                1 => '⭐️',
-                                2 => '⭐️⭐️',
-                                3 => '⭐️⭐️⭐️',
-                                4 => '⭐️⭐️⭐️⭐️',
-                                5 => '⭐️⭐️⭐️⭐️⭐️',
-                            ])
-                            ->required(),
-                        \Filament\Forms\Components\Textarea::make('review')
-                            ->label('Review')
-                            ->placeholder('Write your review here...')
-                            ->rows(4),
-                    ])
-                    ->action(function (Order $record, array $data) {
-                        $record->update([
-                            'rating' => $data['rating'],
-                            'review' => $data['review'],
-                        ]);
-                        Notification::make()->title('Thank you for your feedback!')->success()->send();
-                    }),
-            ])
-            ->defaultSort('id', 'desc');
-    }
+public function table(Table $table): Table
+{
+    return $table
+        ->query(Order::with('orderItems.product')->where('created_by', Auth::id())->latest())
+        ->columns([
+            TextColumn::make('id')
+                ->label('Order #')
+                ->sortable(),
+
+            TextColumn::make('delivery_option')
+                ->label('Delivery')
+                ->badge()
+                ->color(fn($state) => match ($state) {
+                    'pickup' => 'gray',
+                    'delivery' => 'info',
+                    default => 'secondary',
+                }),
+
+            TextColumn::make('created_at')
+                ->label('Placed On')
+                ->dateTime()
+                ->since(),
+
+            TextColumn::make('expected_delivery_date')
+                ->label('Expected Delivery Date')
+                ->formatStateUsing(fn($state, $record) =>
+                    $record->status === 'delivered'
+                        ? 'Done'
+                        : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
+                )
+                ->sortable(),
+
+            // Show ordered items with size & quantity
+            TextColumn::make('orderItems')
+                ->label('Items')
+                ->html()
+                ->formatStateUsing(fn($state, $record) =>
+                    $record->orderItems
+                        ->map(fn($item) => e($item->product->name)
+                            . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
+                        )
+                        ->implode('<br>')
+                ),
+
+            // Show full price breakdown including subtotal, discount, delivery fee, and final total
+            TextColumn::make('total')
+                ->label('Total (UGX)')
+                ->html()
+                ->formatStateUsing(function ($state, $record) {
+                    $finalTotal = $state;  // This is the saved total from DB
+
+                    $isDelivery = $record->delivery_option === 'delivery';
+                    $deliveryFee = $isDelivery ? 5000 : 0;
+
+                    // Calculate subtotal from order items
+                    $subtotal = $record->orderItems->sum(fn($item) => $item->quantity * $item->unit_price);
+
+                    // Calculate discount applied
+                    $discount = max(0, ($subtotal + $deliveryFee) - $finalTotal);
+
+                    $breakdown = "<div>Subtotal: UGX " . number_format($subtotal) . "</div>";
+
+                    if ($discount > 0) {
+                        $breakdown .= "<div class='text-green-600'>Discount: - UGX " . number_format($discount) . "</div>";
+                    }
+
+                    if ($deliveryFee > 0) {
+                        $breakdown .= "<div>Delivery Fee: + UGX " . number_format($deliveryFee) . "</div>";
+                    }
+
+                    $breakdown .= "<div class='font-bold mt-1'>Final: UGX " . number_format($finalTotal) . "</div>";
+
+                    return $breakdown;
+                }),
+
+            TextColumn::make('status')
+                ->badge()
+                ->sortable()
+                ->colors([
+                    'warning' => 'pending',
+                    'info' => 'confirmed',
+                    'success' => 'delivered',
+                    'danger' => 'cancelled',
+                ]),
+        ])
+        ->actions([
+            Action::make('ResumeOrder')
+                ->color('warning')
+                ->icon('heroicon-o-play')
+                ->label('Resume Order')
+                ->visible(fn(Order $record) => $record->status === 'cancelled')
+                ->requiresConfirmation()
+                ->action(fn(Order $record) => $record->update(['status' => 'pending'])),
+
+            Action::make('cancel')
+                ->label('Cancel')
+                ->color('danger')
+                ->icon('heroicon-o-x-circle')
+                ->visible(fn(Order $record) => $record->status === 'pending')
+                ->requiresConfirmation()
+                ->action(fn(Order $record) => $record->update(['status' => 'cancelled'])),
+
+            Action::make('rate_review')
+                ->label('Rate & Review')
+                ->icon('heroicon-o-star')
+                ->color('warning')
+                ->visible(fn(Order $record) => $record->status === 'delivered' && is_null($record->rating))
+                ->form([
+                    \Filament\Forms\Components\Select::make('rating')
+                        ->label('Rating (1-5 Stars)')
+                        ->options([
+                            1 => '⭐️',
+                            2 => '⭐️⭐️',
+                            3 => '⭐️⭐️⭐️',
+                            4 => '⭐️⭐️⭐️⭐️',
+                            5 => '⭐️⭐️⭐️⭐️⭐️',
+                        ])
+                        ->required(),
+                    \Filament\Forms\Components\Textarea::make('review')
+                        ->label('Review')
+                        ->placeholder('Write your review here...')
+                        ->rows(4),
+                ])
+                ->action(function (Order $record, array $data) {
+                    $record->update([
+                        'rating' => $data['rating'],
+                        'review' => $data['review'],
+                    ]);
+                    Notification::make()->title('Thank you for your feedback!')->success()->send();
+                }),
+        ])
+        ->defaultSort('id', 'desc');
+}
 }
