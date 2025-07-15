@@ -23,9 +23,9 @@ class Product extends Page
     protected static string $view = 'filament.vendor.pages.product';
 
     public function getMaxContentWidth(): MaxWidth
-    {
-        return MaxWidth::Full;
-    }
+{
+    return MaxWidth::Full;
+}
     public function getTitle(): string | Htmlable
     {
         return __('Bulk purchase Page');
@@ -33,7 +33,7 @@ class Product extends Page
     //description
     public function getSubHeading(): string | Htmlable
     {
-        return __('Purchase products in bulk at discounted rates.');
+        return __('Purchase products in bulk at discounted rates. Choose from a wide range of products and enjoy exclusive bulk pricing inclusive of chance to order beyond current stock levels');
     }
     public function mount()
     {

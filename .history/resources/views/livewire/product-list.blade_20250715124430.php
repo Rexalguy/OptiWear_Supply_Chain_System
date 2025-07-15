@@ -8,19 +8,10 @@
             <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
                 <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
             </div>
-            <div>
-                <div>
-                    <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
-                    <p class="text-sm">SKU: {{ $product->sku }}</p>
-                    <p class="text-sm">Price: UGX {{ number_format($product->price) }}</p>
-                    <p class="text-sm text-gray-600">Available: {{ $product->quantity_available }}</p>
-                </div>
-                <div>
-                    <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
-                        Add to Cart
-                    </x-filament::button>
-                </div>
-            </div>
+            <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
+            <p class="text-sm text-gray-500">SKU: {{ $product->sku }}</p>
+            <p class="text-sm text-gray-600">Price: UGX {{ number_format($product->price) }}</p>
+            <p class="text-sm text-gray-600">Available: {{ $product->quantity_available }}</p>
         </div>
         @endforeach
     </div>
@@ -50,24 +41,16 @@
         </style>
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in" style="cursor:pointer;" wire:click.self="closeProductModal">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
-                <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-4xl font-extrabold focus:outline-none close-btn-animate" style="right:1rem;top:1rem;" wire:click="closeProductModal" aria-label="Close">&times;</button>
+                <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-4xl font-extrabold focus:outline-none close-btn-animate" style="right:1rem;top:1rem; " wire:click="closeProductModal" aria-label="Close">&times;</button>
                 <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
                 <img src="{{ $clickedProduct->image ? asset('storage/' . $clickedProduct->image) : '/images/image.png' }}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
                 </div>
-                <div>
-                    <div>
-                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
-                        <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
-                        <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
-                        <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
-                        <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                    </div>
-                    <div>
-                        <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
-                        Add to Cart
-                    </x-filament::button>
-                    </div>
-                </div>
+                <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
+                <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
+                <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
+                <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
+                <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
+                <button class="mt-4 btn btn-primary" wire:click="closeProductModal">Close</button>
             </div>
         </div>
     @endif

@@ -56,18 +56,14 @@
                 </div>
                 <div>
                     <div>
-                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
-                        <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
-                        <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
-                        <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
-                        <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                    </div>
-                    <div>
-                        <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
-                        Add to Cart
-                    </x-filament::button>
+                        
                     </div>
                 </div>
+                <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
+                <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
+                <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
+                <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
+                <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
             </div>
         </div>
     @endif

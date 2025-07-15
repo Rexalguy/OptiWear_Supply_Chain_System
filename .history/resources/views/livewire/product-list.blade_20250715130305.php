@@ -62,11 +62,7 @@
                         <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
                     </div>
-                    <div>
-                        <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
-                        Add to Cart
-                    </x-filament::button>
-                    </div>
+                    div
                 </div>
             </div>
         </div>

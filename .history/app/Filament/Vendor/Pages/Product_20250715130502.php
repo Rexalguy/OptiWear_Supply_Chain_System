@@ -2,10 +2,8 @@
 
 namespace App\Filament\Vendor\Pages;
 
-use Filament\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Pages\Page;
 
 class Product extends Page
 
@@ -22,19 +20,10 @@ class Product extends Page
 
     protected static string $view = 'filament.vendor.pages.product';
 
-    public function getMaxContentWidth(): MaxWidth
-    {
-        return MaxWidth::Full;
-    }
     public function getTitle(): string | Htmlable
-    {
-        return __('Bulk purchase Page');
-    }
-    //description
-    public function getSubHeading(): string | Htmlable
-    {
-        return __('Purchase products in bulk at discounted rates.');
-    }
+{
+    return __('Custom Page Title');
+}
     public function mount()
     {
         $this->products = ProductModel::all();
