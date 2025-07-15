@@ -118,7 +118,7 @@
 @endphp
 
 <x-filament-panels::page>
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-4xl mx-auto mb-8">
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-4xl mx-auto mb-8 relative">
         <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Demand Prediction (Line Chart)</h2>
         <form method="get" class="absolute top-8 right-8 mb-0 z-10">
             <label for="time_frame" class="font-semibold mr-2 text-gray-800 dark:text-gray-200">Time Frame:</label>
@@ -337,50 +337,55 @@
             $min = $allValues->sortBy('value')->first();
             $total = $allValues->sum('value');
         @endphp
-        <div class="mt-8">
-            <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Demand Prediction Summary</h3>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-3xl mx-auto mt-8 mb-8">
+            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Demand Prediction Summary</h3>
             <ul class="text-base mb-4 text-gray-800 dark:text-gray-200">
                 <li><strong>Highest:</strong> {{ $max['category'] ?? '-' }} ({{ $max['x'] ?? '-' }}) -
-                    {{ $max['value'] ?? '-' }}</li>
+                    {{ $max['value'] ?? '-' }}
+                </li>
                 <li><strong>Lowest:</strong> {{ $min['category'] ?? '-' }} ({{ $min['x'] ?? '-' }}) -
-                    {{ $min['value'] ?? '-' }}</li>
+                    {{ $min['value'] ?? '-' }}
+                </li>
                 <li><strong>Total Predicted Demand:</strong> {{ $total }}</li>
             </ul>
-            <div class="border-b border-gray-200 dark:border-gray-700 mb-8"></div>
-            <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Category Breakdown</h4>
-            <table class="min-w-full bg-transparent divide-y divide-gray-200 dark:divide-gray-700 mb-8">
-                <thead>
-                    <tr>
-                        <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Category</th>
-                        <th class="px-6 py-3 text-right text-base font-semibold text-gray-700 dark:text-gray-200">Total Predicted Demand</th>
-                        <th class="px-6 py-3 text-right text-base font-semibold text-gray-700 dark:text-gray-200">Share (%)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $categoryTotals = collect();
-                        foreach ($series as $catSeries) {
-                            $sum = collect($catSeries['data'])->filter(fn($v) => $v !== null)->sum();
-                            $categoryTotals->push([
-                                'category' => $catSeries['name'],
-                                'total' => $sum
-                            ]);
-                        }
-                        $grandTotal = $categoryTotals->sum('total');
-                    @endphp
-                    @foreach($categoryTotals as $row)
-                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                            <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['category'] }}</td>
-                            <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row['total'] }}</td>
-                            <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">
-                                {{ $grandTotal > 0 ? number_format(($row['total'] / $grandTotal) * 100, 1) : '0.0' }}%
-                            </td>
+            <hr class="my-4 border-gray-300 dark:border-gray-700">
+            <h4 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Category Breakdown</h4>
+            <div class="overflow-x-auto rounded-xl shadow mb-8">
+                <table class="min-w-full bg-white dark:bg-gray-900 rounded-xl">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-800">
+                            <th class="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200">Category</th>
+                            <th class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200">Total Predicted
+                                Demand</th>
+                            <th class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200">Share (%)</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="border-b border-gray-200 dark:border-gray-700 mb-8"></div>
-            <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Trend Analysis</h4>
+                    </thead>
+                    <tbody>
+                        @php
+                            $categoryTotals = collect();
+                            foreach ($series as $catSeries) {
+                                $sum = collect($catSeries['data'])->filter(fn($v) => $v !== null)->sum();
+                                $categoryTotals->push([
+                                    'category' => $catSeries['name'],
+                                    'total' => $sum
+                                ]);
+                            }
+                            $grandTotal = $categoryTotals->sum('total');
+                        @endphp
+                        @foreach($categoryTotals as $row)
+                            <tr class="hover:bg-blue-50 even:bg-gray-50 even:dark:bg-gray-800 transition">
+                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['category'] }}</td>
+                                <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row['total'] }}</td>
+                                <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">
+                                    {{ $grandTotal > 0 ? number_format(($row['total'] / $grandTotal) * 100, 1) : '0.0' }}%
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <hr class="my-4 border-gray-300 dark:border-gray-700">
+            <h4 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Trend Analysis</h4>
             @php
                 $trendRows = collect();
                 foreach ($series as $catSeries) {
@@ -433,31 +438,34 @@
                     }
                 }
             @endphp
-            <table class="min-w-full bg-transparent divide-y divide-gray-200 dark:divide-gray-700 mb-8">
-                <thead>
-                    <tr>
-                        <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Category</th>
-                        <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Trend</th>
-                        <th class="px-6 py-3 text-right text-base font-semibold text-gray-700 dark:text-gray-200">% Change (First → Last)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($trendRows as $row)
-                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                            <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['category'] }}</td>
-                            <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['trend'] }}</td>
-                            <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row['pct'] }}%</td>
+            <div class="overflow-x-auto rounded-xl shadow mb-8">
+                <table class="min-w-full bg-white dark:bg-gray-900 rounded-xl mb-4">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-800">
+                            <th class="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200">Category</th>
+                            <th class="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200">Trend</th>
+                            <th class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200">% Change (First
+                                → Last)</th>
                         </tr>
-                    @endforeach
-                    <tr class="font-bold">
-                        <td class="px-6 py-3 text-gray-900 dark:text-gray-100">Total</td>
-                        <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $totalTrend }}</td>
-                        <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">
-                            {{ $totalPct !== null ? number_format($totalPct, 1) : '-' }}%
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($trendRows as $row)
+                            <tr class="hover:bg-blue-50 even:bg-gray-50 even:dark:bg-gray-800 transition">
+                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['category'] }}</td>
+                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row['trend'] }}</td>
+                                <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row['pct'] }}%</td>
+                            </tr>
+                        @endforeach
+                        <tr class="font-bold bg-gray-50 dark:bg-gray-800">
+                            <td class="px-6 py-3 text-gray-900 dark:text-gray-100">Total</td>
+                            <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $totalTrend }}</td>
+                            <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">
+                                {{ $totalPct !== null ? number_format($totalPct, 1) : '-' }}%
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     @php
@@ -480,33 +488,115 @@
         })->values();
     @endphp
 
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-4xl mx-auto mb-8">
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-4xl mx-auto mt-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Customer Segmentation</h2>
         <div class="flex flex-wrap gap-8 items-start">
             <div class="flex-1 min-w-[320px]">
                 <div id="segment-pie-chart"></div>
             </div>
             <div class="flex-2 min-w-[320px]">
-                <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Top Product by Segment</h4>
-                <table class="min-w-full bg-transparent divide-y divide-gray-200 dark:divide-gray-700 mb-8">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Segment</th>
-                            <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Top Shirt Category</th>
-                            <th class="px-6 py-3 text-right text-base font-semibold text-gray-700 dark:text-gray-200">Total Purchased</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($segmentTopBuys as $row)
-                            <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->segment }}</td>
-                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->shirt_category }}</td>
-                                <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row->total_purchased }}</td>
+                <h4 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">Top Product by Segment</h4>
+                <div class="overflow-x-auto rounded-xl shadow mb-8">
+                    <table class="min-w-full bg-white dark:bg-gray-900 rounded-xl">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-800">
+                                <th class="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200">Segment</th>
+                                <th class="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200">Top Shirt
+                                    Category</th>
+                                <th class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200">Total
+                                    Purchased</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($segmentTopBuys as $row)
+                                <tr class="hover:bg-blue-50 even:bg-gray-50 even:dark:bg-gray-800 transition">
+                                    <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->segment }}</td>
+                                    <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->shirt_category }}</td>
+                                    <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">
+                                        {{ $row->total_purchased }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script>
+            // --- SEGMENTATION PIE CHART (Pseudo-3D effect) ---
+            var pieOptions = {
+                chart: {
+                    type: 'pie',
+                    height: 460,
+                    toolbar: { show: false },
+                    animations: { enabled: true, easing: 'easeinout', speed: 1200 },
+                },
+                labels: @json($pieLabels),
+                series: @json($pieValues),
+                legend: {
+                    position: 'bottom',
+                    fontSize: '17px',
+                    fontWeight: 700,
+                    labels: { colors: ['#222'] },
+                    itemMargin: { horizontal: 16, vertical: 8 }
+                },
+                dataLabels: {
+                    enabled: true,
+                    style: { fontSize: '13px', fontWeight: 600 },
+                    formatter: function (val, opts) {
+                        return val.toFixed(1) + '%';
+                    },
+                    dropShadow: {
+                        enabled: true,
+                        top: 4,
+                        left: 4,
+                        blur: 8,
+                        color: '#000',
+                        opacity: 0.22
+                    }
+                },
+                colors: [
+                    '#6366f1', '#f59e42', '#10b981', '#ef4444', '#fbbf24', '#3b82f6', '#a21caf', '#14b8a6',
+                    {
+                        type: 'gradient',
+                        gradient: {
+                            shade: 'dark',
+                            type: 'vertical',
+                            shadeIntensity: 0.7,
+                            gradientToColors: ['#818cf8', '#fbbf24', '#34d399', '#f87171', '#fde68a', '#60a5fa', '#c084fc', '#2dd4bf'],
+                            inverseColors: false,
+                            opacityFrom: 0.98,
+                            opacityTo: 0.85,
+                            stops: [0, 100]
+                        }
+                    }
+                ],
+                stroke: { show: true, width: 3, colors: ['#fff'] },
+                fill: { type: 'gradient' },
+                tooltip: {
+                    y: { formatter: function () { return ''; } }
+                },
+                plotOptions: {
+                    pie: {
+                        expandOnClick: true,
+                        customScale: 1.10,
+                        offsetY: 8,
+                        dataLabels: {
+                            offset: 8
+                        }
+                    }
+                },
+                dropShadow: {
+                    enabled: true,
+                    top: 8,
+                    left: 0,
+                    blur: 16,
+                    color: '#000',
+                    opacity: 0.18
+                }
+            };
+            var pieChart = new ApexCharts(document.querySelector("#segment-pie-chart"), pieOptions);
+            pieChart.render();
+        </script>
     </div>
 </x-filament-panels::page>
