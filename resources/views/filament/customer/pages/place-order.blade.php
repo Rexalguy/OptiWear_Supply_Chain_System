@@ -1,7 +1,9 @@
 <x-filament-panels::page>
+    
     <div class="p-6 space-y-6">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🛍️ Available Products</h2>
 
+        
         {{-- Cart token info --}}
         <div class="mt-6 text-right">
             @if ($potentialTokens > 0)
@@ -35,7 +37,7 @@
                     {{-- Product Info --}}
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm text-gray-500">SKU: {{ $product->sku }}</p>
-                    <p class="text-sm text-gray-600">Price: UGX {{ number_format($product->price) }}</p>
+                    <p class="text-sm text-gray-600">Price: UGX {{ number_format($product->unit_price) }}</p>
                     <p class="text-sm {{ $product->quantity_available > 10 ? 'text-green-600' : 'text-yellow-600' }}">
                         Available: {{ $product->quantity_available }}
                     </p>
@@ -87,7 +89,7 @@
                 {{-- Product Details --}}
                 <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
                 <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
-                <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
+                <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                 <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
                 <p class="text-sm text-gray-600 mt-2">{{ $clickedProduct->description }}</p>
 

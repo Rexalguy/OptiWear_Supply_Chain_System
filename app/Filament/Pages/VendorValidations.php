@@ -90,7 +90,17 @@ class VendorValidations extends Page implements HasTable
                 ->visible(fn ($record) => !$record->notified_at)
                 ->requiresConfirmation()
                 ->action(function ($record) {
-                    // Simulate sending notification (e.g., email, SMS)
+                    
+
+            if ($record->is_valid) {
+            $user = $record->user;
+
+            // Only update role if the user is currently a 'customer'
+            if ($user && $user->role === 'customer') {
+                $user->update(['role' => 'vendor']);
+            }
+
+        }
                     $record->notified_at = now();
                     $record->save();
 

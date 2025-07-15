@@ -2,29 +2,31 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Widgets;
+use Filament\Panel;
 // Removed duplicate import of Widgets
 // Removed duplicate import of PanelProvider
-use App\Http\Controllers\RedirectController;
+use Widgets\AccountWidget;
+use Filament\PanelProvider;
 // Removed duplicate import of MenuItem
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Pages\Dashboard;
+use App\Filament\Admin\Widgets;
+use Widgets\FilamentInfoWidget;
+use App\Models\VendorValidation;
 use Filament\Navigation\MenuItem;
 // Removed duplicate import of PanelProvider
-use Filament\Pages\Dashboard;
-use Filament\Panel;
-use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\Filament\Pages\VendorValidations;
+use Filament\Http\Middleware\Authenticate;
+use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Filament\Http\Middleware\AuthenticateSession;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Widgets\AccountWidget;
-use Widgets\FilamentInfoWidget;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -48,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Dashboard::class,
+                Dashboard::class, VendorValidations::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
