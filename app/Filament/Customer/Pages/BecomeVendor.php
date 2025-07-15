@@ -2,6 +2,7 @@
 
 namespace App\Filament\Customer\Pages;
 
+use Carbon\Carbon;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use App\Models\VendorValidation;
@@ -14,10 +15,12 @@ use Filament\Infolists\Components\Tabs;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 
 class BecomeVendor extends Page implements HasForms, HasInfolists
@@ -35,6 +38,44 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
     protected static string $view = 'filament.customer.pages.become-vendor';
 
+    public static function getNavigationBadge(): ?string
+{
+    $user = Auth::user();
+
+    // Get the latest validation for this user
+    $latest = VendorValidation::where('user_id', $user->id)
+        ->latest()
+        ->first();
+
+    // Show badge only if a notification has been sent but user hasn't acknowledged it
+    if ($latest && $latest->notified_at && is_null($latest->viewed_at)) {
+        return '!';
+    }
+
+    return null;
+}
+
+public static function getNavigationBadgeColor(): ?string
+{
+    return 'danger'; // red badge
+}
+
+public function mount(): void
+{
+    $this->form->fill();
+
+    $this->latestApplication = VendorValidation::where('user_id', Auth::id())
+        ->latest()
+        ->first();
+
+    // ✅ Mark as viewed if it was notified
+    if ($this->latestApplication && $this->latestApplication->notified_at && !$this->latestApplication->viewed_at) {
+        $this->latestApplication->update(['viewed_at' => now()]);
+    }
+}
+
+
+
                 public static function canAccess(): bool
         {
             return Auth::user()?->role === 'customer';
@@ -42,20 +83,6 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
 
 
-        public function mount(): void
-    {
-        $this->form->fill();
-
-         
-        $this->latestApplication = VendorValidation::where('user_id', Auth::id())
-        ->whereNotNull('notified_at')
-        ->latest()
-        ->first();
-
-
-        
-
-    }
 
         public function submit(): void
         {
@@ -168,68 +195,91 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
         public function infolist(Infolist $infolist): Infolist
     {
-        $latest = VendorValidation::where('user_id', Auth::id())->latest()->first();
+            $this->latestApplication = VendorValidation::where('user_id', Auth::id())
+        ->latest()
+        ->first();
 
 
-        if (!$this->latestApplication) {
-        return $infolist->schema([]); // Return empty infolist
+if (
+    !$this->latestApplication ||
+    is_null($this->latestApplication->notified_at)
+) {
+    return $infolist->schema([]);
+}
 
-        
-    }
+return $infolist
+    ->record($this->latestApplication)
+    ->schema([
+        Tabs::make('Application Status')->tabs([
+            Tabs\Tab::make('Overview')->schema([
+                Section::make('Current Validation Status')
+                    ->schema([
+                        TextEntry::make('business_name')->label('Business Name'),
 
-        return $infolist
-            ->record($this->latestApplication)
-            ->schema([
-                Tabs::make('Application Status')
-                    ->tabs([
-                        Tabs\Tab::make('Status')
-                            ->schema([
-                                Section::make('Current Validation Status')
-                                    ->schema([
-                                        TextEntry::make('name')
-                                            ->label('Business Name')
-                                            ->default($latest?->business_name ?? 'N/A'),
+                        TextEntry::make('is_valid')
+                            ->label('Validation Status :')
+                            ->getStateUsing(fn ($record) =>
+                                is_null($record->notified_at)
+                                    ? 'Application is being reviewed...'
+                                    : ($record->is_valid ? 'VALID' : 'INVALID')
+                            )
+                            ->color(fn ($record) =>
+                                is_null($record->notified_at)
+                                    ? 'warning'
+                                    : ($record->is_valid ? 'success' : 'danger')
+                            ),
 
-                                        TextEntry::make('is_valid')
-                                        ->label('Validation Status :')
-                                        ->getStateUsing(fn ($record) =>
-                                            is_null($record->notified_at)
-                                                ? 'Application is being reviewed...'
-                                                : ($record->is_valid ? 'VALID' : 'INVALID')
-                                        )
-                                         ->color(fn ($record) =>
-                                            is_null($record->notified_at)
-                                                ? 'warning'
-                                                : ($record->is_valid ? 'success' : 'danger')
-                                        ),
+                        TextEntry::make('visit_date')
+                            ->label('Visit Date :')
+                            ->default(fn ($record) => $record->visit_date ?? 'NOT ALLOCATED'),
+                    ])
+                    ->visible(fn ($record) => filled($record->notified_at)),
 
-                                        TextEntry::make('visit_date')
-                                            ->label('Visit Date :')
-                                            ->default($latest?->visit_date ?? 'NOT ALLOCATED'),
+                // ✅ Show Confirm Button Outside Section
+                        Actions::make([
+                Action::make('confirmViewed')
+                    ->label('Confirm Notification')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->notified_at && !$record->viewed_at)
+                    ->action(function ($record) {
+                        $record->update(['viewed_at' => now()]);
 
-                                        TextEntry::make('reasons')
-                                        ->label('Failure Reasons : ')
-                                        ->getStateUsing(function ($record) {
-                                            if (!$record->notified_at || $record->is_valid) {
-                                                return null;
-                                            }
+                        Notification::make()
+                            ->title('Confirmed')
+                            ->body('Sign out and sign in again as a Vendor.')
+                            ->success()
+                            ->send();
 
-                                            $reasons = is_array($record->reasons)
-                                                ? $record->reasons
-                                                : json_decode($record->reasons, true);
+                        return redirect('http://optiwear_supply_chain_system.test/customer');
+                    }),
+            ]),
+            ]),
 
-                                            if (!is_array($reasons)) {
-                                                return 'None';
-                                            }
+            Tabs\Tab::make('Failure Reasons')->schema([
+                Section::make('Why You Were Not Approved')
+                    ->schema([
+                        TextEntry::make('reasons')
+                            ->label('Failure Reasons :')
+                            ->getStateUsing(function ($record) {
+                                $reasons = is_array($record->reasons)
+                                    ? $record->reasons
+                                    : json_decode($record->reasons, true);
 
-                                            return implode('. ', array_map('ucfirst', $reasons)) . '.';
-                                        })
-                                        ->visible(fn ($record) =>
-                                            $record->notified_at && !$record->is_valid),
-                                    ]),
-                            ]),
+                                if (!is_array($reasons)) {
+                                    return 'None';
+                                }
+
+                                return implode('. ', array_map('ucfirst', $reasons)) . '.';
+                            }),
                     ]),
-            ]);
+            ])
+                ->visible(fn ($record) =>
+                    $record->notified_at && !$record->is_valid
+                ),
+        ]),
+    ]);
+
+
     }
 
 }

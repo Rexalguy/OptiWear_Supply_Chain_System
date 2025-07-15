@@ -30,13 +30,13 @@ class VendorValidations extends Page implements HasTable
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) VendorValidation::count();
+        return (string) VendorValidation::whereNull('notified_at')->count();
     }
 
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return VendorValidation::count() > 10 ? 'warning' : 'info';
+        return VendorValidation::whereNull('notified_at')->count() > 10 ? 'warning' : 'info';
     }
 
     public static function getNavigationBadgeTooltip(): ?string
