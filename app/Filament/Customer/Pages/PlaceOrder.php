@@ -16,23 +16,33 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
-    public int $potentialTokens = 0;
+    // ✅ UI / modal state
+    public ?Product $clickedProduct = null;
+    public bool $selectedProduct = false;
 
+    // ✅ Cart + wishlist
     public array $cart = [];
-
-    public $products;
     public array $wishlistProductIds = [];
 
+    // ✅ Product list
+    public $products;
+
+    // ✅ Size selection UI
     public array $showSizeDropdown = [];
     public array $selectedSize = [];
-    public array $sizes = ['S', 'M', 'L', 'XL'];
+    public array $sizes = ['S', 'M', 'L', 'XL']; // Example sizes
 
+    // ✅ Delivery & pricing
     public string $deliveryOption = 'pickup';
     protected int $deliveryFee = 5000; // fixed delivery fee
+    public int $potentialTokens = 0;
 
     public function mount(): void
     {
+        // Load current cart
         $this->cart = session()->get('cart', []);
+
+        // Load available products
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
         $this->updateTokenCount();
@@ -41,16 +51,16 @@ class PlaceOrder extends Page
 
     public function getHeaderWidgets(): array
     {
-        return [
-            MyStatsWidget::class,
-        ];
+        return [MyStatsWidget::class];
     }
 
+    /** ✅ Quick helper to show Filament notifications */
     protected function notify(string $message, string $type = 'success'): void
     {
         Notification::make()->title($message)->{$type}()->send();
     }
 
+    /** ✅ Wishlist loading */
     protected function loadWishlistProductIds(): void
     {
         $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
@@ -58,23 +68,26 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
-    public function addToCart(int $productId): void
+    /** ✅ MODAL HANDLERS */
+    public function openProductModal(int $productId): void
     {
-        $product = Product::find($productId);
-
-        if (!$product || $product->quantity_available < 1) {
-            $this->notify('Product out of stock', 'danger');
-            return;
-        }
-
-        $this->showSizeDropdown[$productId] = true;
+        $this->clickedProduct = Product::find($productId);
+        $this->selectedProduct = true;
     }
 
+    public function closeProductModal(): void
+    {
+        $this->clickedProduct = null;
+        $this->selectedProduct = false;
+    }
+
+    /** ✅ Request to show size dropdown for adding */
     public function requestNewSize(int $productId): void
     {
         $this->showSizeDropdown[$productId] = true;
     }
 
+    /** ✅ Add to cart (only via modal confirm) */
     public function confirmAddToCart(int $productId): void
     {
         $product = Product::find($productId);
@@ -105,6 +118,7 @@ class PlaceOrder extends Page
 
         session()->put('cart', $this->cart);
 
+        // Reset dropdown + selection for that product
         unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
 
         $this->updateTokenCount();
@@ -112,6 +126,7 @@ class PlaceOrder extends Page
         $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
+    /** ✅ CART MANAGEMENT */
     public function removeFromCart(string $cartKey): void
     {
         if (isset($this->cart[$cartKey])) {
@@ -124,9 +139,7 @@ class PlaceOrder extends Page
 
     public function incrementQuantity(string $cartKey): void
     {
-        if (!isset($this->cart[$cartKey])) {
-            return;
-        }
+        if (!isset($this->cart[$cartKey])) return;
 
         $productId = $this->cart[$cartKey]['product_id'];
         $product = Product::find($productId);
@@ -137,7 +150,6 @@ class PlaceOrder extends Page
         }
 
         $currentQty = $this->cart[$cartKey]['quantity'];
-
         $maxQty = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
@@ -152,9 +164,7 @@ class PlaceOrder extends Page
 
     public function decrementQuantity(string $cartKey): void
     {
-        if (!isset($this->cart[$cartKey])) {
-            return;
-        }
+        if (!isset($this->cart[$cartKey])) return;
 
         $this->cart[$cartKey]['quantity']--;
 
@@ -166,6 +176,7 @@ class PlaceOrder extends Page
         $this->updateTokenCount();
     }
 
+    /** ✅ Wishlist toggle */
     public function toggleWishlist(int $productId): void
     {
         $user = Auth::user();
@@ -188,23 +199,24 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
+    /** ✅ Token calculation */
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
+    /** ✅ Cart total */
     public function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
             $product = Product::find($item['product_id']);
-            if (!$product) {
-                return $total;
-            }
+            if (!$product) return $total;
             return $total + ($product->price * ($item['quantity'] ?? 0));
         }, 0);
     }
 
+    /** ✅ Computed properties for Blade */
     public function getCartCountProperty(): int
     {
         return collect($this->cart)->sum('quantity');
@@ -226,15 +238,12 @@ class PlaceOrder extends Page
         return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
     }
 
-
-    // Return cart items keyed by cartKey, merged with product details for easier access in Blade
+    /** ✅ ProductCartItems merges cart + product info */
     public function getProductCartItemsProperty()
     {
         return collect($this->cart)->mapWithKeys(function ($item, $key) {
             $product = Product::find($item['product_id']);
-            if (!$product) {
-                return [];
-            }
+            if (!$product) return [];
             return [
                 $key => [
                     'product' => $product,
