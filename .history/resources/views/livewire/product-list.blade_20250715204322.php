@@ -1,18 +1,17 @@
-<x-filament-panels::page>
- @php
+@php
     $cartCount = isset($cartCount) ? $cartCount : 0;
 @endphp
 <div>
-    <x-filament::badge color="info" size="x-lg" weight="Semibold">
-       <H1 class="text-lg font-semibold p-2">Cart ({{ $cartCount }})</H1>
+    <x-filament::badge color="success" size="xs">
+        Cart ({{ $cartCount }}) 
     </x-filament::badge>
     <div class="rounded border-gray-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
         @foreach ($products as $product)
         <div 
             class="rounded-xl  p-4 cursor-pointer shadow bg-white dark:bg-gray-800" 
-            
+            wire:click="openProductModal({{ $product->id }})"
         >
-            <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
+            <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
                 <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
             </div>
             <div>
@@ -23,7 +22,7 @@
                     <p>Minimum Order Quantity: 150 pieces</p>
                 </div>
                 <div>
-                    <x-filament::button wire:click="addToCart({{ $product->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
+                    <x-filament::button wire:click="$addToCart({{ $product->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
                         Add to Cart
                     </x-filament::button>
                 </div>
@@ -80,5 +79,3 @@
         </div>
     @endif
 </div>
-
-</x-filament-panels::page>

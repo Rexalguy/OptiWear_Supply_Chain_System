@@ -43,7 +43,7 @@ class Product extends Page
     {
         $this->products = ProductModel::all();
         $this->cart = session()->get('cart', []);
-        $this->cartCount = session()->get('cartCount', 0);
+        $this->cartCount = s;
         $this->min_order_quantity = 150;
     }
     public function notify(string $type, string $message): void

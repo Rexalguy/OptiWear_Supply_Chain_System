@@ -5,14 +5,12 @@ namespace App\Filament\Vendor\Pages;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
-use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
 
 class Product extends Page
 
 {
     public $cartCount = 0;
-    public $min_order_quantity = 150;
     public $cart = [];
     public $clickedProduct;
     public $selectedProduct = false;
@@ -42,16 +40,6 @@ class Product extends Page
     public function mount()
     {
         $this->products = ProductModel::all();
-        $this->cart = session()->get('cart', []);
-        $this->cartCount = session()->get('cartCount', 0);
-        $this->min_order_quantity = 150;
-    }
-    public function notify(string $type, string $message): void
-    {
-        Notification::make()
-            ->title($message)
-            ->{$type}()
-            ->send();
     }
     public function openProductModal($productId)
     {
@@ -60,13 +48,11 @@ class Product extends Page
     }
     public function addToCart($productId)
     {
-        $product = ProductModel::find($productId);
+        $product = Product::find($productId);
         if ($product) {
             $this->cart[] = $product;
-            $this->cartCount += $this->min_order_quantity;
+            $this->cartCount++;
             session()->put('cart', $this->cart);
-            session()->put('cartCount', $this->cartCount);
-            $this->notify('success', 'Product added to cart successfully!');
         }
     }
     public function closeProductModal()

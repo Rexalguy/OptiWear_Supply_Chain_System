@@ -5,7 +5,6 @@ namespace App\Filament\Vendor\Pages;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
-use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
 
 class Product extends Page
@@ -43,15 +42,15 @@ class Product extends Page
     {
         $this->products = ProductModel::all();
         $this->cart = session()->get('cart', []);
-        $this->cartCount = session()->get('cartCount', 0);
+        $this->cartCount = count($this->cart);
         $this->min_order_quantity = 150;
     }
     public function notify(string $type, string $message): void
     {
-        Notification::make()
-            ->title($message)
-            ->{$type}()
-            ->send();
+        session()->flash('notification', [
+            'type' => $type,
+            'message' => $message,
+        ]);
     }
     public function openProductModal($productId)
     {
@@ -65,7 +64,6 @@ class Product extends Page
             $this->cart[] = $product;
             $this->cartCount += $this->min_order_quantity;
             session()->put('cart', $this->cart);
-            session()->put('cartCount', $this->cartCount);
             $this->notify('success', 'Product added to cart successfully!');
         }
     }

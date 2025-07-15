@@ -7,12 +7,15 @@ use App\Models\Product;
 
 class ProductList extends Component
 {
+    public $cartCount;
+    public $cart = [];
     public $products;
     public $clickedProduct = null;
     public $selectedProduct = false;
 
     public function mount()
     {
+        $
         $this->products = Product::all();
     }
 

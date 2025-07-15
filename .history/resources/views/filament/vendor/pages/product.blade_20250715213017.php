@@ -10,9 +10,9 @@
         @foreach ($products as $product)
         <div 
             class="rounded-xl  p-4 cursor-pointer shadow bg-white dark:bg-gray-800" 
-            
+            wire:click="openProductModal({{ $product->id }})"
         >
-            <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
+            <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
                 <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
             </div>
             <div>

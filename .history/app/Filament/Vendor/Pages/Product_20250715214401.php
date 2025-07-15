@@ -43,7 +43,7 @@ class Product extends Page
     {
         $this->products = ProductModel::all();
         $this->cart = session()->get('cart', []);
-        $this->cartCount = session()->get('cartCount', 0);
+        $this->cartCount = count($this->cart);
         $this->min_order_quantity = 150;
     }
     public function notify(string $type, string $message): void
@@ -65,7 +65,6 @@ class Product extends Page
             $this->cart[] = $product;
             $this->cartCount += $this->min_order_quantity;
             session()->put('cart', $this->cart);
-            session()->put('cartCount', $this->cartCount);
             $this->notify('success', 'Product added to cart successfully!');
         }
     }
