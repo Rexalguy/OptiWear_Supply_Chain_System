@@ -116,65 +116,65 @@ class ShirtSupplyChainSeeder extends Seeder
         ])->map(fn($data) => User::create($data));
 
         // INFO TABLES
+        
 
+            DB::table('admin_info')->insert([
+                'user_id' => $users[0]->id,
+                'title' => 'System Admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        DB::table('admin_info')->insert([
-            'user_id' => $users[0]->id,
-            'title' => 'System Admin',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            DB::table('manufacturing_info')->insert([
+                'user_id' => $users[1]->id,
+                'factory_name' => 'Okello Textiles Ltd',
+                'location' => 'Kampala',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        DB::table('manufacturing_info')->insert([
-            'user_id' => $users[1]->id,
-            'factory_name' => 'Okello Textiles Ltd',
-            'location' => 'Kampala',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            DB::table('supplier_info')->insert([
+                'user_id' => $users[2]->id,
+                'company_name' => 'Nabwire Supplies',
+                'location' => 'Jinja',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        DB::table('supplier_info')->insert([
-            'user_id' => $users[2]->id,
-            'company_name' => 'Nabwire Supplies',
-            'location' => 'Jinja',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            DB::table('vendor_info')->insert([
+                'user_id' => $users[3]->id,
+                'business_name' => 'Mugisha Designs',
+                'location' => 'Masaka',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        DB::table('vendor_info')->insert([
-            'user_id' => $users[3]->id,
-            'business_name' => 'Mugisha Designs',
-            'location' => 'Masaka',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('customer_info')->insert([
-            ['user_id' => $users[4]->id, 'address' => 'Ntinda, Kampala', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[5]->id, 'address' => 'Gulu Road, Lira', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[6]->id, 'address' => 'Bugolobi, Kampala', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[7]->id, 'address' => 'Entebbe', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[8]->id, 'address' => 'Mbarara Town', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+            DB::table('customer_info')->insert([
+                ['user_id' => $users[4]->id, 'address' => 'Ntinda, Kampala', 'created_at' => now(), 'updated_at' => now()],
+                ['user_id' => $users[5]->id, 'address' => 'Gulu Road, Lira', 'created_at' => now(), 'updated_at' => now()],
+                ['user_id' => $users[6]->id, 'address' => 'Bugolobi, Kampala', 'created_at' => now(), 'updated_at' => now()],
+                ['user_id' => $users[7]->id, 'address' => 'Entebbe', 'created_at' => now(), 'updated_at' => now()],
+                ['user_id' => $users[8]->id, 'address' => 'Mbarara Town', 'created_at' => now(), 'updated_at' => now()],
+            ]);
 
 
         // RAW MATERIAL CATEGORIES
-        $categoryData = [
-            ['name' => 'Cotton Fabrics', 'description' => 'High-quality cotton used for making shirts.'],
-            ['name' => 'Thread & Stitching Materials', 'description' => 'Threads and materials used for sewing.'],
-            ['name' => 'Dyes & Chemicals', 'description' => 'Colorants and chemicals used in production.'],
-            ['name' => 'Packaging Materials', 'description' => 'Used to package finished shirt products.'],
-            ['name' => 'Buttons & Zippers', 'description' => 'Closures like buttons and zippers.'],
-            ['name' => 'Printing Inks', 'description' => 'Inks used in shirt screen printing.'],
-            ['name' => 'Adhesives & Glues', 'description' => 'Bonding agents used during manufacturing.'],
-        ];
+            $categoryData = [
+                ['name' => 'Cotton Fabrics', 'description' => 'High-quality cotton used for making shirts.'],
+                ['name' => 'Thread & Stitching Materials', 'description' => 'Threads and materials used for sewing.'],
+                ['name' => 'Dyes & Chemicals', 'description' => 'Colorants and chemicals used in production.'],
+                ['name' => 'Packaging Materials', 'description' => 'Used to package finished shirt products.'],
+                ['name' => 'Buttons & Zippers', 'description' => 'Closures like buttons and zippers.'],
+                ['name' => 'Printing Inks', 'description' => 'Inks used in shirt screen printing.'],
+                ['name' => 'Adhesives & Glues', 'description' => 'Bonding agents used during manufacturing.'],
+            ];
 
-        $categories = collect($categoryData)->map(function ($data) {
-            return RawMaterialCategory::firstOrCreate(
-                ['name' => $data['name']],
-                ['description' => $data['description']]
-            );
-        });
+            $categories = collect($categoryData)->map(function ($data) {
+                return RawMaterialCategory::firstOrCreate(
+                    ['name' => $data['name']],
+                    ['description' => $data['description']]
+                );
+            });
 
         // RAW MATERIALS
         $rawMaterialsData = [

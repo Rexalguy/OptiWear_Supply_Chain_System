@@ -167,9 +167,9 @@ class RawMaterialsPurchaseOrderResource extends Resource
 
                 function () {
                     if (Auth::user()->role == 'supplier') {
-                        return RawMaterialsPurchaseOrder::query()->where('supplier_id', Auth::id())->latest();
+                        RawMaterialsPurchaseOrder::query()->where('supplier_by', Auth::id())->latest();
                     } else {
-                        return RawMaterialsPurchaseOrder::query()->where('created_by', Auth::id())->latest();
+                        RawMaterialsPurchaseOrder::query()->where('created_by', Auth::id())->latest();
                     }
                 }
             )
