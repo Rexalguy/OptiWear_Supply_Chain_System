@@ -18,19 +18,17 @@ class PlaceOrder extends Page
 
     public int $potentialTokens = 0;
 
-    /**
-     * Cart stores entries keyed by productId-size (e.g. "12-L"),
-     * with value ['product_id' => int, 'size' => string, 'quantity' => int].
-     */
     public array $cart = [];
 
     public $products;
     public array $wishlistProductIds = [];
 
-    // Size selection state per product (for dropdown UI)
     public array $showSizeDropdown = [];
     public array $selectedSize = [];
     public array $sizes = ['S', 'M', 'L', 'XL'];
+
+    public string $deliveryOption = 'pickup';
+    protected int $deliveryFee = 5000; // fixed delivery fee
 
     public function mount(): void
     {
@@ -60,9 +58,6 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
-    /**
-     * Show size dropdown for product when user clicks "Add to Cart".
-     */
     public function addToCart(int $productId): void
     {
         $product = Product::find($productId);
@@ -75,17 +70,11 @@ class PlaceOrder extends Page
         $this->showSizeDropdown[$productId] = true;
     }
 
-    /**
-     * ✅ Triggered when user clicks "➕ Add Another Size"
-     */
     public function requestNewSize(int $productId): void
     {
         $this->showSizeDropdown[$productId] = true;
     }
 
-    /**
-     * Confirm size selection and add item to cart (or increment quantity if exists).
-     */
     public function confirmAddToCart(int $productId): void
     {
         $product = Product::find($productId);
@@ -102,14 +91,11 @@ class PlaceOrder extends Page
             return;
         }
 
-        // Create unique cart key combining product ID and size
         $cartKey = $productId . '-' . $size;
 
         if (isset($this->cart[$cartKey])) {
-            // Increment quantity for existing product-size entry
             $this->cart[$cartKey]['quantity']++;
         } else {
-            // Add new entry for product-size
             $this->cart[$cartKey] = [
                 'product_id' => $productId,
                 'size' => $size,
@@ -119,7 +105,6 @@ class PlaceOrder extends Page
 
         session()->put('cart', $this->cart);
 
-        // Clean up UI states
         unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
 
         $this->updateTokenCount();
@@ -127,9 +112,6 @@ class PlaceOrder extends Page
         $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
-    /**
-     * Remove a specific product+size entry from cart.
-     */
     public function removeFromCart(string $cartKey): void
     {
         if (isset($this->cart[$cartKey])) {
@@ -140,9 +122,6 @@ class PlaceOrder extends Page
         }
     }
 
-    /**
-     * Increment quantity for a specific product+size.
-     */
     public function incrementQuantity(string $cartKey): void
     {
         if (!isset($this->cart[$cartKey])) {
@@ -159,7 +138,6 @@ class PlaceOrder extends Page
 
         $currentQty = $this->cart[$cartKey]['quantity'];
 
-        // Limit to stock or max 50 units
         $maxQty = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
@@ -172,10 +150,6 @@ class PlaceOrder extends Page
         $this->updateTokenCount();
     }
 
-    /**
-     * Decrement quantity for a specific product+size.
-     * Remove the entry if quantity falls below 1.
-     */
     public function decrementQuantity(string $cartKey): void
     {
         if (!isset($this->cart[$cartKey])) {
@@ -192,9 +166,6 @@ class PlaceOrder extends Page
         $this->updateTokenCount();
     }
 
-    /**
-     * Toggle wishlist state for a product.
-     */
     public function toggleWishlist(int $productId): void
     {
         $user = Auth::user();
@@ -217,18 +188,12 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
-    /**
-     * Calculate and update token rewards based on cart total.
-     */
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
-    /**
-     * Calculate total cart price.
-     */
     public function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
@@ -240,11 +205,24 @@ class PlaceOrder extends Page
         }, 0);
     }
 
-    /**
-     * Count total quantity of items in cart.
-     */
     public function getCartCountProperty(): int
     {
         return collect($this->cart)->sum('quantity');
+    }
+
+    public function getDeliveryFeeProperty(): int
+    {
+        return $this->deliveryOption === 'delivery' ? $this->deliveryFee : 0;
+    }
+
+    public function getDiscountProperty(): int
+    {
+        $userTokens = Auth::user()->tokens ?? 0;
+        return $userTokens >= 200 ? 10000 : 0;
+    }
+
+    public function getFinalAmountProperty(): int
+    {
+        return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
     }
 }
