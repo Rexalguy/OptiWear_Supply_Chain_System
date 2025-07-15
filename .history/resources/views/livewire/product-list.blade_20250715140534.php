@@ -58,7 +58,7 @@
                     <div>
                         <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
-                        <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->price) }}</p>
+                        <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
                         <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
                     </div>

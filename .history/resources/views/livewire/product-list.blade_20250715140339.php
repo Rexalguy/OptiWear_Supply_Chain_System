@@ -49,7 +49,7 @@
             }
         </style>
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in" style="cursor:pointer;" wire:click.self="closeProductModal">
-            <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
+            <div class="shadow bg-white dark:bg-gray-800 p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
                 <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-4xl font-extrabold focus:outline-none close-btn-animate" style="right:1rem;top:1rem;" wire:click="closeProductModal" aria-label="Close">&times;</button>
                 <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
                 <img src="{{ $clickedProduct->image ? asset('storage/' . $clickedProduct->image) : '/images/image.png' }}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
@@ -57,8 +57,8 @@
                 <div>
                     <div>
                         <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
-                        <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
-                        <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->price) }}</p>
+                        <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
+                        <p class="text-sm text-gray-600">Price: UGX {{ number_format($clickedProduct->price) }}</p>
                         <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
                     </div>
