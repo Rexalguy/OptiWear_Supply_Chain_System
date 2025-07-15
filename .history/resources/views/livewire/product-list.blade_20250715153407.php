@@ -13,7 +13,7 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->price) }}</p>
-                    <p>Minimum Order Quantity: 150 pieces</p>
+                    <p>Minimum Order Quantity: 150 pi</p>
                 </div>
                 <div>
                     <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
@@ -61,7 +61,6 @@
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->price) }}</p>
                         <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                        <p>Minimum Order Quantity: 150 pieces</p>
                     </div>
                     <div>
                         <x-filament::button color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">

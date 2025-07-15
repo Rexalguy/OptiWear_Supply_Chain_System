@@ -23,7 +23,7 @@ class PlaceOrder extends Page
     public $quantity = 200;
     public $delivery_method;
     public $notes;
-    public static ?string $title = "Cart";
+    p
 
     public function mount()
     {
