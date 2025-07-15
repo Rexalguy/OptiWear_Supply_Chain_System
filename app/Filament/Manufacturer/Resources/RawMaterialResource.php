@@ -24,7 +24,10 @@ class RawMaterialResource extends Resource
 
     protected static ?string $navigationGroup = 'Raw Materials';
 
-    
+    public static function canCreate(): bool
+    {
+            return false;
+    }
     public static function canViewAny(): bool
     {
         $user = Auth::user();
