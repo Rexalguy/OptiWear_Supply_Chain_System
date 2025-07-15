@@ -26,6 +26,7 @@ class CustomerPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->topNavigation()
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('13rem')
             ->brandName('OptiWear')
