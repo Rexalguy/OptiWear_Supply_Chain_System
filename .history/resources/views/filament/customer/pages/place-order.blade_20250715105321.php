@@ -22,7 +22,7 @@
             @foreach ($products as $product)
                 <div class=" p-4 rounded-lg shadow bg-white dark:bg-gray-800">
                     <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                        <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
+                        <img style="height: 350px; object-fit: cover;" src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="w-full h-64 object-cover rounded">
                     </div>
                     
                     <div>
