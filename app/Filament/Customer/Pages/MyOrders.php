@@ -73,10 +73,12 @@ class MyOrders extends Page implements HasTable
         return $tokens >= 200 ? 10000 : 0;
     }
 
+    // Fixed: cart items are arrays with quantity & size
     protected function getCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
+        return collect($this->cart)->reduce(function ($total, $item, $productId) {
             $product = Product::find($productId);
+            $qty = is_array($item) && isset($item['quantity']) ? (int)$item['quantity'] : (int)$item;
             return $product ? $total + ($product->price * $qty) : $total;
         }, 0);
     }
@@ -142,14 +144,18 @@ class MyOrders extends Page implements HasTable
                 'total' => $netTotal,
             ]);
 
-            foreach ($this->cart as $productId => $quantity) {
+            foreach ($this->cart as $productId => $item) {
                 $product = Product::findOrFail($productId);
+                $quantity = $item['quantity'] ?? 1;
+                $size = $item['size'] ?? null;
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'SKU' => $product->sku,
                     'quantity' => $quantity,
                     'unit_price' => $product->price,
+                    'size' => $size,
                 ]);
             }
 
@@ -177,43 +183,15 @@ class MyOrders extends Page implements HasTable
         }
     }
 
-    public function increaseQuantity($productId): void
-    {
-        $product = Product::find($productId);
-        if (!$product) {
-            Notification::make()->title('Product not found')->danger()->send();
-            return;
-        }
+    // Remove increaseQuantity and decreaseQuantity if you only want remove button on cart summary
 
-        $currentQty = $this->cart[$productId] ?? 0;
-
-        if ($currentQty >= 50) {
-            Notification::make()->title('Limit: Max 50 units per product')->warning()->send();
-            return;
-        }
-
-        if ($currentQty >= $product->quantity_available) {
-            Notification::make()->title("Only {$product->quantity_available} units available for {$product->name}")->danger()->send();
-            return;
-        }
-
-        $this->cart[$productId] = $currentQty + 1;
-        session()->put('cart', $this->cart);
-
-        $this->calculatePotentialTokens();
-    }
-
-    public function decreaseQuantity($productId): void
+    public function removeFromCart($productId): void
     {
         if (isset($this->cart[$productId])) {
-            if ($this->cart[$productId] > 1) {
-                $this->cart[$productId]--;
-            } else {
-                unset($this->cart[$productId]);
-            }
-
+            unset($this->cart[$productId]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
+            Notification::make()->title('Removed from cart')->success()->send();
         }
     }
 
@@ -252,7 +230,7 @@ class MyOrders extends Page implements HasTable
                     ->html()
                     ->formatStateUsing(function ($state, $record) {
                         return $record->orderItems
-                            ->map(fn($item) => e($item->product->name) . ' (x' . $item->quantity . ')')
+                            ->map(fn($item) => e($item->product->name) . " (Size: " . e($item->size) . ", qty: {$item->quantity})")
                             ->implode('<br>');
                     }),
                 TextColumn::make('status')

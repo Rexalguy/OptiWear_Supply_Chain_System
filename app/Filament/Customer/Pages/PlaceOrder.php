@@ -21,6 +21,11 @@ class PlaceOrder extends Page
     public $products;
     public array $wishlistProductIds = [];
 
+    // New: For dropdown state & selected size
+    public array $showSizeDropdown = [];
+    public array $selectedSize = [];
+    public array $sizes = ['S', 'M', 'L', 'XL'];
+
     public function mount(): void
     {
         $this->cart = session()->get('cart', []);
@@ -49,25 +54,57 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
+    /**
+     * Step 1: Show dropdown instead of adding directly
+     */
     public function addToCart($productId): void
     {
         $product = Product::find($productId);
+
         if (!$product || $product->quantity_available < 1) {
             $this->notify('Product out of stock', 'danger');
             return;
         }
 
-        $qty = $this->cart[$productId] ?? 0;
-        if ($qty >= 50) {
-            $this->notify('Maximum 50 items per product allowed', 'warning');
+        // Show dropdown for size selection
+        $this->showSizeDropdown[$productId] = true;
+    }
+
+    /**
+     * Step 2: Confirm size selection & actually add to cart
+     */
+    public function confirmAddToCart($productId): void
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
-        $this->cart[$productId] = $qty + 1;
+        $size = $this->selectedSize[$productId] ?? null;
+
+        if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
+            return;
+        }
+
+        // If product already in cart, increment quantity
+        if (isset($this->cart[$productId])) {
+            $this->cart[$productId]['quantity']++;
+        } else {
+            $this->cart[$productId] = [
+                'quantity' => 1,
+                'size' => $size,
+            ];
+        }
+
         session()->put('cart', $this->cart);
 
+        // Hide dropdown after confirming
+        unset($this->showSizeDropdown[$productId]);
+
         $this->updateTokenCount();
-        $this->notify('Added to cart');
+        $this->notify("Added to cart (Size: $size)");
     }
 
     public function removeFromCart($productId): void
@@ -81,16 +118,27 @@ class PlaceOrder extends Page
     }
 
     public function incrementQuantity($productId): void
-    {
-        $product = Product::find($productId);
-        $qty = $this->cart[$productId] ?? 0;
+{
+    $product = Product::find($productId);
 
-        if ($product && $qty < min(50, $product->quantity_available)) {
-            $this->cart[$productId]++;
-            session()->put('cart', $this->cart);
-            $this->updateTokenCount();
-        }
+    // If product not in cart yet, do nothing
+    if (!$product || !isset($this->cart[$productId])) {
+        return;
     }
+
+    // Check stock limit
+    $currentQty = $this->cart[$productId]['quantity'] ?? 0;
+    if ($currentQty >= min(50, $product->quantity_available)) {
+        $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
+        return;
+    }
+
+    //  Instead of directly incrementing,
+    // we trigger the size dropdown again
+    $this->showSizeDropdown[$productId] = true;
+    $this->notify("Please select a size for the additional {$product->name}", 'info');
+}
+
 
     public function decrementQuantity($productId): void
     {
@@ -98,8 +146,8 @@ class PlaceOrder extends Page
             return;
         }
 
-        $this->cart[$productId]--;
-        if ($this->cart[$productId] < 1) {
+        $this->cart[$productId]['quantity']--;
+        if ($this->cart[$productId]['quantity'] < 1) {
             unset($this->cart[$productId]);
         }
 
@@ -137,14 +185,14 @@ class PlaceOrder extends Page
 
     public function calculateCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
+        return collect($this->cart)->reduce(function ($total, $item, $productId) {
             $product = Product::find($productId);
-            return $product ? $total + ($product->price * $qty) : $total;
+            return $product ? $total + ($product->price * ($item['quantity'] ?? 0)) : $total;
         }, 0);
     }
 
     public function getCartCountProperty(): int
     {
-        return array_sum($this->cart);
+        return collect($this->cart)->sum('quantity');
     }
 }
