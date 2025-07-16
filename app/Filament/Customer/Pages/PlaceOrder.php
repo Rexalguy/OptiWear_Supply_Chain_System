@@ -16,23 +16,23 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
-    // ✅ UI / modal state
+    //  UI / modal state
     public ?Product $clickedProduct = null;
     public bool $selectedProduct = false;
 
-    // ✅ Cart + wishlist
+    //  Cart + wishlist
     public array $cart = [];
     public array $wishlistProductIds = [];
 
-    // ✅ Product list
+    // Product list
     public $products;
 
-    // ✅ Size selection UI
+    //  Size selection UI
     public array $showSizeDropdown = [];
     public array $selectedSize = [];
     public array $sizes = ['S', 'M', 'L', 'XL']; // Example sizes
 
-    // ✅ Delivery & pricing
+    //  Delivery & pricing
     public string $deliveryOption = 'pickup';
     protected int $deliveryFee = 5000; // fixed delivery fee
     public int $potentialTokens = 0;
@@ -54,13 +54,13 @@ class PlaceOrder extends Page
         return [MyStatsWidget::class];
     }
 
-    /** ✅ Quick helper to show Filament notifications */
+    /* Quick helper to show Filament notifications */
     protected function notify(string $message, string $type = 'success'): void
     {
         Notification::make()->title($message)->{$type}()->send();
     }
 
-    /** ✅ Wishlist loading */
+    /* Wishlist loading */
     protected function loadWishlistProductIds(): void
     {
         $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
@@ -68,7 +68,7 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
-    /** ✅ MODAL HANDLERS */
+    /* MODAL HANDLERS */
     public function openProductModal(int $productId): void
     {
         $this->clickedProduct = Product::find($productId);
@@ -81,13 +81,13 @@ class PlaceOrder extends Page
         $this->selectedProduct = false;
     }
 
-    /** ✅ Request to show size dropdown for adding */
+    /* Request to show size dropdown for adding */
     public function requestNewSize(int $productId): void
     {
         $this->showSizeDropdown[$productId] = true;
     }
 
-    /** ✅ Add to cart (only via modal confirm) */
+    /* Add to cart (only via modal confirm) */
     public function confirmAddToCart(int $productId): void
     {
         $product = Product::find($productId);
@@ -126,7 +126,7 @@ class PlaceOrder extends Page
         $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
-    /** ✅ CART MANAGEMENT */
+    /* CART MANAGEMENT */
     public function removeFromCart(string $cartKey): void
     {
         if (isset($this->cart[$cartKey])) {
@@ -176,7 +176,7 @@ class PlaceOrder extends Page
         $this->updateTokenCount();
     }
 
-    /** ✅ Wishlist toggle */
+    /* Wishlist toggle */
     public function toggleWishlist(int $productId): void
     {
         $user = Auth::user();
@@ -199,14 +199,14 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
-    /** ✅ Token calculation */
+    /* Token calculation */
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
-    /** ✅ Cart total */
+    /* Cart total */
     public function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
@@ -216,7 +216,7 @@ class PlaceOrder extends Page
         }, 0);
     }
 
-    /** ✅ Computed properties for Blade */
+    /* Computed properties for Blade */
     public function getCartCountProperty(): int
     {
         return collect($this->cart)->sum('quantity');
@@ -238,7 +238,7 @@ class PlaceOrder extends Page
         return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
     }
 
-    /** ✅ ProductCartItems merges cart + product info */
+    /* ProductCartItems merges cart + product info */
     public function getProductCartItemsProperty()
     {
         return collect($this->cart)->mapWithKeys(function ($item, $key) {

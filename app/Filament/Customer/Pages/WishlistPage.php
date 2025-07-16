@@ -20,10 +20,14 @@ class WishlistPage extends Page
     public array $cart = [];
     public int $potentialTokens = 0;
 
-    //  New for size selection dropdown (like PlaceOrder)
+    // For size selection dropdown 
     public array $showSizeDropdown = [];
     public array $selectedSize = [];
     public array $sizes = ['S', 'M', 'L', 'XL'];
+
+    // For modal management
+    public $clickedProduct = null;
+    public $selectedProduct = false;
 
     public function mount(): void
     {
@@ -62,8 +66,22 @@ class WishlistPage extends Page
         }
     }
 
+    // Modal open method - new
+    public function openProductModal(int $productId): void
+    {
+        $this->clickedProduct = Product::find($productId);
+        $this->selectedProduct = true;
+    }
+
+    // Modal close method - new
+    public function closeProductModal(): void
+    {
+        $this->clickedProduct = null;
+        $this->selectedProduct = false;
+    }
+
     /**
-     *  Show size dropdown for product when user clicks "Add to Cart"
+     * Show size dropdown for product when user clicks "Add to Cart"
      */
     public function addToCart(int $productId): void
     {
@@ -96,7 +114,7 @@ class WishlistPage extends Page
             return;
         }
 
-        //  Create unique cart key combining product ID and size
+        // Create unique cart key combining product ID and size
         $cartKey = $productId . '-' . $size;
 
         if (isset($this->cart[$cartKey])) {
@@ -129,7 +147,7 @@ class WishlistPage extends Page
     }
 
     /**
-     *  Remove a specific product+size entry from cart
+     * Remove a specific product+size entry from cart
      */
     public function removeFromCart(string $cartKey): void
     {
@@ -142,7 +160,7 @@ class WishlistPage extends Page
     }
 
     /**
-     *  Increment quantity for a specific product+size
+     * Increment quantity for a specific product+size
      */
     public function incrementQuantity(string $cartKey): void
     {
@@ -170,7 +188,7 @@ class WishlistPage extends Page
     }
 
     /**
-     *  Decrement quantity for a specific product+size
+     * Decrement quantity for a specific product+size
      */
     public function decrementQuantity(string $cartKey): void
     {
@@ -187,7 +205,7 @@ class WishlistPage extends Page
     }
 
     /**
-     *  Allow user to add another size of same product
+     * Allow user to add another size of same product
      */
     public function requestNewSize(int $productId): void
     {
