@@ -209,7 +209,7 @@ class PlaceOrder extends Page
         return collect($this->cart)->reduce(function ($total, $item) {
             $product = Product::find($item['product_id']);
             if (!$product) return $total;
-            return $total + ($product->price * ($item['quantity'] ?? 0));
+            return $total + ($product->unit_price * ($item['quantity'] ?? 0));
         }, 0);
     }
 

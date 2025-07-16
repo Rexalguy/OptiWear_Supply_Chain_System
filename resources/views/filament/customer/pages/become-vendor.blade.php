@@ -71,9 +71,10 @@
                     </div>
                 @endif
 
-                @if (!is_null($this->latestApplication?->notified_at))
-                    {{ $this->infolist }}
+                @if ($this->latestApplication && $this->latestApplication->notified_at && is_null($this->latestApplication->viewed_at))
+                 {{ $this->infolist }}
                 @endif
+
             </div>
         </x-filament::card>
     </div>

@@ -24,7 +24,10 @@ class RawMaterialResource extends Resource
 
     protected static ?string $navigationGroup = 'Raw Materials';
 
-    
+    public static function canCreate(): bool
+    {
+            return false;
+    }
     public static function canViewAny(): bool
     {
         $user = Auth::user();
@@ -97,9 +100,6 @@ class RawMaterialResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->default('Uncategorized'),
-                Tables\Columns\TextColumn::make('reorder_level')
-                    ->numeric($precision = 2)
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('current_stock')
                     ->numeric($precision = 2)
                     ->sortable(),
@@ -160,7 +160,7 @@ class RawMaterialResource extends Resource
         return [
             'index' => Pages\ListRawMaterials::route('/'),
             'create' => Pages\CreateRawMaterial::route('/create'),
-            'view' => Pages\ViewRawMaterial::route('/{record}'),
+            // 'view' => Pages\ViewRawMaterial::route('/{record}'),
             'edit' => Pages\EditRawMaterial::route('/{record}/edit'),
         ];
     }

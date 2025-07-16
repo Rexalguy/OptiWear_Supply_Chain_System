@@ -158,6 +158,7 @@ class ProductionOrderResource extends Resource
                 ActionGroup::make([
                     Tables\Actions\Action::make('bom')
                         ->label('View BOM')
+                        ->slideOver()
                         ->icon('heroicon-o-information-circle')
                         ->modalHeading('Required Raw Materials')
                         ->infolist(function (ProductionOrder $record): array {
@@ -192,6 +193,7 @@ class ProductionOrderResource extends Resource
 
                     Tables\Actions\Action::make('viewLog')
                         ->label('Stage Log')
+                        ->slideOver()
                         ->icon('heroicon-o-clock')
                         ->modalHeading('Production Stage Log')
                         ->infolist(function (ProductionOrder $record): array {

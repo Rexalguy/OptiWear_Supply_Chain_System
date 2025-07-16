@@ -8,7 +8,7 @@ class VendorValidation extends Model
 {
         protected $fillable = [
         'user_id', 'business_name', 'is_valid', 'reasons',
-        'visit_date', 'supporting_documents', 'notified_at'
+        'visit_date', 'supporting_documents', 'notified_at', 'viewed_at', 
     ];
 
     public function user()
