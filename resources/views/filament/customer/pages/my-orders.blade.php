@@ -34,7 +34,7 @@
                             $product = $products->get($item['product_id']);
                             $quantity = $item['quantity'] ?? 0;
                             $size = $item['size'] ?? '-';
-                            $subtotal = $product ? $product->price * $quantity : 0;
+                            $subtotal = $product ? $product->unit_price * $quantity : 0;
                         @endphp
 
                         @if ($product)
@@ -43,7 +43,7 @@
                                     <div class="font-semibold text-lg">{{ $product->name }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300">SKU: {{ $product->sku }}</div>
                                     <div class="text-sm text-gray-700 dark:text-gray-400 mt-1">
-                                        Size: <strong>{{ $size }}</strong> | UGX {{ number_format($product->price) }} × {{ $quantity }}
+                                        Size: <strong>{{ $size }}</strong> | UGX {{ number_format($product->unit_price) }} x {{ $quantity }}
                                     </div>
 
                                     {{-- Remove --}}
