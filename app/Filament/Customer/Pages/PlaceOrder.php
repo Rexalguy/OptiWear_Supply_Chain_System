@@ -16,14 +16,33 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
-    public int $potentialTokens = 0;
+    //  UI / modal state
+    public ?Product $clickedProduct = null;
+    public bool $selectedProduct = false;
+
+    //  Cart + wishlist
     public array $cart = [];
-    public $products;
     public array $wishlistProductIds = [];
+
+    // Product list
+    public $products;
+
+    //  Size selection UI
+    public array $showSizeDropdown = [];
+    public array $selectedSize = [];
+    public array $sizes = ['S', 'M', 'L', 'XL']; // Example sizes
+
+    //  Delivery & pricing
+    public string $deliveryOption = 'pickup';
+    protected int $deliveryFee = 5000; // fixed delivery fee
+    public int $potentialTokens = 0;
 
     public function mount(): void
     {
+        // Load current cart
         $this->cart = session()->get('cart', []);
+
+        // Load available products
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
         $this->updateTokenCount();
@@ -32,16 +51,16 @@ class PlaceOrder extends Page
 
     public function getHeaderWidgets(): array
     {
-        return [
-            MyStatsWidget::class,
-        ];
+        return [MyStatsWidget::class];
     }
 
+    /* Quick helper to show Filament notifications */
     protected function notify(string $message, string $type = 'success'): void
     {
         Notification::make()->title($message)->{$type}()->send();
     }
 
+    /* Wishlist loading */
     protected function loadWishlistProductIds(): void
     {
         $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
@@ -49,65 +68,116 @@ class PlaceOrder extends Page
             ->toArray();
     }
 
-    public function addToCart($productId): void
+    /* MODAL HANDLERS */
+    public function openProductModal(int $productId): void
     {
-        $product = Product::find($productId);
-        if (!$product || $product->quantity_available < 1) {
-            $this->notify('Product out of stock', 'danger');
-            return;
-        }
-
-        $qty = $this->cart[$productId] ?? 0;
-        if ($qty >= 50) {
-            $this->notify('Maximum 50 items per product allowed', 'warning');
-            return;
-        }
-
-        $this->cart[$productId] = $qty + 1;
-        session()->put('cart', $this->cart);
-
-        $this->updateTokenCount();
-        $this->notify('Added to cart');
+        $this->clickedProduct = Product::find($productId);
+        $this->selectedProduct = true;
     }
 
-    public function removeFromCart($productId): void
+    public function closeProductModal(): void
     {
-        if (isset($this->cart[$productId])) {
-            unset($this->cart[$productId]);
+        $this->clickedProduct = null;
+        $this->selectedProduct = false;
+    }
+
+    /* Request to show size dropdown for adding */
+    public function requestNewSize(int $productId): void
+    {
+        $this->showSizeDropdown[$productId] = true;
+    }
+
+    /* Add to cart (only via modal confirm) */
+    public function confirmAddToCart(int $productId): void
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
+            return;
+        }
+
+        $size = $this->selectedSize[$productId] ?? null;
+
+        if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
+            return;
+        }
+
+        $cartKey = $productId . '-' . $size;
+
+        if (isset($this->cart[$cartKey])) {
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            $this->cart[$cartKey] = [
+                'product_id' => $productId,
+                'size' => $size,
+                'quantity' => 1,
+            ];
+        }
+
+        session()->put('cart', $this->cart);
+
+        // Reset dropdown + selection for that product
+        unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
+
+        $this->updateTokenCount();
+
+        $this->notify("Added {$product->name} (Size: $size) to cart");
+    }
+
+    /* CART MANAGEMENT */
+    public function removeFromCart(string $cartKey): void
+    {
+        if (isset($this->cart[$cartKey])) {
+            unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->updateTokenCount();
             $this->notify('Removed from cart');
         }
     }
 
-    public function incrementQuantity($productId): void
+    public function incrementQuantity(string $cartKey): void
     {
+        if (!isset($this->cart[$cartKey])) return;
+
+        $productId = $this->cart[$cartKey]['product_id'];
         $product = Product::find($productId);
-        $qty = $this->cart[$productId] ?? 0;
 
-        if ($product && $qty < min(50, $product->quantity_available)) {
-            $this->cart[$productId]++;
-            session()->put('cart', $this->cart);
-            $this->updateTokenCount();
-        }
-    }
-
-    public function decrementQuantity($productId): void
-    {
-        if (!isset($this->cart[$productId])) {
+        if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
-        $this->cart[$productId]--;
-        if ($this->cart[$productId] < 1) {
-            unset($this->cart[$productId]);
+        $currentQty = $this->cart[$cartKey]['quantity'];
+        $maxQty = min(50, $product->quantity_available);
+
+        if ($currentQty >= $maxQty) {
+            $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
+            return;
+        }
+
+        $this->cart[$cartKey]['quantity']++;
+        session()->put('cart', $this->cart);
+        $this->updateTokenCount();
+    }
+
+    public function decrementQuantity(string $cartKey): void
+    {
+        if (!isset($this->cart[$cartKey])) return;
+
+        $this->cart[$cartKey]['quantity']--;
+
+        if ($this->cart[$cartKey]['quantity'] < 1) {
+            unset($this->cart[$cartKey]);
         }
 
         session()->put('cart', $this->cart);
         $this->updateTokenCount();
     }
 
-    public function toggleWishlist($productId): void
+    /* Wishlist toggle */
+    public function toggleWishlist(int $productId): void
     {
         $user = Auth::user();
 
@@ -129,22 +199,58 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
+    /* Token calculation */
     protected function updateTokenCount(): void
     {
         $total = $this->calculateCartTotal();
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
+    /* Cart total */
     public function calculateCartTotal(): int
     {
-        return collect($this->cart)->reduce(function ($total, $qty, $productId) {
-            $product = Product::find($productId);
-            return $product ? $total + ($product->price * $qty) : $total;
+        return collect($this->cart)->reduce(function ($total, $item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) return $total;
+            return $total + ($product->price * ($item['quantity'] ?? 0));
         }, 0);
     }
 
+    /* Computed properties for Blade */
     public function getCartCountProperty(): int
     {
-        return array_sum($this->cart);
+        return collect($this->cart)->sum('quantity');
+    }
+
+    public function getDeliveryFeeProperty(): int
+    {
+        return $this->deliveryOption === 'delivery' ? $this->deliveryFee : 0;
+    }
+
+    public function getDiscountProperty(): int
+    {
+        $userTokens = Auth::user()->tokens ?? 0;
+        return $userTokens >= 200 ? 10000 : 0;
+    }
+
+    public function getFinalAmountProperty(): int
+    {
+        return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
+    }
+
+    /* ProductCartItems merges cart + product info */
+    public function getProductCartItemsProperty()
+    {
+        return collect($this->cart)->mapWithKeys(function ($item, $key) {
+            $product = Product::find($item['product_id']);
+            if (!$product) return [];
+            return [
+                $key => [
+                    'product' => $product,
+                    'size' => $item['size'],
+                    'quantity' => $item['quantity'],
+                ],
+            ];
+        });
     }
 }
