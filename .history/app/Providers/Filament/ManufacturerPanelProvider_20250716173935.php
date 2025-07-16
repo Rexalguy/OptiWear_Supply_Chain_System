@@ -53,9 +53,9 @@ class ManufacturerPanelProvider extends PanelProvider
                 ->label('Production Workflow')
                 ->icon('heroicon-o-chart-bar')
                 ,
-            NavigationGroup::make()
-                ->label('Analytics')
-                ->icon('heroicon-o-chart-bar-square')
+                NavigationGroup::make()
+                ->label('Production Workflow')
+                ->icon('heroicon-o-chart-bar')
                 ,
 
             NavigationGroup::make()

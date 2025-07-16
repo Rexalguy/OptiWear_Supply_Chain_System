@@ -9,7 +9,6 @@ use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationGroup;
 use App\Filament\Customer\Pages\ChatPage;
-use App\Filament\Pages\Analytics;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
@@ -53,10 +52,6 @@ class ManufacturerPanelProvider extends PanelProvider
                 ->label('Production Workflow')
                 ->icon('heroicon-o-chart-bar')
                 ,
-            NavigationGroup::make()
-                ->label('Analytics')
-                ->icon('heroicon-o-chart-bar-square')
-                ,
 
             NavigationGroup::make()
                 ->label('Raw Materials')
@@ -67,7 +62,7 @@ class ManufacturerPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
                 ChatPage::class, 
-                Analytics::class,
+                Ana
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')

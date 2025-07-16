@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Widgets;
-use App\Filament\Pages\Analytics;
 // Removed duplicate import of Widgets
 // Removed duplicate import of PanelProvider
 use App\Http\Controllers\RedirectController;
@@ -41,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarWidth('20rem')
             ->id('admin')
-        ->login([RedirectController::class, 'toLogin'])
+            ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
             ->colors([
                 'primary' => Color::Amber,
@@ -50,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
                 Dashboard::class,
+                Analy
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([

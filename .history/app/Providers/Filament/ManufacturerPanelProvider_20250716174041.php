@@ -55,7 +55,8 @@ class ManufacturerPanelProvider extends PanelProvider
                 ,
             NavigationGroup::make()
                 ->label('Analytics')
-                ->icon('heroicon-o-chart-bar-square')
+                ->icon('heroicon-o-chart-bar-square
+')
                 ,
 
             NavigationGroup::make()

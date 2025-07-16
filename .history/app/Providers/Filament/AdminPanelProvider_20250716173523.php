@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarWidth('20rem')
             ->id('admin')
-        ->login([RedirectController::class, 'toLogin'])
+            ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
             ->colors([
                 'primary' => Color::Amber,
