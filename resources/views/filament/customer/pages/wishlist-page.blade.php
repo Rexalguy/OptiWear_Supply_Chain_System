@@ -38,12 +38,12 @@
                                 <x-heroicon-o-x-mark class="w-4 h-4"/>
                             </button>
 
-                            {{-- Product Image --}}
-                            <div class="w-full h-48 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                                <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}"
-                                     alt="{{ $product->name }}"
-                                     class="h-full w-auto object-contain">
-                            </div>
+  {{-- Product Image (smaller & constrained) --}}
+<div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
+    <img src="{{ $product->image }}" 
+         alt="{{ $product->name }}"
+         style="max-height: 180px; max-width: 90%; object-fit: contain;">
+</div>
 
                             {{-- Product Info --}}
                             <h3 class="text-lg font-semibold">{{ $product->name }}</h3>                           
@@ -96,12 +96,13 @@
                     &times;
                 </button>
 
-                {{-- Product Image --}}
-                <div class="w-full h-48 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
-                    <img src="{{ $clickedProduct->image ? asset('storage/' . $clickedProduct->image) : '/images/image.png' }}"
-                         alt="{{ $clickedProduct->name }}"
-                         class="h-full w-auto object-contain">
-                </div>
+              {{-- Product Image in Modal (smaller) --}}
+<div class="w-full flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
+    <img src="{{ $clickedProduct->image }}"
+         alt="{{ $clickedProduct->name }}"
+         style="max-height: 180px; max-width: 90%; object-fit: contain;">
+</div>
+
 
                 {{-- Product Details --}}
                 <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
@@ -112,14 +113,13 @@
 
                 {{-- Existing Cart Items for this Product --}}
                 @php
-                    // Ensure $cart is always defined to avoid errors
                     if (!isset($cart) || !is_array($cart)) {
                         $cart = [];
                     }
+                    // Ensure $clickedProduct is assigned
+                    $clickedProduct = $clickedProduct ?? null;
                     $cartItemsForClicked = collect($cart)
-                        ->filter(function($item) use ($clickedProduct) {
-                            return $clickedProduct && isset($item['product_id']) && $item['product_id'] === $clickedProduct->id;
-                        });
+                        ->filter(fn($item) => isset($item['product_id']) && $clickedProduct && $item['product_id'] === $clickedProduct->id);
                 @endphp
 
                 @foreach ($cartItemsForClicked as $cartKey => $cartItem)
@@ -177,10 +177,15 @@
                 {{-- Wishlist & Close --}}
                 <div class="flex justify-between mt-4">
                     {{-- Remove from wishlist directly --}}
-                    <x-filament::button color="danger"
-                        wire:click="removeFromWishlist({{ $wishlistItems->firstWhere('product_id', $clickedProduct->id)->id ?? 0 }})">
-                        Remove from Wishlist
-                    </x-filament::button>
+                    @php
+                        $wishlistId = $wishlistItems->firstWhere('product_id', $clickedProduct->id)->id ?? null;
+                    @endphp
+                    @if ($wishlistId)
+                        <x-filament::button color="danger"
+                            wire:click="removeFromWishlist({{ $wishlistId }})">
+                            Remove from Wishlist
+                        </x-filament::button>
+                    @endif
                     <x-filament::button color="secondary" wire:click="closeProductModal">
                         Close
                     </x-filament::button>
