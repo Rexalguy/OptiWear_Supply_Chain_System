@@ -57,7 +57,9 @@ class VendorPanelProvider extends PanelProvider
                 ChatPage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
-            ->widgets([])
+            ->widgets([
+                StatsOverviewWidget::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
