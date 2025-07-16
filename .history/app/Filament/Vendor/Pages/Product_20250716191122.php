@@ -20,10 +20,7 @@ class Product extends Page
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?int $navigationSort = 1;
-    public static function getNavigationSort(): ?int
-    {
-        return 1; // Lower = higher in the group
-    }
+    
 
     protected static ?string $navigationLabel = "Shop In Bulk";
     protected static ?string $navigationGroup = 'Products';

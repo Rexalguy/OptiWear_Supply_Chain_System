@@ -45,6 +45,7 @@ class VendorPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make('Products')
                     ->icon('heroicon-o-cube')
+                    ->sort(1)
                     ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')

@@ -43,7 +43,7 @@ class VendorPanelProvider extends PanelProvider
                 'gray' => Color::Stone,
             ])
             ->navigationGroups([
-                NavigationGroup::make('Products')
+                NavigationGroup::make('Products')p
                     ->icon('heroicon-o-cube')
                     ->collapsed(),
             ])

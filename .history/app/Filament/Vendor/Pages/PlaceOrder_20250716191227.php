@@ -24,7 +24,7 @@ class PlaceOrder extends Page
         $this->cart = session()->get('cart', []);
         $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
     }
-    // Removed duplicate declaration of $navigationSort
+    public static int $navigationSort = 2;
     public static function getNavigationSort(): ?int
     {
         return 2; // Lower = higher in the group
