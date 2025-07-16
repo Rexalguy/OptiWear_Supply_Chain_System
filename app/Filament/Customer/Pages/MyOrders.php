@@ -277,7 +277,7 @@ class MyOrders extends Page implements HasTable
                     ->formatStateUsing(fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
-                            : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
+                            : ($state ? Carbon::parse($state)->format('d M Y ') : 'N/A')
                     )
                     ->sortable(),
                 TextColumn::make('orderItems')
