@@ -32,6 +32,7 @@ class CustomerPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarWidth('20rem')
             // ->brandLogo(asset('images/logo.jpg'))
+            ->viteTheme('resources/css/filament/customer/theme.css')
             ->id('customer')
             ->path('customer')           // URL prefix for this panel
             ->default()                  // Make this the default panel

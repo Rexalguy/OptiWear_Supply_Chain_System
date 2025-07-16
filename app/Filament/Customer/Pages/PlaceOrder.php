@@ -49,10 +49,7 @@ class PlaceOrder extends Page
         $this->loadWishlistProductIds();
     }
 
-    public function getHeaderWidgets(): array
-    {
-        return [MyStatsWidget::class];
-    }
+
 
     /* Quick helper to show Filament notifications */
     protected function notify(string $message, string $type = 'success'): void

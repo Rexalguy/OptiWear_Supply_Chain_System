@@ -17,6 +17,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\Action;
+use App\Filament\Customer\Widgets\MyStatsWidget;
 
 class MyOrders extends Page implements HasTable
 {
@@ -52,6 +53,11 @@ class MyOrders extends Page implements HasTable
     public static function getNavigationBadgeTooltip(): ?string
     {
         return 'Your pending orders';
+    }
+
+        public function getHeaderWidgets(): array
+    {
+        return [MyStatsWidget::class];
     }
 
     public function mount(): void
