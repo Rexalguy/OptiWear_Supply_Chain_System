@@ -89,7 +89,7 @@ class MyOrders extends Page implements HasTable
         return collect($this->cart)->reduce(function ($total, $item) {
             $product = Product::find($item['product_id']);
             $qty = $item['quantity'] ?? 1;
-            return $product ? $total + ($product->price * $qty) : $total;
+            return $product ? $total + ($product->unit_price * $qty) : $total;
         }, 0);
     }
 
@@ -179,7 +179,7 @@ class MyOrders extends Page implements HasTable
                 'created_by' => Auth::id(),
                 'status' => 'pending',
                 'delivery_option' => $this->deliveryOption,
-                'expected_delivery_date' => $expectedDate,
+                'expected_fulfillment_date' => $expectedDate,
                 'total' => $finalTotal,
             ]);
 
@@ -203,7 +203,7 @@ class MyOrders extends Page implements HasTable
                     'product_id' => $product->id,
                     'SKU' => $product->sku,
                     'quantity' => $quantity,
-                    'unit_price' => $product->price,
+                    'unit_price' => $product->unit_price,
                     'size' => $size,
                 ]);
             }
@@ -272,12 +272,12 @@ class MyOrders extends Page implements HasTable
                         default => 'secondary',
                     }),
                 TextColumn::make('created_at')->label('Placed On')->dateTime()->since(),
-                TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
+                TextColumn::make('expected_fulfillment_date')
+                    ->label('Expected Fulfillment Date')
                     ->formatStateUsing(fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
-                            : ($state ? Carbon::parse($state)->format('d M Y H:i') : 'N/A')
+                            : ($state ? Carbon::parse($state)->format('d M Y ') : 'N/A')
                     )
                     ->sortable(),
                 TextColumn::make('orderItems')

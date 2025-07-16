@@ -59,7 +59,13 @@ class OrderResource extends Resource
                 Forms\Components\TextInput::make('total')
                     ->required()
                     ->numeric(),
-                Forms\Components\DateTimePicker::make('expected_delivery_date'),
+                Forms\Components\DateTimePicker::make('expected_fulfillment_date')
+                    ->label('Expected Fulfillment Date')
+                    ->required()
+                    ->default(now()->addDays(7))
+                    ->minDate(now())
+                    ->maxDate(now()->addMonths(3))
+                    ->displayFormat('d M Y '),
                 Forms\Components\TextInput::make('rating')
                     ->numeric()
                     ->default(null),
