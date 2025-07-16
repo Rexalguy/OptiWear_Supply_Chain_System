@@ -32,6 +32,7 @@ class CustomerPanelProvider extends PanelProvider
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
+            ->viteTheme('resources/css/filament/customer/theme.css')
             // ->brandLogo(asset('images/logo.jpg'))
             ->id('customer')
             ->path('customer')           // URL prefix for this panel
