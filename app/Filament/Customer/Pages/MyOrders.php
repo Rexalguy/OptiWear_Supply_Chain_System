@@ -2,22 +2,22 @@
 
 namespace App\Filament\Customer\Pages;
 
+use Filament\Tables;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\OrderItem;
-use App\Models\CustomerInfo;
 use Filament\Pages\Page;
-use Filament\Tables;
+use App\Models\OrderItem;
 use Filament\Tables\Table;
+use App\Models\CustomerInfo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Notifications\Notification;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
 use App\Filament\Customer\Widgets\MyStatsWidget;
+use Filament\Tables\Concerns\InteractsWithTable;
 
 class MyOrders extends Page implements HasTable
 {

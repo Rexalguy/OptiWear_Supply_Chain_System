@@ -13,24 +13,20 @@ class ChatPage extends Page
     protected static string $view = 'filament.customer.pages.chat-page';
     protected static ?int $navigationSort = 7;
 
-//     public static function getNavigationBadge(): ?string
-// {
-//     return (string) ChatMessage::where('receiver_id', Auth::id())
-//         ->where('is_read', false)
-//         ->count();
-// }
+     public static function getNavigationBadge(): ?string
+    {
+        return static::getUnreadMessageCount() ?: null;
+    }
 
-// public static function getNavigationBadgeColor(): ?string
-// {
-//     $unread = ChatMessage::where('receiver_id', Auth::id())
-//         ->where('is_read', false)
-//         ->count();
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'info'; 
+    }
 
-//     return $unread > 0 ? 'danger' : 'gray';
-// }
-
-// public static function getNavigationBadgeTooltip(): ?string
-// {
-//     return 'Unread messages';
-// }
+    protected static function getUnreadMessageCount(): int
+    {
+        return ChatMessage::where('receiver_id', Auth::id())
+            ->whereNull('is_read')
+            ->count();
+    }
 }
