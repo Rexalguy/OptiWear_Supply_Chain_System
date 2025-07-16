@@ -272,8 +272,8 @@ class MyOrders extends Page implements HasTable
                         default => 'secondary',
                     }),
                 TextColumn::make('created_at')->label('Placed On')->dateTime()->since(),
-                TextColumn::make('expected_delivery_date')
-                    ->label('Expected Delivery Date')
+                TextColumn::make('expected_fulfillment_date')
+                    ->label('Expected Fulfillment Date')
                     ->formatStateUsing(fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
