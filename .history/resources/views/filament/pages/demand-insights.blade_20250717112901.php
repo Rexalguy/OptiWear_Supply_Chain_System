@@ -1,8 +1,4 @@
 @php
-    if (!isset($pieLabels))
-        $pieLabels = [];
-    if (!isset($pieValues))
-        $pieValues = [];
     use Illuminate\Support\Carbon;
     $timeFrames = [
         '30_days' => 'Next 30 Days',
@@ -222,100 +218,15 @@
             }
 
             function renderPieChart() {
-                const theme = getApexTheme();
-                var pieOptions = {
-                    chart: {
-                        type: 'pie',
-                        height: 460,
-                        toolbar: { show: false },
-                        animations: { enabled: true, easing: 'easeinout', speed: 1200 },
-                        background: theme.chartBg
-                    },
-                    theme: {
-                        mode: theme.isDark ? 'dark' : 'light'
-                    },
-                    labels: @json($pieLabels),
-                    series: @json($pieValues),
-                    legend: {
-                        position: 'bottom',
-                        fontSize: '17px',
-                        fontWeight: 700,
-                        labels: { colors: theme.labelColor },
-                        itemMargin: { horizontal: 16, vertical: 8 }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        style: { fontSize: '13px', fontWeight: 600, colors: [theme.labelColor] },
-                        formatter: function (val, opts) {
-                            return val.toFixed(1) + '%';
-                        },
-                        dropShadow: {
-                            enabled: true,
-                            top: 4,
-                            left: 4,
-                            blur: 8,
-                            color: '#000',
-                            opacity: 0.22
-                        }
-                    },
-                    colors: [
-                        '#6366f1', '#f59e42', '#10b981', '#ef4444', '#fbbf24', '#3b82f6', '#a21caf', '#14b8a6',
-                        {
-                            type: 'gradient',
-                            gradient: {
-                                shade: 'dark',
-                                type: 'vertical',
-                                shadeIntensity: 0.7,
-                                gradientToColors: ['#818cf8', '#fbbf24', '#34d399', '#f87171', '#fde68a', '#60a5fa', '#c084fc', '#2dd4bf'],
-                                inverseColors: false,
-                                opacityFrom: 0.98,
-                                opacityTo: 0.85,
-                                stops: [0, 100]
-                            }
-                        }
-                    ],
-                    stroke: { show: true, width: 3, colors: ['#fff'] },
-                    fill: { type: 'gradient' },
-                    tooltip: {
-                        theme: theme.tooltipTheme,
-                        y: { formatter: function () { return ''; } }
-                    },
-                    plotOptions: {
-                        pie: {
-                            expandOnClick: true,
-                            customScale: 1.10,
-                            offsetY: 8,
-                            dataLabels: {
-                                offset: 8
-                            }
-                        }
-                    },
-                    dropShadow: {
-                        enabled: true,
-                        top: 8,
-                        left: 0,
-                        blur: 16,
-                        color: '#000',
-                        opacity: 0.18
-                    }
-                };
-                var pieEl = document.querySelector("#segment-pie-chart");
-                if (pieEl._apexchart) {
-                    pieEl._apexchart.destroy();
-                }
-                var pieChart = new ApexCharts(pieEl, pieOptions);
-                pieChart.render();
-                pieEl._apexchart = pieChart;
+                // Pie chart removed - moved to Segmentation Insights page
             }
 
             // Initial render
             renderDemandChart();
-            renderPieChart();
 
             // Listen for dark mode changes (class toggle on <html>)
             const observer = new MutationObserver(() => {
                 renderDemandChart();
-                renderPieChart();
             });
             observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         </script>
@@ -458,55 +369,6 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-    @php
-        // --- SEGMENTATION ANALYTICS ---
-        $segmentResults = \Illuminate\Support\Facades\DB::table('segmentation_results')->get();
-        $allSegments = $segmentResults->pluck('segment_label')->unique()->values();
-        $pieData = $segmentResults->groupBy('segment_label')->map(function ($rows, $label) {
-            return $rows->sum('total_purchased');
-        });
-        $pieLabels = $pieData->keys()->toArray();
-        $pieValues = $pieData->values()->toArray();
-        // For each segment, find the shirt_category with the highest total_purchased
-        $segmentTopBuys = $segmentResults->groupBy('segment_label')->map(function ($rows, $label) {
-            $top = $rows->sortByDesc('total_purchased')->first();
-            return (object) [
-                'segment' => $label,
-                'shirt_category' => $top->shirt_category ?? '-',
-                'total_purchased' => $top->total_purchased ?? 0
-            ];
-        })->values();
-    @endphp
-
-    <div class="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-4xl mx-auto mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Customer Segmentation</h2>
-        <div class="flex flex-wrap gap-8 items-start">
-            <div class="flex-1 min-w-[320px]">
-                <div id="segment-pie-chart"></div>
-            </div>
-            <div class="flex-2 min-w-[320px]">
-                <h4 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Top Product by Segment</h4>
-                <table class="min-w-full bg-transparent divide-y divide-gray-200 dark:divide-gray-700 mb-8">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Segment</th>
-                            <th class="px-6 py-3 text-left text-base font-semibold text-gray-700 dark:text-gray-200">Top Shirt Category</th>
-                            <th class="px-6 py-3 text-right text-base font-semibold text-gray-700 dark:text-gray-200">Total Purchased</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($segmentTopBuys as $row)
-                            <tr class="hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->segment }}</td>
-                                <td class="px-6 py-3 text-gray-900 dark:text-gray-100">{{ $row->shirt_category }}</td>
-                                <td class="px-6 py-3 text-right text-gray-900 dark:text-gray-100">{{ $row->total_purchased }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 </x-filament-panels::page>
