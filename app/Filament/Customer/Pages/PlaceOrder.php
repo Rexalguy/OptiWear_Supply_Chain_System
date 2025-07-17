@@ -38,7 +38,7 @@ class PlaceOrder extends Page
 
     public function mount(): void
     {
-        // ✅ Load & sanitize old cart
+        //  Load & sanitize old cart
         $this->cart = session()->get('cart', []);
 
         // Auto-fix legacy cart structure
@@ -216,7 +216,7 @@ class PlaceOrder extends Page
     public function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
-            // ✅ Ensure product_id exists or recover from old structure
+            //  Ensure product_id exists or recover from old structure
             if (!isset($item['product_id'])) {
                 if (isset($item['product']) && $item['product'] instanceof Product) {
                     $item['product_id'] = $item['product']->id;
@@ -259,7 +259,7 @@ class PlaceOrder extends Page
     public function getProductCartItemsProperty()
     {
         return collect($this->cart)->mapWithKeys(function ($item, $key) {
-            // ✅ Fix legacy items
+            //  Fix legacy items
             if (!isset($item['product_id']) && isset($item['product']) && $item['product'] instanceof Product) {
                 $item['product_id'] = $item['product']->id;
             }

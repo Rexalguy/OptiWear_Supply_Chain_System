@@ -31,7 +31,7 @@ class WishlistPage extends Page
 
     public function mount(): void
     {
-        // ✅ Load & sanitize old cart
+        //  Load & sanitize old cart
         $this->cart = session()->get('cart', []);
 
         $this->cart = collect($this->cart)->mapWithKeys(function ($item, $key) {
@@ -234,7 +234,7 @@ class WishlistPage extends Page
     protected function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
-            // ✅ Ensure product_id exists
+            //  Ensure product_id exists
             if (!isset($item['product_id'])) {
                 if (isset($item['product']) && $item['product'] instanceof Product) {
                     $item['product_id'] = $item['product']->id;
