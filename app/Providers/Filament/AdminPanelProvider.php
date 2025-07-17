@@ -45,8 +45,13 @@ class AdminPanelProvider extends PanelProvider
         ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
             ->colors([
-                'primary' => Color::Amber,
-            ])
+                               'primary' => Color::Indigo,    // Strategic & modern
+                                'info'    => Color::Blue,      // Reports, data info
+                                'success' => Color::Emerald,   // Completed, Validated
+                                'warning' => Color::Amber,     // Stock low, Reorder
+                                'danger'  => Color::Rose,      // Errors, Failed Orders
+                                'gray'    => Color::Zinc,      // Neutral, background tones
+                                        ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
