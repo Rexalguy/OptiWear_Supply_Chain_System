@@ -130,13 +130,13 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
  <div class="flex justify-between mt-4">
-                    <x-filament::button
-                        :color="in_array($clickedProduct->id, $wishlistProductIds) ? 'danger' : 'gray'"
-                        :icon="in_array($clickedProduct->id, $wishlistProductIds) ? 'heroicon-s-heart' : 'heroicon-o-heart'"
-                        wire:click="toggleWishlist({{ $clickedProduct->id }})"
-                        tooltip="Add/Remove from Wishlist"
-                    />
- </div>
+            <x-filament::button
+                :color="in_array($product->id, $wishlistProductIds) ? 'danger' : 'gray'"
+                :icon="in_array($product->id, $wishlistProductIds) ? 'heroicon-s-heart' : 'heroicon-o-heart'"
+                wire:click="toggleWishlist({{ $product->id }})"
+                tooltip="Add/Remove from Wishlist"
+            />
+        </div>
                     
                     {{-- Small "Order" Button --}}
                     <div class="mt-3 flex justify-end">
