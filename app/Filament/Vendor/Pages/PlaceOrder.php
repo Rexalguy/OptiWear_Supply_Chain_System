@@ -8,115 +8,216 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\MaxWidth;
+use Illuminate\Contracts\Support\Htmlable;
 
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = "View Orders";
+    protected static ?string $navigationLabel = "Cart & Orders";
     protected static ?string $navigationGroup = 'Orders';
     protected static string $view = 'filament.vendor.pages.place-order';
 
     use Forms\Concerns\InteractsWithForms;
 
-    public $product_id;
-    public $quantity = 200;
-    public $delivery_method;
+    public $cart = [];
+    public $cartCount = 0;
+    public $orders = [];
+    public $delivery_method = 'pickup';
     public $notes;
-    public static ?string $title = "Cart";
+    public $isLoading = false;
+
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
+
+    public function getTitle(): string | Htmlable
+    {
+        return __('Cart & Order History');
+    }
+
+    public function getSubHeading(): string | Htmlable
+    {
+        return __('Review your cart and place orders or view your order history.');
+    }
 
     public function mount()
     {
-        $this->form->fill([]);
+        try {
+            $this->cart = session()->get('cart', []);
+            $this->cartCount = session()->get('cartCount', 0);
+            $this->loadOrders();
+            $this->form->fill([
+                'delivery_method' => $this->delivery_method
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('PlaceOrder mount error: ' . $e->getMessage());
+            $this->cart = [];
+            $this->cartCount = 0;
+            $this->orders = collect();
+        }
+    }
+
+    public function loadOrders()
+    {
+        try {
+            $this->orders = Order::select(['id', 'status', 'created_at', 'total', 'delivery_method'])
+                ->with(['orderItems:id,order_id,product_id,quantity,unit_price', 'orderItems.product:id,name'])
+                ->where('vendor_id', auth()->id())
+                ->orderBy('created_at', 'desc')
+                ->limit(5) // Reduced limit for better performance
+                ->get();
+        } catch (\Exception $e) {
+            \Log::error('Load orders error: ' . $e->getMessage());
+            $this->orders = collect();
+        }
     }
 
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Select::make('product_id')
-                ->label('Product')
-                ->options(Product::pluck('name', 'id'))
-                ->reactive()
-                ->searchable()
-                ->afterStateUpdated(fn() => $this->dispatch('refresh'))
-                ->required(),
-
-            Forms\Components\Placeholder::make('unit_price')
-                ->label('Unit Price')
-                ->inlineLabel()
-                ->content(fn() => $this->getUnitPrice()),
-
-            Forms\Components\TextInput::make('quantity')
-                ->numeric()
-                ->minValue(200)
+            Forms\Components\Select::make('delivery_method')
+                ->options(['pickup' => 'Pickup from Warehouse', 'delivery' => 'Door-to-Door Delivery'])
                 ->required()
-                ->reactive()
-                ->afterStateUpdated(fn() => $this->dispatch('refresh')),
-
-            Forms\Components\Placeholder::make('total')
-                ->label('Total Price')
-                ->inlineLabel()
-                ->content(fn() => $this->calculateTotal()),
+                ->default('pickup'),
 
             Forms\Components\Textarea::make('notes')
-                ->label('Extra Notes About Product')
+                ->label('Special Instructions')
+                ->placeholder('Any special delivery instructions or notes...')
                 ->nullable()
                 ->rows(3),
-
-            Forms\Components\Select::make('delivery_method')
-                ->options(['pickup' => 'Pickup', 'delivery' => 'Delivery'])
-                ->required(),
         ];
     }
 
-    public function getUnitPrice()
+    public function removeFromCart($productId)
     {
-        if (!$this->product_id) return '0 UGX';
-        $product = Product::find($this->product_id);
-        return $product ? $product->unit_price . ' UGX' : '0 UGX';
+        try {
+            if (isset($this->cart[$productId])) {
+                unset($this->cart[$productId]);
+                $this->updateCartSession();
+                
+                Notification::make()
+                    ->title('Item removed from cart')
+                    ->success()
+                    ->send();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Remove from cart error: ' . $e->getMessage());
+            Notification::make()
+                ->title('Error removing item from cart')
+                ->danger()
+                ->send();
+        }
     }
 
-    public function calculateTotal()
+    public function updateQuantity($productId, $newQuantity)
     {
-        if (!$this->product_id || !$this->quantity) return '0 UGX';
-        $product = Product::find($this->product_id);
-        return $product ? ($product->unit_price * $this->quantity) . ' UGX' : '0 UGX';
+        try {
+            $newQuantity = (int) $newQuantity;
+            
+            if ($newQuantity <= 0) {
+                $this->removeFromCart($productId);
+                return;
+            }
+
+            if (isset($this->cart[$productId])) {
+                $this->cart[$productId]['quantity'] = $newQuantity;
+                $this->updateCartSession();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Update quantity error: ' . $e->getMessage());
+        }
+    }
+
+    private function updateCartSession()
+    {
+        $this->cartCount = collect($this->cart)->sum('quantity');
+        session()->put('cart', $this->cart);
+        session()->put('cartCount', $this->cartCount);
+    }
+
+    public function getTotalAmount()
+    {
+        try {
+            return collect($this->cart)->sum(function ($item) {
+                return ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Calculate total error: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     public function placeOrder()
     {
-        $product = Product::find($this->product_id);
+        try {
+            $this->isLoading = true;
+            
+            if (empty($this->cart)) {
+                Notification::make()
+                    ->title('Your cart is empty')
+                    ->danger()
+                    ->send();
+                return;
+            }
 
-        if (!$product) {
-            Notification::make()->title('Invalid product selected.')->danger()->send();
-            return;
+            $total = $this->getTotalAmount();
+
+            // Get the manufacturer from the first product efficiently
+            $firstProductId = array_keys($this->cart)[0];
+            $firstProduct = Product::select(['id', 'manufacturer_id'])->find($firstProductId);
+            
+            $order = Order::create([
+                'vendor_id' => auth()->id(),
+                'created_by' => auth()->id(),
+                'manufacturer_id' => $firstProduct->manufacturer_id ?? null,
+                'delivery_method' => $this->delivery_method,
+                'status' => 'pending',
+                'total' => $total,
+            ]);
+
+            // Batch insert order items
+            $orderItems = [];
+            foreach ($this->cart as $item) {
+                $orderItems[] = [
+                    'order_id' => $order->id,
+                    'product_id' => $item['id'],
+                    'unit_price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            
+            OrderItem::insert($orderItems);
+
+            // Clear cart efficiently
+            $this->cart = [];
+            $this->cartCount = 0;
+            session()->forget(['cart', 'cartCount']);
+            
+            // Reload orders
+            $this->loadOrders();
+
+            Notification::make()
+                ->title('Order placed successfully!')
+                ->body("Order #{$order->id} has been submitted for processing.")
+                ->success()
+                ->send();
+
+            $this->form->fill(['delivery_method' => 'pickup', 'notes' => '']);
+
+        } catch (\Exception $e) {
+            \Log::error('Place order error: ' . $e->getMessage());
+            Notification::make()
+                ->title('Error placing order')
+                ->body('Please try again or contact support.')
+                ->danger()
+                ->send();
+        } finally {
+            $this->isLoading = false;
         }
-
-        $total = $product->unit_price * $this->quantity;
-
-        $order = Order::create([
-            'vendor_id' =>  \Illuminate\Support\Facades\Auth::check() ? \Illuminate\Support\Facades\Auth::id() : null,
-            'created_by' => \Illuminate\Support\Facades\Auth::id(),
-            'manufacturer_id' => $product->manufacturer_id,
-            'delivery_method' => $this->delivery_method,
-            'status' => 'pending',
-            'total' => $total,
-        ]);
-
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $this->product_id,
-            'unit_price' => $product->unit_price,
-            'quantity' => $this->quantity,
-            'total_price' => $total,
-            'notes' => $this->notes,
-        ]);
-
-        Notification::make()
-            ->title('Order placed successfully!')
-            ->success()
-            ->send();
-
-        return redirect()->route('filament.vendor.resources.vendor-orders.index');
     }
 }
