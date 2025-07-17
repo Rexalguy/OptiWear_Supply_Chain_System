@@ -3,11 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Manufacturer;
 
 class Order extends Model
 {
-    protected $fillable = ['status', 'created_by', 'delivery_option', 'expected_delivery_date', 'total', 'rating', 'review','vendor_id',  'payment_method', 'delivery_method', 'expected_fulfillment_date', 'decline_reason'];
+    protected $fillable = [
+        'status', 
+        'created_by', 
+        'delivery_option', 
+        'expected_delivery_date', 
+        'total', 
+        'rating', 
+        'review',
+        'vendor_id',  
+        'payment_method', 
+        'delivery_method', 
+        'expected_fulfillment_date', 
+        'decline_reason',
+        'manufacturer_id'
+    ];
+
+    protected $casts = [
+        'total' => 'decimal:2',
+        'expected_delivery_date' => 'date',
+        'expected_fulfillment_date' => 'date',
+    ];
 
     public function creator()
     {
@@ -18,14 +37,14 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-     public function vendor()
+    
+    public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
     }
 
-    public function manufacturer() {
+    public function manufacturer() 
+    {
         return $this->belongsTo(User::class, 'manufacturer_id');
     }
-
-
 }
