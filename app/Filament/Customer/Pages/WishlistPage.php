@@ -13,7 +13,7 @@ class WishlistPage extends Page
     protected static ?string $navigationIcon = 'heroicon-o-heart';
     protected static ?int $navigationSort = 3;
     protected static string $view = 'filament.customer.pages.wishlist-page';
-    protected static ?string $title = ' My Wishlist';
+    protected static ?string $title = 'My Wishlist';
 
     public $wishlistItems = [];
 
@@ -31,7 +31,20 @@ class WishlistPage extends Page
 
     public function mount(): void
     {
+        //  Load & sanitize old cart
         $this->cart = session()->get('cart', []);
+
+        $this->cart = collect($this->cart)->mapWithKeys(function ($item, $key) {
+            // If product_id is missing but we have an object reference
+            if (!isset($item['product_id']) && isset($item['product']) && $item['product'] instanceof Product) {
+                $item['product_id'] = $item['product']->id;
+            }
+            return [$key => $item];
+        })->toArray();
+
+        // Save back sanitized cart
+        session()->put('cart', $this->cart);
+
         $this->refreshWishlist();
         $this->updateTokens();
     }
@@ -66,14 +79,14 @@ class WishlistPage extends Page
         }
     }
 
-    // Modal open method - new
+    // Modal open method
     public function openProductModal(int $productId): void
     {
         $this->clickedProduct = Product::find($productId);
         $this->selectedProduct = true;
     }
 
-    // Modal close method - new
+    // Modal close method
     public function closeProductModal(): void
     {
         $this->clickedProduct = null;
@@ -166,8 +179,8 @@ class WishlistPage extends Page
     {
         if (!isset($this->cart[$cartKey])) return;
 
-        $productId = $this->cart[$cartKey]['product_id'];
-        $product   = Product::find($productId);
+        $productId = $this->cart[$cartKey]['product_id'] ?? null;
+        $product = $productId ? Product::find($productId) : null;
 
         if (!$product) {
             $this->notify('Product not found', 'danger');
@@ -175,7 +188,7 @@ class WishlistPage extends Page
         }
 
         $currentQty = $this->cart[$cartKey]['quantity'];
-        $maxQty     = min(50, $product->quantity_available);
+        $maxQty = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
             $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
@@ -221,9 +234,24 @@ class WishlistPage extends Page
     protected function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
+            //  Ensure product_id exists
+            if (!isset($item['product_id'])) {
+                if (isset($item['product']) && $item['product'] instanceof Product) {
+                    $item['product_id'] = $item['product']->id;
+                } else {
+                    return $total; // skip invalid items
+                }
+            }
+
             $product = Product::find($item['product_id']);
             if (!$product) return $total;
-            return $total + ($product->price * ($item['quantity'] ?? 0));
+
+            $qty = $item['quantity'] ?? 1;
+
+            // Use correct price field
+            $price = $product->unit_price ?? $product->price ?? 0;
+
+            return $total + ($price * $qty);
         }, 0);
     }
 }

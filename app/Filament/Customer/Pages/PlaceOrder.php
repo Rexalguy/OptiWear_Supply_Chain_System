@@ -7,7 +7,6 @@ use App\Models\Wishlist;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
-use App\Filament\Customer\Widgets\MyStatsWidget;
 
 class PlaceOrder extends Page
 {
@@ -16,40 +15,50 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
-    //  UI / modal state
+    // UI / modal state
     public ?Product $clickedProduct = null;
     public bool $selectedProduct = false;
 
-    //  Cart + wishlist
+    // Cart + wishlist
     public array $cart = [];
     public array $wishlistProductIds = [];
 
     // Product list
     public $products;
 
-    //  Size selection UI
+    // Size selection UI
     public array $showSizeDropdown = [];
     public array $selectedSize = [];
     public array $sizes = ['S', 'M', 'L', 'XL']; // Example sizes
 
-    //  Delivery & pricing
+    // Delivery & pricing
     public string $deliveryOption = 'pickup';
     protected int $deliveryFee = 5000; // fixed delivery fee
     public int $potentialTokens = 0;
 
     public function mount(): void
     {
-        // Load current cart
+        //  Load & sanitize old cart
         $this->cart = session()->get('cart', []);
+
+        // Auto-fix legacy cart structure
+        $this->cart = collect($this->cart)->mapWithKeys(function ($item, $key) {
+            if (!isset($item['product_id']) && isset($item['product']) && $item['product'] instanceof Product) {
+                $item['product_id'] = $item['product']->id;
+            }
+            return [$key => $item];
+        })->toArray();
+
+        // Save back sanitized cart
+        session()->put('cart', $this->cart);
 
         // Load available products
         $this->products = Product::where('quantity_available', '>', 0)->get();
 
+        // Update tokens & wishlist
         $this->updateTokenCount();
         $this->loadWishlistProductIds();
     }
-
-
 
     /* Quick helper to show Filament notifications */
     protected function notify(string $message, string $type = 'success'): void
@@ -108,8 +117,8 @@ class PlaceOrder extends Page
         } else {
             $this->cart[$cartKey] = [
                 'product_id' => $productId,
-                'size' => $size,
-                'quantity' => 1,
+                'size'       => $size,
+                'quantity'   => 1,
             ];
         }
 
@@ -138,8 +147,8 @@ class PlaceOrder extends Page
     {
         if (!isset($this->cart[$cartKey])) return;
 
-        $productId = $this->cart[$cartKey]['product_id'];
-        $product = Product::find($productId);
+        $productId = $this->cart[$cartKey]['product_id'] ?? null;
+        $product   = $productId ? Product::find($productId) : null;
 
         if (!$product) {
             $this->notify('Product not found', 'danger');
@@ -147,7 +156,7 @@ class PlaceOrder extends Page
         }
 
         $currentQty = $this->cart[$cartKey]['quantity'];
-        $maxQty = min(50, $product->quantity_available);
+        $maxQty     = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
             $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
@@ -187,7 +196,7 @@ class PlaceOrder extends Page
             $this->notify('Removed from wishlist');
         } else {
             Wishlist::create([
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
                 'product_id' => $productId,
             ]);
             $this->notify('Added to wishlist');
@@ -203,13 +212,24 @@ class PlaceOrder extends Page
         $this->potentialTokens = $total > 50000 ? floor($total / 15000) : 0;
     }
 
-    /* Cart total */
+    /* Cart total (SAFE) */
     public function calculateCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
+            //  Ensure product_id exists or recover from old structure
+            if (!isset($item['product_id'])) {
+                if (isset($item['product']) && $item['product'] instanceof Product) {
+                    $item['product_id'] = $item['product']->id;
+                } else {
+                    return $total; // skip invalid items
+                }
+            }
+
             $product = Product::find($item['product_id']);
             if (!$product) return $total;
-            return $total + ($product->unit_price * ($item['quantity'] ?? 0));
+
+            $qty = $item['quantity'] ?? 1;
+            return $total + ($product->unit_price * $qty);
         }, 0);
     }
 
@@ -239,12 +259,20 @@ class PlaceOrder extends Page
     public function getProductCartItemsProperty()
     {
         return collect($this->cart)->mapWithKeys(function ($item, $key) {
-            $product = Product::find($item['product_id']);
+            //  Fix legacy items
+            if (!isset($item['product_id']) && isset($item['product']) && $item['product'] instanceof Product) {
+                $item['product_id'] = $item['product']->id;
+            }
+
+            $productId = $item['product_id'] ?? null;
+            $product   = $productId ? Product::find($productId) : null;
+
             if (!$product) return [];
+
             return [
                 $key => [
-                    'product' => $product,
-                    'size' => $item['size'],
+                    'product'  => $product,
+                    'size'     => $item['size'],
                     'quantity' => $item['quantity'],
                 ],
             ];

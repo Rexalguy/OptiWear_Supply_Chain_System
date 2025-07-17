@@ -24,3 +24,9 @@
   border-radius: 0 !important;
 
 }
+
+.col-[--col-span-default] fi-wi-widget fi-wi-chart{
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
