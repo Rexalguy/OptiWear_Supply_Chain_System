@@ -27,7 +27,7 @@ class percentageContributionChart extends ChartWidget
         
         // Get total demand for each category from the last X days
         $categoryData = DB::table('demand_prediction_results')
-            ->select('shirt_category', DB::raw('SUM(predicted_quantity) as total_demand'))
+            ->select('shirt_category', DB::raw('SUM(predicted_quanti) as total_demand'))
             ->where('created_at', '>=', now()->subDays($days))
             ->groupBy('shirt_category')
             ->get();

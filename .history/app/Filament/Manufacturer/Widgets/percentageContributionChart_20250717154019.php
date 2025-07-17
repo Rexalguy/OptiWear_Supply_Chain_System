@@ -4,6 +4,7 @@ namespace App\Filament\Manufacturer\Widgets;
 
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 
 class percentageContributionChart extends ChartWidget
 {
@@ -26,8 +27,8 @@ class percentageContributionChart extends ChartWidget
         $days = (int) $this->filter;
         
         // Get total demand for each category from the last X days
-        $categoryData = DB::table('demand_prediction_results')
-            ->select('shirt_category', DB::raw('SUM(predicted_quantity) as total_demand'))
+        $categoryData = DB::table('demand_forecasts')
+            ->select('shirt_category', DB::raw('SUM(predicted_demand) as total_demand'))
             ->where('created_at', '>=', now()->subDays($days))
             ->groupBy('shirt_category')
             ->get();

@@ -50,7 +50,7 @@ class percentageContributionChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Demand Contribution',
+                    'label' => 'Category Demand Forecast',
                     'data' => $data,
                     'backgroundColor' => array_slice($backgroundColor, 0, count($data)),
                     'borderWidth' => 2,
