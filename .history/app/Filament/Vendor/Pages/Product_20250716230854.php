@@ -25,6 +25,12 @@ class Product extends Page
     {
         return 1; // Lower = higher in the group
     }
+    public static function getWigets(): array
+    {
+        return [
+            StatsOverview::class,
+        ];
+    }
 
     protected static ?string $navigationLabel = "Shop In Bulk";
     protected static ?string $navigationGroup = 'Products';

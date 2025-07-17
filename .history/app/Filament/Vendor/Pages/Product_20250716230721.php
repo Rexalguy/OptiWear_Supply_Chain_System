@@ -2,7 +2,6 @@
 
 namespace App\Filament\Vendor\Pages;
 
-use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
@@ -25,6 +24,7 @@ class Product extends Page
     {
         return 1; // Lower = higher in the group
     }
+    
 
     protected static ?string $navigationLabel = "Shop In Bulk";
     protected static ?string $navigationGroup = 'Products';

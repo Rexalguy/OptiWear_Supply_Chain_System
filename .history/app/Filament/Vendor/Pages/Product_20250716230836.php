@@ -2,7 +2,6 @@
 
 namespace App\Filament\Vendor\Pages;
 
-use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
@@ -24,6 +23,12 @@ class Product extends Page
     public static function getNavigationSort(): ?int
     {
         return 1; // Lower = higher in the group
+    }
+    public static function getWigets(): array
+    {
+        return [
+            StatsOverviewWidget::class,
+        ];
     }
 
     protected static ?string $navigationLabel = "Shop In Bulk";
