@@ -278,6 +278,7 @@ class ShirtSupplyChainSeeder extends Seeder
                     'quantity_available' => rand(100, 600),
                     'shirt_category_id' => $category->id, // new correct relationship
                     'low_stock_threshold' => rand(80, 120),
+                    'image' => $productImages[$productName] ?? null,
                     'available_sizes' => json_encode(
                         collect(['S', 'M', 'L', 'XL'])->shuffle()->take(rand(2, 4))->sort()->values()->all()
                     ),
