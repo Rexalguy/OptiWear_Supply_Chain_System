@@ -55,13 +55,9 @@ class percentageContributionChart extends ChartWidget
             'rgba(153, 102, 255, 0.8)',  // Purple
         ];
 
-        // Calculate total first
-        $totalDemand = $categoryData->sum('total_demand');
-
         foreach ($categoryData as $index => $category) {
-            $percentage = $totalDemand > 0 ? round(($category->total_demand / $totalDemand) * 100, 1) : 0;
-            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category)) . ' (' . $percentage . '%)';
-            $data[] = $percentage;
+            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category));
+            $data[] = (float) $category->total_demand;
         }
 
         return [

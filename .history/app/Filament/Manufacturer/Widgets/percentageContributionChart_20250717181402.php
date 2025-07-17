@@ -59,8 +59,9 @@ class percentageContributionChart extends ChartWidget
         $totalDemand = $categoryData->sum('total_demand');
 
         foreach ($categoryData as $index => $category) {
+            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category));
+            // Convert to percentage for display
             $percentage = $totalDemand > 0 ? round(($category->total_demand / $totalDemand) * 100, 1) : 0;
-            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category)) . ' (' . $percentage . '%)';
             $data[] = $percentage;
         }
 
@@ -102,6 +103,15 @@ class percentageContributionChart extends ChartWidget
                     'labels' => [
                         'usePointStyle' => true,
                         'padding' => 20,
+                    ],
+                ],
+                'tooltip' => [
+                    'callbacks' => [
+                        'label' => RawJs::make('function(context) {
+                            var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                            var percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ": " + percentage + "%";
+                        }'),
                     ],
                 ],
             ],

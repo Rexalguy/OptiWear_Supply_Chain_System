@@ -4,7 +4,6 @@ namespace App\Filament\Manufacturer\Widgets;
 
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
-use Filament\Support\RawJs;
 
 class percentageContributionChart extends ChartWidget
 {
@@ -55,13 +54,9 @@ class percentageContributionChart extends ChartWidget
             'rgba(153, 102, 255, 0.8)',  // Purple
         ];
 
-        // Calculate total first
-        $totalDemand = $categoryData->sum('total_demand');
-
         foreach ($categoryData as $index => $category) {
-            $percentage = $totalDemand > 0 ? round(($category->total_demand / $totalDemand) * 100, 1) : 0;
-            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category)) . ' (' . $percentage . '%)';
-            $data[] = $percentage;
+            $labels[] = ucfirst(str_replace('_', ' ', $category->shirt_category));
+            $data[] = (float) $category->total_demand;
         }
 
         return [
@@ -80,7 +75,7 @@ class percentageContributionChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'doughnut';
+        return 'polarArea';
     }
 
     protected function getOptions(): array
@@ -89,11 +84,14 @@ class percentageContributionChart extends ChartWidget
             'responsive' => true,
             'maintainAspectRatio' => false,
             'scales' => [
-                'x' => [
-                    'display' => false,
-                ],
-                'y' => [
-                    'display' => false,
+                'r' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'display' => true,
+                    ],
+                    'grid' => [
+                        'color' => 'rgba(255, 255, 255, 0.1)',
+                    ],
                 ],
             ],
             'plugins' => [
@@ -102,6 +100,15 @@ class percentageContributionChart extends ChartWidget
                     'labels' => [
                         'usePointStyle' => true,
                         'padding' => 20,
+                    ],
+                ],
+                'tooltip' => [
+                    'callbacks' => [
+                        'label' => 'function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ": " + context.parsed.toLocaleString() + " units (" + percentage + "%)";
+                        }',
                     ],
                 ],
             ],
