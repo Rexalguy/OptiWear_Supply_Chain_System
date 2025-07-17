@@ -48,7 +48,14 @@ class PlaceOrder extends Page
         try {
             $this->cart = session()->get('cart', []);
             $this->cartCount = session()->get('cartCount', 0);
-            $this->loadOrders();
+            
+            // Only load orders if needed and with minimal data
+            if ($this->shouldLoadOrders()) {
+                $this->loadOrders();
+            } else {
+                $this->orders = collect();
+            }
+            
             $this->form->fill([
                 'delivery_method' => $this->delivery_method
             ]);
@@ -60,15 +67,26 @@ class PlaceOrder extends Page
         }
     }
 
+    private function shouldLoadOrders()
+    {
+        // Only load orders if we have few items in cart to reduce initial load time
+        return count($this->cart) < 5;
+    }
+
     public function loadOrders()
     {
         try {
+            // Simplified query with only essential data
             $this->orders = Order::select(['id', 'status', 'created_at', 'total', 'delivery_method'])
-                ->with(['orderItems:id,order_id,product_id,quantity,unit_price', 'orderItems.product:id,name'])
                 ->where('vendor_id', auth()->id())
                 ->orderBy('created_at', 'desc')
-                ->limit(5) // Reduced limit for better performance
-                ->get();
+                ->limit(3) // Further reduced limit
+                ->get()
+                ->map(function ($order) {
+                    // Get order items count instead of loading all items
+                    $order->items_count = OrderItem::where('order_id', $order->id)->count();
+                    return $order;
+                });
         } catch (\Exception $e) {
             \Log::error('Load orders error: ' . $e->getMessage());
             $this->orders = collect();
@@ -141,9 +159,11 @@ class PlaceOrder extends Page
     public function getTotalAmount()
     {
         try {
-            return collect($this->cart)->sum(function ($item) {
-                return ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-            });
+            $total = 0;
+            foreach ($this->cart as $item) {
+                $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
+            }
+            return $total;
         } catch (\Exception $e) {
             \Log::error('Calculate total error: ' . $e->getMessage());
             return 0;
@@ -164,43 +184,32 @@ class PlaceOrder extends Page
             }
 
             $total = $this->getTotalAmount();
-
-            // Get the manufacturer from the first product efficiently
-            $firstProductId = array_keys($this->cart)[0];
-            $firstProduct = Product::select(['id', 'manufacturer_id'])->find($firstProductId);
             
+            // Create order without complex relationships
             $order = Order::create([
                 'vendor_id' => auth()->id(),
                 'created_by' => auth()->id(),
-                'manufacturer_id' => $firstProduct->manufacturer_id ?? null,
                 'delivery_method' => $this->delivery_method,
                 'status' => 'pending',
                 'total' => $total,
             ]);
 
-            // Batch insert order items
-            $orderItems = [];
+            // Simplified order items creation
             foreach ($this->cart as $item) {
-                $orderItems[] = [
+                OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['id'],
                     'unit_price' => $item['price'],
                     'quantity' => $item['quantity'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                ]);
             }
-            
-            OrderItem::insert($orderItems);
 
-            // Clear cart efficiently
+            // Clear cart
             $this->cart = [];
             $this->cartCount = 0;
             session()->forget(['cart', 'cartCount']);
             
-            // Reload orders
-            $this->loadOrders();
-
+            // Don't reload orders immediately, just show success
             Notification::make()
                 ->title('Order placed successfully!')
                 ->body("Order #{$order->id} has been submitted for processing.")
@@ -219,5 +228,12 @@ class PlaceOrder extends Page
         } finally {
             $this->isLoading = false;
         }
+    }
+
+    // Add method to load orders on demand
+    public function loadOrderHistory()
+    {
+        $this->loadOrders();
+        $this->dispatch('orders-loaded');
     }
 }

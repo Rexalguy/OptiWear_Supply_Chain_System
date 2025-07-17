@@ -49,12 +49,12 @@
     <div class="space-y-8">
         <!-- Loading State -->
         <div wire:loading class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="bg-white dark:bg-slate-800 rounded-lg p-6 flex items-center space-x-3">
                 <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="text-gray-600">Processing...</span>
+                <span class="text-gray-600 dark:text-gray-300">Processing...</span>
             </div>
         </div>
 
@@ -74,23 +74,23 @@
                     @foreach ($cart as $item)
                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-xl">
                             <div class="flex-1">
-                                <h3 class="font-semibold text-lg text-gray-900 dark:text-white">{{ $item['name'] }}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Quantity: {{ $item['quantity'] }} pieces</p>
+                                <h3 class="font-semibold text-lg text-gray-900 dark:text-white">{{ $item['name'] ?? 'Unknown Product' }}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Quantity: {{ $item['quantity'] ?? 0 }} pieces</p>
                                 <p class="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                    UGX {{ number_format($item['price'] * $item['quantity']) }}
+                                    UGX {{ number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 0)) }}
                                 </p>
                             </div>
                             
                             <div class="flex items-center gap-3">
                                 <input 
                                     type="number" 
-                                    wire:change="updateQuantity({{ $item['id'] }}, $event.target.value)"
-                                    value="{{ $item['quantity'] }}"
+                                    wire:change="updateQuantity({{ $item['id'] ?? 0 }}, $event.target.value)"
+                                    value="{{ $item['quantity'] ?? 0 }}"
                                     min="100"
-                                    class="w-20 px-2 py-1 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500"
+                                    class="w-20 px-2 py-1 border border-gray-300 dark:border-slate-600 rounded-lg text-center focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
                                 >
                                 <x-filament::button 
-                                    wire:click="removeFromCart({{ $item['id'] }})"
+                                    wire:click="removeFromCart({{ $item['id'] ?? 0 }})"
                                     color="danger"
                                     size="sm"
                                     icon="heroicon-m-trash"
@@ -110,11 +110,11 @@
                         </div>
                         
                         <!-- Order Form -->
-                        <form wire:submit.prevent="placeOrder" class="space-y-4">
+                        <div class="space-y-4">
                             {{ $this->form }}
                             
                             <x-filament::button 
-                                type="submit"
+                                wire:click="placeOrder"
                                 class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
                                 size="lg"
                                 icon="heroicon-m-check-circle"
@@ -123,7 +123,7 @@
                                 <span wire:loading.remove>Place Order</span>
                                 <span wire:loading>Processing...</span>
                             </x-filament::button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,36 +147,41 @@
             </div>
         @endif
 
-        <!-- Order History Section -->
-        @if ($orders && count($orders) > 0)
-            <div class="order-card overflow-hidden">
-                <div class="gradient-header">
-                    <h2 class="text-2xl font-bold">📋 Recent Orders</h2>
+        <!-- Order History Section - Lazy Load -->
+        <div class="order-card overflow-hidden">
+            <div class="gradient-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold">📋 Order History</h2>
+                    @if ($orders->isEmpty())
+                        <x-filament::button 
+                            wire:click="loadOrderHistory"
+                            size="sm"
+                            color="secondary"
+                            icon="heroicon-m-arrow-path"
+                        >
+                            Load Orders
+                        </x-filament::button>
+                    @endif
                 </div>
-                
-                <div class="p-6">
-                    <div class="grid gap-6">
+            </div>
+            
+            <div class="p-6">
+                @if ($orders->isNotEmpty())
+                    <div class="grid gap-4">
                         @foreach ($orders as $order)
-                            <div class="p-6 bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-slate-600">
-                                <div class="flex items-center justify-between mb-4">
+                            <div class="p-4 bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-slate-600">
+                                <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Order #{{ $order->id }}</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->created_at->format('M d, Y - H:i') }}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->created_at->format('M d, Y') }}</p>
                                     </div>
                                     <span class="status-badge status-{{ $order->status }}">{{ ucfirst($order->status) }}</span>
                                 </div>
                                 
-                                <div class="space-y-2 mb-4">
-                                    @foreach ($order->orderItems as $item)
-                                        <div class="flex justify-between text-sm">
-                                            <span class="text-gray-700 dark:text-gray-300">{{ $item->product->name ?? 'Product' }} ({{ $item->quantity }}x)</span>
-                                            <span class="font-medium text-gray-900 dark:text-white">UGX {{ number_format($item->unit_price * $item->quantity) }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                
-                                <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-slate-600">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">Delivery: {{ ucfirst($order->delivery_method) }}</span>
+                                <div class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-slate-600">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $order->items_count ?? 0 }} item(s) • {{ ucfirst($order->delivery_method) }}
+                                    </span>
                                     <span class="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                                         UGX {{ number_format($order->total) }}
                                     </span>
@@ -184,8 +189,13 @@
                             </div>
                         @endforeach
                     </div>
-                </div>
+                @else
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                        <div class="text-4xl mb-2">📋</div>
+                        <p>Click "Load Orders" to view your order history</p>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
     </div>
 </x-filament-panels::page>

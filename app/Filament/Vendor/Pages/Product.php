@@ -43,10 +43,14 @@ class Product extends Page
     public function mount()
     {
         try {
-            $this->cart = session()->get('cart', []);
-            $this->cartCount = session()->get('cartCount', 0);
-            // Only select necessary fields for better performance
-            $this->products = ProductModel::select(['id', 'name', 'sku', 'price', 'image'])->get();
+            // Simplified cart loading
+            $this->cart = session('cart', []);
+            $this->cartCount = session('cartCount', 0);
+            
+            // Load only essential product data
+            $this->products = ProductModel::select(['id', 'name', 'sku', 'price', 'image'])
+                ->limit(20) // Limit products for better performance
+                ->get();
         } catch (\Exception $e) {
             \Log::error('Product mount error: ' . $e->getMessage());
             $this->cart = [];
@@ -119,9 +123,12 @@ class Product extends Page
 
     private function updateCartSession()
     {
-        $this->cartCount = collect($this->cart)->sum('quantity');
-        session()->put('cart', $this->cart);
-        session()->put('cartCount', $this->cartCount);
+        try {
+            $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
+            session(['cart' => $this->cart, 'cartCount' => $this->cartCount]);
+        } catch (\Exception $e) {
+            \Log::error('Update cart session error: ' . $e->getMessage());
+        }
     }
 
     public function closeProductModal()
@@ -130,6 +137,5 @@ class Product extends Page
         $this->clickedProduct = null;
     }
 
-    // Remove the syncCart method as it's causing performance issues
-    // Use simpler cart persistence instead
+    // Remove the syncCart method entirely as it's causing issues
 }
