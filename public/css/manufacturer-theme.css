@@ -1,0 +1,120 @@
+/* Modern Glass Morphism Widgets for Manufacturer Panel */
+
+.fi-section-content-ctn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+  overflow: hidden !important;
+}
+
+.fi-section-content-ctn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Stats Widget Styling */
+.fi-wi-stats {
+  padding: 1.5rem !important;
+}
+
+.fi-wi-stats .fi-section-content-ctn {
+  height: auto !important;
+  min-height: 120px !important;
+  max-height: 160px !important;
+}
+
+/* Chart Widget Base */
+.fi-wi-chart .fi-section-content-ctn {
+  padding: 1.5rem !important;
+  min-height: 350px !important;
+}
+
+/* Individual Widget Gradients */
+[data-widget="segment-distribution"] .fi-section-content-ctn {
+  height: 420px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+[data-widget="segment-purchase-behavior"] .fi-section-content-ctn {
+  height: 380px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+[data-widget="category-preferences"] .fi-section-content-ctn {
+  height: 450px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+[data-widget="age-group-patterns"] .fi-section-content-ctn {
+  height: 400px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+/* Grid Layout */
+.fi-section {
+  padding: 0.75rem !important;
+  margin: 0.5rem !important;
+  background-color: transparent !important;
+}
+
+/* Card Headers */
+.fi-section-header {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1rem 1.5rem !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.fi-section-header-heading {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Stats Cards */
+.fi-stats-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.fi-stats-card:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.02) !important;
+}
+
+/* Chart Canvas */
+.fi-wi-chart canvas {
+  border-radius: 8px !important;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .fi-section-content-ctn {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6)) !important;
+    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fi-wi-chart .fi-section-content-ctn {
+    height: 300px !important;
+    min-height: 280px !important;
+  }
+  
+  .fi-section {
+    padding: 0.5rem !important;
+    margin: 0.25rem !important;
+  }
+}
