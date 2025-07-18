@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-     protected $fillable = ['name','image', 'sku', 'price', 'quantity_available','shirt_category_id'];
+    protected $fillable = ['name', 'image', 'sku', 'unit_price', 'quantity_available', 'shirt_category_id', 'manufacturer_id','available_sizes'];
 
     public function billOfMaterials()
     {
@@ -32,8 +32,13 @@ class Product extends Model
     {
         return $this->belongsTo(ShirtCategory::class);
     }
+    public function manufacturer()
+    {
+        return $this->belongsTo(User::class, 'manufacturer_id');
+    }
+
     public function wishlistedBy()
-{
-    return $this->hasMany(Wishlist::class);
-}
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 }

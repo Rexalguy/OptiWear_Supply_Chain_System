@@ -26,12 +26,15 @@ class CustomerPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->topNavigation()
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('13rem')
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
+            ->viteTheme('resources/css/filament/customer/theme.css')
             // ->brandLogo(asset('images/logo.jpg'))
+            ->viteTheme('resources/css/filament/customer/theme.css')
             ->id('customer')
             ->path('customer')           // URL prefix for this panel
             ->default()                  // Make this the default panel
@@ -58,7 +61,7 @@ class CustomerPanelProvider extends PanelProvider
             )
 
             ->pages([
-                Pages\Dashboard::class,
+                // Pages\Dashboard::class,
                 \App\Filament\Customer\Pages\PlaceOrder::class,
 
             ])

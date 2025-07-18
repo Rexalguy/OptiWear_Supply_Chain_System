@@ -88,7 +88,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('price')
+                Tables\Columns\TextColumn::make('unit_price')
                     ->label('Price (UGX)')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_available')
