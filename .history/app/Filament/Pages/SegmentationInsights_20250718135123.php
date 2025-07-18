@@ -19,3 +19,4 @@ class SegmentationInsights extends Page
         ];
     }
 }
+}

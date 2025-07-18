@@ -18,4 +18,6 @@ class SegmentationInsights extends Page
             SegmentStatsWidget::class,
         ];
     }
+
+    
 }

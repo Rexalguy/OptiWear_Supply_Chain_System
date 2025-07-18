@@ -18,4 +18,11 @@ class SegmentationInsights extends Page
             SegmentStatsWidget::class,
         ];
     }
+
+        protected function getHeaderWidgets(): array
+    {
+        return [
+            SegmentStatsWidget::class,
+        ];
+    }
 }

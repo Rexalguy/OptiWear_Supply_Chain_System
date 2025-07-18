@@ -2,6 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Manufacturer\Widgets\customerSegments;
+use App\Filament\Manufacturer\Widgets\segmentationBehaviour;
+use App\Filament\Manufacturer\Widgets\segmentationSummary;
+use App\Filament\Manufacturer\Widgets\DebugWidget;
 use Filament\Pages\Page;
 use App\Filament\Manufacturer\Widgets\SegmentStatsWidget;
 
@@ -16,6 +20,16 @@ class SegmentationInsights extends Page
     {
         return [
             SegmentStatsWidget::class,
+        ];
+    }
+
+        protected function getFooterWidgets(): array
+    {
+        return [
+            DebugWidget::class,
+            customerSegments::class,
+            segmentationBehaviour::class,
+            segmentationSummary::class,
         ];
     }
 }
