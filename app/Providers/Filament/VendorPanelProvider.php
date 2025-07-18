@@ -10,6 +10,7 @@ use Filament\Support\Colors\Color;
 use App\Filament\Customer\Pages\ChatPage;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
+use App\Http\Middleware\VerifyVendor;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -68,6 +69,7 @@ class VendorPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                VerifyVendor::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

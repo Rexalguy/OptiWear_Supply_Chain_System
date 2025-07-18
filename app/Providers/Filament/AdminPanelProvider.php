@@ -25,6 +25,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use App\Filament\Admin\Widgets\AdminSalesPieChart;
 use App\Filament\Admin\Widgets\AdminStatsOverview;
+use App\Http\Middleware\VerifyAdmin;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -80,6 +81,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                VerifyAdmin::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
