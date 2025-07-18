@@ -8,9 +8,9 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css',
-                'resources/js/app.js',
-                'resources/css/filament/customer/theme.css',
-                'resources/css/filament/admin/theme.css'],
+                 'resources/js/app.js',
+                  'resources/css/filament/customer/theme.css',
+                    'resources/css/filament/admin/theme.css'],
             refresh: true,
         }),
         tailwindcss(),
