@@ -12,6 +12,8 @@ class ProductsPolarChart extends ChartWidget
     protected static ?string $heading = '📦 Product Quantity by Category';
     protected static string $color = 'info';
 
+    protected int | string | array $columnSpan = 2;
+
     
     protected static ?string $description = 'Displays the quantity of products available in each shirt category using a polar area chart.';
     
@@ -103,10 +105,6 @@ class ProductsPolarChart extends ChartWidget
     }
 
     // Increase column span for the widget
-    public static function getColumns(): int
-    {
-        return 1; // Increase to 3 columns for wider display
-    }
 
     protected function getType(): string
     {

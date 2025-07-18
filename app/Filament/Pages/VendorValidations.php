@@ -21,6 +21,8 @@ class VendorValidations extends Page implements HasTable
     protected static ?string $title = 'Vendor Validation';
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
+     protected static ?string $navigationGroup = 'User Monitor';
+
 
 
 
