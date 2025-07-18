@@ -25,8 +25,12 @@ class ProductsTable extends Page implements HasTable
     return $table
         ->query(Product::query())
         ->columns([
-            TextColumn::make('name')->label('Product Name'),
-            TextColumn::make('ShirtCategory.category')->label('Category'),
+            TextColumn::make('name')->label('Product Name')
+            ->searchable()
+            ->sortable(),
+            TextColumn::make('ShirtCategory.category')->label('Category')
+            ->searchable()
+            ->sortable(),
             TextColumn::make('quantity_available')->label('Stock'),
             TextColumn::make('unit_price')->money('UGX')->label('Price'),
         ]);
