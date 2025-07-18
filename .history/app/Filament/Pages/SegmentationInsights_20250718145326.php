@@ -27,6 +27,7 @@ class SegmentationInsights extends Page
         return [
             SegmentationPolarChart::class,
             SegmentationBarChart::class,
+            SegmentationTable::class,
         ];
     }
 }

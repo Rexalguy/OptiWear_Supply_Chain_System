@@ -4,7 +4,7 @@ namespace App\Filament\Manufacturer\Widgets;
 
 use Filament\Widgets\ChartWidget;
 
-class segmentationBehaviourTemp extends ChartWidget
+class customerSegments extends ChartWidget
 {
     protected static ?string $heading = 'Chart';
 
@@ -17,6 +17,6 @@ class segmentationBehaviourTemp extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line';
+        return 'polarArea';
     }
 }
