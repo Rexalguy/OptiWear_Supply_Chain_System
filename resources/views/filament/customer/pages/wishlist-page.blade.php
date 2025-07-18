@@ -105,10 +105,8 @@
 
 
                 {{-- Product Details --}}
-                <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
-                <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
-                <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
-                <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
+                <h3 class="text-lg ">{{ $clickedProduct->name }}</h3>
+                <p class="text-lg font-bold">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                 <p class="text-sm text-gray-600 mt-2">{{ $clickedProduct->description }}</p>
 
                 {{-- Existing Cart Items for this Product --}}
