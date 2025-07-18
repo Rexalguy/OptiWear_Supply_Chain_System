@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use Illuminate\View\View;
+use Filament\Support\Assets\Js;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
-use Illuminate\View\View;
+use Filament\Support\Facades\FilamentAsset;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +30,9 @@ class AppServiceProvider extends ServiceProvider
             PanelsRenderHook::FOOTER,
             fn(): View => view('footer'),
         );
+
+        FilamentAsset::register([
+            Js::make('chart-js-plugins', Vite::asset('resources/js/filament-chart-js-plugins.js'))->module(),
+        ]);
     }
 }

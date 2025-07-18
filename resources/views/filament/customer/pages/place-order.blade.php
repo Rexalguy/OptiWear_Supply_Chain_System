@@ -127,19 +127,18 @@
 </div>
 
                     {{-- Product Info --}}
-                    <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
-                    <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
- <div class="flex justify-between mt-4">
-            <x-filament::button
+                    <h3 class="text-lg ">{{ $product->name }}</h3>
+                    <p class="text-lg font-bold">Price: UGX {{ number_format($product->unit_price) }}</p>
+
+
+                    {{-- Small "Order" Button --}}
+                    <div class="flex justify-between mt-4">
+                          <x-filament::button
                 :color="in_array($product->id, $wishlistProductIds) ? 'danger' : 'gray'"
                 :icon="in_array($product->id, $wishlistProductIds) ? 'heroicon-s-heart' : 'heroicon-o-heart'"
                 wire:click="toggleWishlist({{ $product->id }})"
                 tooltip="Add/Remove from Wishlist"
             />
-        </div>
-                    
-                    {{-- Small "Order" Button --}}
-                    <div class="mt-3 flex justify-end">
                         <x-filament::button size="sm" color="primary"
                             wire:click="openProductModal({{ $product->id }})">
                              Order
@@ -191,10 +190,8 @@
 </div>
 
                 {{-- Product Details --}}
-                <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
-                <p class="text-sm text-gray-500">SKU: {{ $clickedProduct->sku }}</p>
-                <p class="text-sm">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
-                <p class="text-sm text-gray-600">Available: {{ $clickedProduct->quantity_available }}</p>
+                <h3 class="text-lg ">{{ $clickedProduct->name }}</h3>
+                <p class="text-lg font-bold">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                 <p class="text-sm text-gray-600 mt-2">{{ $clickedProduct->description }}</p>
 
                 {{-- Existing Cart Items for this Product --}}

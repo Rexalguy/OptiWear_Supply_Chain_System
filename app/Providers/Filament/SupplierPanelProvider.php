@@ -20,6 +20,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource;
+use App\Http\Middleware\VerifySupplier;
 
 class SupplierPanelProvider extends PanelProvider
 {
@@ -65,6 +66,7 @@ class SupplierPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                VerifySupplier::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
