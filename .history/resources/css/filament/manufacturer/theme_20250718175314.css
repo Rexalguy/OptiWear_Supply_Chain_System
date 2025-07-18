@@ -1,3 +1,6 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css'; 
+
+@config 'tailwind.config.js';
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @config 'tailwind.config.js';
@@ -238,4 +241,3 @@
         font-size: 0.875rem !important;
     }
 }
-
