@@ -7,7 +7,11 @@ import tailwindcss from 'tailwindcss';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/css/filament/customer/theme.css', 'resources/js/filament-chart-js-plugins.js'],
+            input: ['resources/css/app.css',
+                 'resources/js/app.js',
+                  'resources/css/filament/customer/theme.css',
+                   'resources/js/filament-chart-js-plugins.js',
+                    'resources/css/filament/admin/theme.css'],
             refresh: true,
         }),
         tailwindcss(),

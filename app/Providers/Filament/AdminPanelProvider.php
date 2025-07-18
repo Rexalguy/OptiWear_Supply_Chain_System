@@ -13,14 +13,18 @@ use App\Filament\Admin\Widgets;
 use Widgets\FilamentInfoWidget;
 use App\Models\VendorValidation;
 use Filament\Navigation\MenuItem;
-// Removed duplicate import of PanelProvider
 use Filament\Support\Colors\Color;
 use App\Filament\Pages\VendorValidations;
 use Filament\Http\Middleware\Authenticate;
+// Removed duplicate import of PanelProvider
 use App\Http\Controllers\RedirectController;
+use App\Filament\Admin\Widgets\AdminSalesChart;
 use Illuminate\Session\Middleware\StartSession;
+use App\Filament\Admin\Widgets\AdminTopSalesBar;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Admin\Widgets\AdminSalesPieChart;
+use App\Filament\Admin\Widgets\AdminStatsOverview;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -41,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->id('admin')
         ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
@@ -55,12 +60,15 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Dashboard::class, VendorValidations::class,
+                 VendorValidations::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                AdminStatsOverview::class,
+                AdminTopSalesBar::class,   
+                AdminSalesPieChart::class,
+                AdminSalesChart::class,
+                
             ])
             ->middleware([
                 EncryptCookies::class,
