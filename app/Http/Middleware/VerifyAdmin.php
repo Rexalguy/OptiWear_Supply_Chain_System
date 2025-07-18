@@ -18,9 +18,12 @@ class VerifyAdmin
     {
         
         if(Auth::user() && Auth::user()->role === "admin")
-        return $next($request);
+        {
+            return $next($request);
+        }
+            return redirect('customer/place-order');
 
-        abort(403, "ACCESS DENIED");
+        
 }
 
 }

@@ -18,8 +18,10 @@ class VerifyManufacturer
     {
 
         if(Auth::user() && Auth::user()->role === "manufacturer")
-        return $next($request);
+        {
+            return $next($request);
+        }
+            return redirect('customer/place-order');
+}
 
-        abort(403, "ACCESS DENIED");
-    }
 }

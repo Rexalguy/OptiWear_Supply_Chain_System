@@ -18,8 +18,9 @@ class VerifyVendor
     {
         
         if(Auth::user() && Auth::user()->role === "vendor")
-        return $next($request);
-
-        abort(403, "ACCESS DENIED");
+        {
+            return $next($request);
+        }
+            return redirect('customer/place-order');
     }
 }
