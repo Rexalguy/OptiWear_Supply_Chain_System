@@ -7,7 +7,7 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
-use App\Filament\Customer\Pages\ChatPage;
+use App\Filament\Vendor\Pages\AnalyticsDashboard;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
@@ -35,22 +35,25 @@ class VendorPanelProvider extends PanelProvider
             ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
             ->colors([
-                'primary' => Color::Amber,    // Business-focused, marketplace feel
-                'info' => Color::Sky,
-                'success' => Color::Lime,
-                'warning' => Color::Orange,
-                'danger' => Color::Red,
-                'gray' => Color::Stone,
+                'primary' => Color::Sky,
+                'info' => Color::Blue,
+                'success' => Color::Emerald,
+                'warning' => Color::Yellow,
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
             ])
             ->navigationGroups([
                 NavigationGroup::make('Products')
                     ->icon('heroicon-o-cube')
                     ->collapsed(),
+                NavigationGroup::make('Analytics')
+                    ->icon('heroicon-o-chart-bar')
+                    ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
             ->pages([
-                ChatPage::class,
+                AnalyticsDashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
             ->widgets([

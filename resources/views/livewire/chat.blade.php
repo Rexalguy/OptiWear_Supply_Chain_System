@@ -1,4 +1,4 @@
-<div>
+<div class="max-w-full">
     <div class="chat-container">
     <!-- Main Chat Layout -->
     <div class="chat-wrapper">

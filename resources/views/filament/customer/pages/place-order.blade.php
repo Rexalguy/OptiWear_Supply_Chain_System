@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    <div class="p-6 space-y-6">
+    <div class="p-6 space-y-6" style="background-color: #030712;">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🛍️ Available Products</h2>
 
         {{-- Cart token info --}}
