@@ -51,7 +51,7 @@ class Product extends Page
 
     public function getProductsProperty()
     {
-        return ProductModel::select(['id', 'name', 'sku', 'price', 'image'])->paginate(12);
+        return ProductModel::select(['id', 'name', 'sku', 'unit_price', 'image'])->paginate(12);
     }
 
     protected function getFormSchema(): array
@@ -74,7 +74,7 @@ class Product extends Page
 
     public function openProductModal($productId)
     {
-        $this->clickedProduct = ProductModel::select(['id', 'name', 'sku', 'price', 'image', 'description'])->find($productId);
+        $this->clickedProduct = ProductModel::select(['id', 'name', 'sku', 'unit_price', 'image', 'description'])->find($productId);
         $this->selectedProduct = true;
     }
 
@@ -108,7 +108,7 @@ class Product extends Page
             $cart[$productId] = [
                 'id' => $product->id,
                 'name' => $product->name,
-                'price' => $product->price,
+                'unit_price' => $product->price,
                 'quantity' => $baleSize,
             ];
             $this->notify('success', 'Added product to cart.');
