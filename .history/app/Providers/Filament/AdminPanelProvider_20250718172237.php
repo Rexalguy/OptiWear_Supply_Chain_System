@@ -8,11 +8,6 @@ use Filament\Panel;
 // Removed duplicate import of PanelProvider
 use Widgets\AccountWidget;
 use Filament\PanelProvider;
-// Removed duplicate import of MenuItem
-use Filament\Pages\Dashboard;
-use App\Filament\Admin\Widgets;
-use Widgets\FilamentInfoWidget;
-use App\Models\VendorValidation;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use App\Filament\Pages\VendorValidations;
@@ -40,6 +35,12 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+<<<<<<< HEAD
+            ->default()
+            ->id('admin')
+            ->login([RedirectController::class, 'toLogin'])
+            ->path('admin')
+=======
 
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('13rem')
@@ -51,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
         ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
+>>>>>>> 54302f75a6d6cca771177af086f8b2d0d2993d97
             ->colors([
                                'primary' => Color::Indigo,    // Strategic & modern
                                 'info'    => Color::Blue,      // Reports, data info
@@ -62,7 +64,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
+<<<<<<< HEAD
+                // Pages\Dashboard::class,
+=======
                  VendorValidations::class,
+>>>>>>> 54302f75a6d6cca771177af086f8b2d0d2993d97
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
