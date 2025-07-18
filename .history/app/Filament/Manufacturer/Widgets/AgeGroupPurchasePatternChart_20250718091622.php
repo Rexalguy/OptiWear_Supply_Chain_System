@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class AgeGroupPurchasePatternChart extends ChartWidget
 {
     protected static ?string $heading = 'Purchase Patterns by Age Group and Gender';
-    protected int | string | array $columnSpan = 2;
+    protected int | string | array $columnSpan = 4;
     
     protected function getData(): array
     {

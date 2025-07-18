@@ -1,0 +1,46 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* Custom styles for segment recommendations widget */
+.segment-recommendations-widget {
+    /* Override Filament's default widget styling */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+.segment-recommendations-widget .fi-wi-widget {
+    /* Override widget container styles */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.segment-recommendations-widget table {
+    /* Ensure table takes full width and has proper styling */
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+}
+
+.segment-recommendations-widget .fi-ta-table {
+    /* Override Filament table styles */
+    background: transparent !important;
+    border: none !important;
+}
+
+.segment-recommendations-widget .fi-ta-content {
+    /* Override table content wrapper */
+    padding: 0 !important;
+    overflow-x: auto !important;
+}
+
+/* Override column span if needed */
+.col-\[--col-span-default\].segment-recommendations-widget {
+    grid-column: 1 / -1 !important; /* Span full width */
+}

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 class SegmentDistributionChart extends ChartWidget
 {
     protected static ?string $heading = 'Customer Segment Distribution';
-    protected static ?string $height = '500px';
     protected int | string | array $columnSpan = 'full';
     
     protected function getData(): array

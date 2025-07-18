@@ -29,7 +29,6 @@ class SegmentationInsights extends Page
         return [
             SegmentPurchaseBehaviorChart::class,
             AgeGroupPurchasePatternChart::class,
-            SegmentRecommendationsTable::class,
         ];
     }
 }

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 class SegmentDistributionChart extends ChartWidget
 {
     protected static ?string $heading = 'Customer Segment Distribution';
-    protected static ?string $height = '500px';
     protected int | string | array $columnSpan = 'full';
     
     protected function getData(): array
@@ -91,24 +90,11 @@ class SegmentDistributionChart extends ChartWidget
             'responsive' => true,
             'maintainAspectRatio' => false,
             'scales' => [
-                'r' => [
-                    'beginAtZero' => true,
-                    'grid' => [
-                        'color' => 'rgba(255, 255, 255, 0.1)',
-                    ],
-                    'angleLines' => [
-                        'color' => 'rgba(255, 255, 255, 0.1)',
-                    ],
-                    'pointLabels' => [
-                        'color' => 'rgba(255, 255, 255, 0.8)',
-                        'font' => [
-                            'size' => 12,
-                        ],
-                    ],
-                    'ticks' => [
-                        'color' => 'rgba(255, 255, 255, 0.6)',
-                        'backdropColor' => 'transparent',
-                    ],
+                'x' => [
+                    'display' => false,
+                ],
+                'y' => [
+                    'display' => false,
                 ],
             ],
             'plugins' => [
@@ -117,15 +103,7 @@ class SegmentDistributionChart extends ChartWidget
                     'labels' => [
                         'usePointStyle' => true,
                         'padding' => 20,
-                        'color' => 'rgba(255, 255, 255, 0.9)',
                     ],
-                ],
-                'tooltip' => [
-                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
-                    'titleColor' => 'white',
-                    'bodyColor' => 'white',
-                    'borderColor' => 'rgba(255, 255, 255, 0.2)',
-                    'borderWidth' => 1,
                 ],
             ],
         ];

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 class SegmentPurchaseBehaviorChart extends ChartWidget
 {
     protected static ?string $heading = 'Purchase Behavior by Customer Segment';
+
     protected static ?string $height = '400px';
-    protected int | string | array $columnSpan = 8;
     
     protected function getData(): array
     {
