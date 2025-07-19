@@ -8,11 +8,7 @@ use Filament\Panel;
 // Removed duplicate import of PanelProvider
 use Widgets\AccountWidget;
 use Filament\PanelProvider;
-// Removed duplicate import of MenuItem
 use Filament\Pages\Dashboard;
-use App\Filament\Admin\Widgets;
-use Widgets\FilamentInfoWidget;
-use App\Models\VendorValidation;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use App\Filament\Pages\VendorValidations;
@@ -40,16 +36,15 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-
+            
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('13rem')
             ->profile()
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->id('admin')
-        ->login([RedirectController::class, 'toLogin'])
+            ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
             ->colors([
                                'primary' => Color::Indigo,    // Strategic & modern
@@ -62,7 +57,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                 VendorValidations::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([

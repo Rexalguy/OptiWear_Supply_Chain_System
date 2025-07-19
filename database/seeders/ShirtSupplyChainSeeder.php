@@ -57,7 +57,7 @@ class ShirtSupplyChainSeeder extends Seeder
 ])->map(fn($data) =>
     User::create(array_merge($data, [
         'password' => Hash::make('password123'),
-        'tokens' => rand(0, 250),
+        'tokens' => $data['role'] === 'customer' ? rand(0, 250) : 0,
         'email_verified_at' => now(),
         'remember_token' => Str::random(10),
     ]))

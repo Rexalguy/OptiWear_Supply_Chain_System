@@ -2,15 +2,14 @@
 
 namespace App\Providers\Filament;
 
-use App\Http\Middleware\VerifyManufacturer;
 use Filament\Panel;
+use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
-use Filament\Navigation\NavigationGroup;
-use App\Filament\Customer\Pages\ChatPage;
-use App\Filament\Pages\Analytics;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
@@ -23,58 +22,38 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
-class ManufacturerPanelProvider extends PanelProvider
+class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('manufacturer')
-            ->path('manufacturer')
+            
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('13rem')
+            ->profile()
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
+            ->id('admin')
             ->login([RedirectController::class, 'toLogin'])
+            ->path('admin') // URL prefix for this panel
             ->colors([
-                'primary' => Color::Indigo,   // Bold, industrial
+                'primary' => Color::Gray,     // Neutral and authoritative
                 'info' => Color::Blue,
-                'success' => Color::Green,
-                'warning' => Color::Yellow,
+                'success' => Color::Emerald,
+                'warning' => Color::Amber,
                 'danger' => Color::Rose,
-                'gray' => Color::Gray,
+                'gray' => Color::Zinc,
             ])
-                    ->navigationGroups([
-            NavigationGroup::make()
-                ->label('Product')
-                ->icon('heroicon-o-cube')
-                ,
-
-            NavigationGroup::make()
-                ->label('Production Workflow')
-                ->icon('heroicon-o-chart-bar')
-                ,
-            NavigationGroup::make()
-                ->label('Analytics')
-                ->icon('heroicon-o-chart-bar-square')
-                ,
-
-            NavigationGroup::make()
-                ->label('Raw Materials')
-                ->icon('heroicon-o-table-cells')
-                ->collapsed(),
-            ])
-
-            ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                ChatPage::class, 
-                
+                Dashboard::class,
             ])
-            ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
-            ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -86,12 +65,26 @@ class ManufacturerPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                VerifyManufacturer::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
             ])
             ->userMenuItems([
+                MenuItem::make()
+                    ->label('Suplier Panel')
+                    ->icon('heroicon-o-truck')
+                    ->url('/supplier'),
+
+                MenuItem::make()
+                    ->label('Manufacturer Panel')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->url('/manufacturer'),
+
+                MenuItem::make()
+                    ->label('Vendor Panel')
+                    ->icon('heroicon-o-building-storefront')
+                    ->url('/vendor'),
+
                 MenuItem::make()
                     ->label('Customer Panel')
                     ->icon('heroicon-o-user-group')

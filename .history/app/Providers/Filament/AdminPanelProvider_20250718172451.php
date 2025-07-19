@@ -8,11 +8,7 @@ use Filament\Panel;
 // Removed duplicate import of PanelProvider
 use Widgets\AccountWidget;
 use Filament\PanelProvider;
-// Removed duplicate import of MenuItem
 use Filament\Pages\Dashboard;
-use App\Filament\Admin\Widgets;
-use Widgets\FilamentInfoWidget;
-use App\Models\VendorValidation;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use App\Filament\Pages\VendorValidations;
