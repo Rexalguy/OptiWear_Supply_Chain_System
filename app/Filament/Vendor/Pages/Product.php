@@ -2,6 +2,7 @@
 
 namespace App\Filament\Vendor\Pages;
 
+use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
@@ -27,6 +28,7 @@ class Product extends Page
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
     protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = "Shop In Bulk";
     protected static ?string $navigationGroup = 'Products';
     protected static string $view = 'filament.vendor.pages.product';
@@ -142,60 +144,10 @@ class Product extends Page
 
         $cart = $this->cart;
 
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $newQuantity;
-            $this->cart = $cart;
-            session(['cart' => $cart]);
-        }
-    }
-
-    public function getTotalAmount()
-    {
-        return collect($this->cart)->sum(fn($item) => ($item['price'] ?? 0) * ($item['quantity'] ?? 0));
-    }
-
-    public function placeOrder()
-    {
-        if (empty($this->cart)) {
-            $this->notify('danger', 'Your cart is empty.');
-            return;
-        }
-
-        $order = Order::create([
-            'vendor_id' => auth()->id(),
-            'created_by' => auth()->id(),
-            'delivery_method' => $this->delivery_method,
-            'notes' => $this->notes,
-            'status' => 'pending',
-            'total' => $this->getTotalAmount(),
-        ]);
-
-        $orderItems = collect($this->cart)->map(fn($item) => [
-            'order_id' => $order->id,
-            'product_id' => $item['id'],
-            'unit_price' => $item['price'],
-            'quantity' => $item['quantity'],
-        ])->toArray();
-
-        OrderItem::insert($orderItems);
-
-        session()->forget('cart');
-        $this->cart = [];
-        $this->notify('success', 'Order placed successfully.');
-
-        $this->form->fill(['delivery_method' => 'pickup', 'notes' => '']);
-    }
-
-    private function notify(string $type, string $message): void
-    {
-        Notification::make()
-            ->title($message)
-            ->{$type}()
-            ->send();
-    }
-
-    public function getCartCountProperty()
-    {
-        return collect($this->cart)->sum('quantity');
+        // if (isset($cart[$productId])) {
+        //     $cart[$productId]['quantity'] = $newQuantity;
+        //     $this->cart = $cart;
+        //     session(['cart' => $cart]);
+        // }
     }
 }

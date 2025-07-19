@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\VerifyManufacturer;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
@@ -9,6 +10,7 @@ use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationGroup;
 use App\Filament\Customer\Pages\ChatPage;
+use App\Filament\Pages\Analytics;
 use Filament\Http\Middleware\Authenticate;
 use App\Http\Controllers\RedirectController;
 use Illuminate\Session\Middleware\StartSession;
@@ -52,6 +54,10 @@ class ManufacturerPanelProvider extends PanelProvider
                 ->label('Production Workflow')
                 ->icon('heroicon-o-chart-bar')
                 ,
+            NavigationGroup::make()
+                ->label('Analytics')
+                ->icon('heroicon-o-chart-bar-square')
+                ,
 
             NavigationGroup::make()
                 ->label('Raw Materials')
@@ -62,7 +68,7 @@ class ManufacturerPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
                 ChatPage::class, 
-                // Dashboard::class
+                Analytics::class,
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')
@@ -80,6 +86,7 @@ class ManufacturerPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                VerifyManufacturer::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

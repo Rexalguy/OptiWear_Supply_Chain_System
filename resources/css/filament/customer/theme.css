@@ -1,0 +1,33 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.filament-card,
+.fi-section-content-ctn,
+.fi-section-content-p6 {
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  height: 16rem !important;     /* Reduced height */
+  max-height: 18rem !important;
+  min-height: 12rem !important;
+}
+
+
+.fi-section {
+  padding: 5px !important;
+  margin: 5px !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+
+}
+
+.col-[--col-span-default] fi-wi-widget fi-wi-chart{
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+

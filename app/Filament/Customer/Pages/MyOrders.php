@@ -2,21 +2,22 @@
 
 namespace App\Filament\Customer\Pages;
 
+use Filament\Tables;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\OrderItem;
-use App\Models\CustomerInfo;
 use Filament\Pages\Page;
-use Filament\Tables;
+use App\Models\OrderItem;
 use Filament\Tables\Table;
+use App\Models\CustomerInfo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Notifications\Notification;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
+use App\Filament\Customer\Widgets\MyStatsWidget;
+use Filament\Tables\Concerns\InteractsWithTable;
 
 class MyOrders extends Page implements HasTable
 {
@@ -54,21 +55,40 @@ class MyOrders extends Page implements HasTable
         return 'Your pending orders';
     }
 
+    public function getHeaderWidgets(): array
+    {
+        return [MyStatsWidget::class];
+    }
+
     public function mount(): void
     {
-        //  Load cart from session
+        // Load cart from session
         $this->cart = session()->get('cart', []);
 
-        //  Auto-clean missing products
+        // Auto-clean invalid or missing products safely
         $this->cart = collect($this->cart)
-            ->filter(fn($item) => Product::where('id', $item['product_id'])->exists())
+            ->filter(function ($item) {
+                // Skip any invalid array without product_id
+                if (!is_array($item) || !isset($item['product_id'])) {
+                    return false;
+                }
+                return Product::where('id', $item['product_id'])->exists();
+            })
             ->toArray();
 
+        // Save cleaned cart back to session
         session()->put('cart', $this->cart);
 
-        $this->userTokens = Auth::user()->tokens;
+        // Ensure user tokens default to 0 if missing
+        $this->userTokens = Auth::user()->tokens ?? 0;
+
+        // Calculate current discount based on tokens
         $this->discount = $this->calculateDiscount($this->userTokens);
+
+        // Fetch saved address if available
         $this->address = $this->getCustomerAddress();
+
+        // Update potential tokens for current cart
         $this->calculatePotentialTokens();
     }
 
@@ -82,29 +102,34 @@ class MyOrders extends Page implements HasTable
         return $tokens >= 200 ? 10000 : 0;
     }
 
-    // Calculate total for all cart items
-     
+    // --- CART TOTAL CALCULATION ---
     protected function getCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
+            // Skip if invalid item
+            if (!isset($item['product_id'])) {
+                return $total;
+            }
+
             $product = Product::find($item['product_id']);
-            $qty = $item['quantity'] ?? 1;
+            $qty = isset($item['quantity']) ? (int) $item['quantity'] : 1;
+
             return $product ? $total + ($product->unit_price * $qty) : $total;
         }, 0);
     }
 
-    // Computed property for subtotal (safe for Blade)
-     
+    // Subtotal for Blade
     public function getSubtotalProperty(): int
     {
         return $this->getCartTotal();
     }
 
-    // Add computed property for total cart quantity
-    
+    // Total quantity in cart
     public function getCartCountProperty(): int
     {
-        return collect($this->cart)->sum('quantity');
+        return collect($this->cart)
+            ->filter(fn($item) => isset($item['quantity']))
+            ->sum('quantity');
     }
 
     public function getFinalAmountProperty(): int
@@ -140,7 +165,7 @@ class MyOrders extends Page implements HasTable
         return $discount;
     }
 
-    // Place order safely (skip missing products)
+    // --- PLACE ORDER SAFELY ---
     public function placeOrder(): void
     {
         if (empty($this->cart)) {
@@ -160,21 +185,13 @@ class MyOrders extends Page implements HasTable
         DB::beginTransaction();
 
         try {
-            //  Calculate subtotal from cart
             $subtotal = $this->getCartTotal();
-
-            // Calculate token-based discount
             $discount = $this->deductUserTokensIfApplicable();
-
-            //  Delivery fee only if user selects delivery
             $deliveryFee = $this->deliveryOption === 'delivery' ? 5000 : 0;
-
-            // Final amount = subtotal - discount + delivery fee
             $finalTotal = max(0, $subtotal - $discount + $deliveryFee);
 
             $expectedDate = now()->addHours($this->deliveryOption === 'delivery' ? 48 : 12);
 
-            // Create the order
             $order = Order::create([
                 'created_by' => Auth::id(),
                 'status' => 'pending',
@@ -186,15 +203,18 @@ class MyOrders extends Page implements HasTable
             $validItems = 0;
 
             foreach ($this->cart as $cartKey => $item) {
-                $product = Product::find($item['product_id']);
+                if (!isset($item['product_id'])) {
+                    unset($this->cart[$cartKey]);
+                    continue;
+                }
 
+                $product = Product::find($item['product_id']);
                 if (!$product) {
                     unset($this->cart[$cartKey]);
                     continue;
                 }
 
                 $validItems++;
-
                 $quantity = $item['quantity'] ?? 1;
                 $size = $item['size'] ?? null;
 
@@ -227,6 +247,7 @@ class MyOrders extends Page implements HasTable
 
             DB::commit();
 
+            // Clear cart after successful order
             $this->cart = [];
             session()->forget('cart');
             $this->calculatePotentialTokens();
@@ -311,6 +332,7 @@ class MyOrders extends Page implements HasTable
                     ->visible(fn(Order $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
                     ->action(fn(Order $record) => $record->update(['status' => 'pending'])),
+
                 Action::make('cancel')
                     ->label('Cancel')
                     ->color('danger')
@@ -318,6 +340,7 @@ class MyOrders extends Page implements HasTable
                     ->visible(fn(Order $record) => $record->status === 'pending')
                     ->requiresConfirmation()
                     ->action(fn(Order $record) => $record->update(['status' => 'cancelled'])),
+
                 Action::make('rate_review')
                     ->label('Rate & Review')
                     ->icon('heroicon-o-star')

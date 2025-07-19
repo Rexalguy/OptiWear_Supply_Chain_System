@@ -31,89 +31,37 @@ class ShirtSupplyChainSeeder extends Seeder
     public function run(): void
     {
         // USERS
-        $users = collect([
-            [
-                'name' => 'Admin Opio',
-                'email' => 'admin@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'admin',
-                'date_of_birth' => '1980-03-15',
-                'gender' => 'male',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'David Okello',
-                'email' => 'manufacturer@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'manufacturer',
-                'date_of_birth' => '1985-07-12',
-                'gender' => 'male',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Sarah Nabwire',
-                'email' => 'supplier@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'supplier',
-                'date_of_birth' => '1988-11-20',
-                'gender' => 'female',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Moses Mugisha',
-                'email' => 'vendor@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'vendor',
-                'date_of_birth' => '1990-05-08',
-                'gender' => 'male',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Faith Namukasa',
-                'email' => 'faith@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'customer',
-                'date_of_birth' => '1996-02-11',
-                'gender' => 'female',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Brian Ouma',
-                'email' => 'brian@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'customer',
-                'date_of_birth' => '1994-06-03',
-                'gender' => 'male',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Patricia Adoch',
-                'email' => 'patricia@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'customer',
-                'date_of_birth' => '1991-09-19',
-                'gender' => 'female',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Edgar Kaggwa',
-                'email' => 'edgar@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'customer',
-                'date_of_birth' => '1993-12-27',
-                'gender' => 'male',
-                'tokens' => 0,
-            ],
-            [
-                'name' => 'Diana Nakato',
-                'email' => 'diana@optiwear.ug',
-                'password' => Hash::make('password123'),
-                'role' => 'customer',
-                'date_of_birth' => '1995-04-23',
-                'gender' => 'female',
-                'tokens' => 0,
-            ],
-        ])->map(fn($data) => User::create($data));
+    $users = collect([
+    ['name' => 'Admin Opio', 'email' => 'admin@optiwear.ug', 'role' => 'admin', 'date_of_birth' => '1980-03-15', 'gender' => 'male'],
+    ['name' => 'David Okello', 'email' => 'manufacturer@optiwear.ug', 'role' => 'manufacturer', 'date_of_birth' => '1985-07-12', 'gender' => 'male'],
+    ['name' => 'Sarah Nabwire', 'email' => 'supplier@optiwear.ug', 'role' => 'supplier', 'date_of_birth' => '1988-11-20', 'gender' => 'female'],
+    ['name' => 'Moses Mugisha', 'email' => 'vendor@optiwear.ug', 'role' => 'vendor', 'date_of_birth' => '1990-05-08', 'gender' => 'male'],
+
+    ['name' => 'Faith Namukasa', 'email' => 'faith@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1996-02-11', 'gender' => 'female'],
+    ['name' => 'Brian Ouma', 'email' => 'brian@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1994-06-03', 'gender' => 'male'],
+    ['name' => 'Patricia Adoch', 'email' => 'patricia@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1991-09-19', 'gender' => 'female'],
+    ['name' => 'Edgar Kaggwa', 'email' => 'edgar@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1993-12-27', 'gender' => 'male'],
+    ['name' => 'Diana Nakato', 'email' => 'diana@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1995-04-23', 'gender' => 'female'],
+
+    ['name' => 'Isaac Ssenyonga', 'email' => 'isaac@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1992-08-10', 'gender' => 'male'],
+    ['name' => 'Ritah Katushabe', 'email' => 'ritah@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1997-03-05', 'gender' => 'female'],
+    ['name' => 'Kenneth Lumu', 'email' => 'kenneth@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1990-01-12', 'gender' => 'male'],
+    ['name' => 'Lydia Komuhangi', 'email' => 'lydia@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1996-09-21', 'gender' => 'female'],
+    ['name' => 'Samuel Nsubuga', 'email' => 'samuel@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1989-11-30', 'gender' => 'male'],
+    ['name' => 'Janet Birungi', 'email' => 'janet@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1998-06-18', 'gender' => 'female'],
+    ['name' => 'Allan Kibuuka', 'email' => 'allan@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1993-04-08', 'gender' => 'male'],
+    ['name' => 'Agnes Tendo', 'email' => 'agnes@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1992-12-22', 'gender' => 'female'],
+    ['name' => 'Fredrick Ochola', 'email' => 'fredrick@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1991-07-14', 'gender' => 'male'],
+    ['name' => 'Susan Akello', 'email' => 'susan@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1994-10-26', 'gender' => 'female'],
+    ['name' => 'Daniel Mbabazi', 'email' => 'daniel@optiwear.ug', 'role' => 'customer', 'date_of_birth' => '1990-05-15', 'gender' => 'male'],
+])->map(fn($data) =>
+    User::create(array_merge($data, [
+        'password' => Hash::make('password123'),
+        'tokens' => rand(0, 250),
+        'email_verified_at' => now(),
+        'remember_token' => Str::random(10),
+    ]))
+);
 
         // INFO TABLES
 
@@ -149,13 +97,22 @@ class ShirtSupplyChainSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        DB::table('customer_info')->insert([
-            ['user_id' => $users[4]->id, 'address' => 'Ntinda, Kampala', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[5]->id, 'address' => 'Gulu Road, Lira', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[6]->id, 'address' => 'Bugolobi, Kampala', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[7]->id, 'address' => 'Entebbe', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $users[8]->id, 'address' => 'Mbarara Town', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        DB::table('customer_info')->insert(
+    $users->where('role', 'customer')->values()->map(function ($user) {
+        $locations = [
+            'Ntinda, Kampala', 'Gulu Road, Lira', 'Bugolobi, Kampala', 'Entebbe',
+            'Mbarara Town', 'Mbale', 'Masindi', 'Soroti', 'Hoima', 'Fort Portal',
+            'Arua', 'Jinja', 'Kabale', 'Iganga', 'Tororo', 'Mukono',
+            'Kawempe', 'Kasese', 'Kamuli', 'Kyengera'
+        ];
+        return [
+            'user_id' => $user->id,
+            'address' => $locations[array_rand($locations)],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    })->all()
+);
 
 
         // RAW MATERIAL CATEGORIES
@@ -312,7 +269,7 @@ class ShirtSupplyChainSeeder extends Seeder
                     $totalCost += $m->price * $qty;
                 }
 
-                $unit_price = round($totalCost * 2.5, 2);
+                $unit_price = round($totalCost * 1.5, 2);
 
                 $product = Product::create([
                     'name' => $productName,
@@ -321,7 +278,10 @@ class ShirtSupplyChainSeeder extends Seeder
                     'quantity_available' => rand(100, 600),
                     'shirt_category_id' => $category->id, // new correct relationship
                     'low_stock_threshold' => rand(80, 120),
-                    'image' => $productImages[$productName] ?? 'null',
+                    'image' => $productImages[$productName] ?? null,
+                    'available_sizes' => json_encode(
+                        collect(['S', 'M', 'L', 'XL'])->shuffle()->take(rand(2, 4))->sort()->values()->all()
+                    ),
                 ]);
 
                 $products[] = $product;

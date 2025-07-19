@@ -2,29 +2,36 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Widgets;
+use Filament\Panel;
 // Removed duplicate import of Widgets
 // Removed duplicate import of PanelProvider
-use App\Http\Controllers\RedirectController;
+use Widgets\AccountWidget;
+use Filament\PanelProvider;
 // Removed duplicate import of MenuItem
+use Filament\Pages\Dashboard;
+use App\Filament\Admin\Widgets;
+use Widgets\FilamentInfoWidget;
+use App\Models\VendorValidation;
+use Filament\Navigation\MenuItem;
+use Filament\Support\Colors\Color;
+use App\Filament\Pages\VendorValidations;
 use Filament\Http\Middleware\Authenticate;
+// Removed duplicate import of PanelProvider
+use App\Http\Controllers\RedirectController;
+use App\Filament\Admin\Widgets\AdminSalesChart;
+use Illuminate\Session\Middleware\StartSession;
+use App\Filament\Admin\Widgets\AdminTopSalesBar;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Admin\Widgets\AdminSalesPieChart;
+use App\Filament\Admin\Widgets\AdminStatsOverview;
+use App\Http\Middleware\VerifyAdmin;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-// Removed duplicate import of PanelProvider
-use Filament\Pages\Dashboard;
-use Filament\Panel;
-use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Widgets\AccountWidget;
-use Widgets\FilamentInfoWidget;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -39,21 +46,30 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('OptiWear')
             ->font('Poppins')
             ->sidebarWidth('20rem')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->id('admin')
-            ->login([RedirectController::class, 'toLogin'])
+        ->login([RedirectController::class, 'toLogin'])
             ->path('admin') // URL prefix for this panel
             ->colors([
-                'primary' => Color::Amber,
-            ])
+                               'primary' => Color::Indigo,    // Strategic & modern
+                                'info'    => Color::Blue,      // Reports, data info
+                                'success' => Color::Emerald,   // Completed, Validated
+                                'warning' => Color::Amber,     // Stock low, Reorder
+                                'danger'  => Color::Rose,      // Errors, Failed Orders
+                                'gray'    => Color::Zinc,      // Neutral, background tones
+                                        ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Dashboard::class,
+                 VendorValidations::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                AdminStatsOverview::class,
+                AdminTopSalesBar::class,   
+                AdminSalesPieChart::class,
+                AdminSalesChart::class,
+                
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -65,6 +81,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                VerifyAdmin::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

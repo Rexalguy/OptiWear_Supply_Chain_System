@@ -1,0 +1,23 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+@layer components {
+  .progress-bar {
+    @apply relative w-full h-5 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800;
+  }
+
+  .progress-fill {
+    @apply absolute top-0 left-0 h-full rounded-full transition-all ease-in-out;
+    background: linear-gradient(to right, #34d399, #3b82f6); /* green to blue */
+  }
+
+  .progress-milestone {
+    @apply absolute top-0 h-full w-1 bg-white dark:bg-gray-300 opacity-80;
+    transform: translateX(-50%);
+  }
+
+  .animate-fill {
+    transition: width 1s ease-in-out;
+  }
+}
