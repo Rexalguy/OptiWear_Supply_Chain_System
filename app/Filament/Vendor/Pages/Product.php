@@ -19,6 +19,7 @@ class Product extends Page
     use WithPagination;
 
     public $cart = [];
+    public $cartCount = 0;
     public $bale_sizes = [];
     public $clickedProduct = null;
     public $selectedProduct = false;
@@ -47,7 +48,25 @@ class Product extends Page
 
     public function mount()
     {
-        $this->cart = session('cart', []);
+        if (!session()->has('cart')) {
+           $this->cart= [];
+            session(['cart' => $this->cart]);
+        }else {
+            $this->cart = session()->get('cart', []);
+        }
+        if (!session()->has('cartCount')) {
+            $this->cartCount = 0;
+            session(['cartCount' => $this->cartCount]);
+        } else {
+            $this->cartCount = session()->get('cartCount', 0);
+            session(['cartCount' => 0]);
+        }
+        $this->cart = session()->get('cart', []);
+        $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
+        if (!session()->has('cartCount')) {
+    
+        }
+
         $this->form->fill(['delivery_method' => 'pickup']);
     }
 

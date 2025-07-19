@@ -50,7 +50,7 @@
                <div class="flex items-center justify-between mb-6">
                    <h2 class="text-2xl font-bold">🛒 Cart ({{ $this->cartCount }} items)</h2>
                    <div class="text-2xl font-bold">
-                       Total: UGX {{ number_format($this->getTotalAmount()) }}
+                       Total: UGX {{ 'Total amount here' }}
                    </div>
                </div>
                
@@ -95,7 +95,7 @@
                        size="lg"
                        icon="heroicon-m-check-circle"
                    >
-                       Place Order - UGX {{ number_format($this->getTotalAmount()) }}
+                       Place Order - UGX : {{ 'Total amount here' }}
                    </x-filament::button>
                </div>
            </div>
