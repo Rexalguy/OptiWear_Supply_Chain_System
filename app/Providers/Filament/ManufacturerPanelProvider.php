@@ -68,7 +68,7 @@ class ManufacturerPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Manufacturer/Pages'), for: 'App\\Filament\\Manufacturer\\Pages')
             ->pages([
                 ChatPage::class, 
-                Analytics::class,
+                
             ])
             ->discoverResources(in: app_path('Filament/Manufacturer/Resources'), for: 'App\\Filament\\Manufacturer\\Resources')
             ->discoverWidgets(in: app_path('Filament/Manufacturer/Widgets'), for: 'App\\Filament\\Manufacturer\\Widgets')

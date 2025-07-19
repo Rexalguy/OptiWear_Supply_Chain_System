@@ -103,7 +103,7 @@ class OrderResource extends Resource
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
-                TextColumn::make('expected_delivery_date')
+                TextColumn::make('expected_fulfillment_date')
                     ->label('Expected Delivery Date')
                     ->formatStateUsing(function ($state, $record) {
                         if ($record->status === 'delivered') {
