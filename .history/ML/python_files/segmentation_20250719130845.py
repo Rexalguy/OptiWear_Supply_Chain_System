@@ -104,27 +104,19 @@ def main():
     
     # Show segment distribution before saving
     segment_counts = df['Segment_Label'].value_counts()
-    print('\nSegment distribution (customer transactions):')
+    print('\nSegment distribution:')
     for segment, count in segment_counts.items():
-        print(f'  {segment}: {count} transactions')
-    
-    # Show unique customer counts per segment
-    unique_customers = df.groupby('Segment_Label')['Customer ID'].nunique()
-    print('\nUnique customers per segment:')
-    for segment, count in unique_customers.items():
-        print(f'  {segment}: {count} unique customers')
+        print(f'  {segment}: {count} customers')
     
     summary = summarize_segments(df)
-    print(f'\nGenerated {len(summary)} summary records')
+    print(f'Generated {len(summary)} summary records')
     
     save_segments(summary)
     print('Segmentation results saved to database.')
     
     # Show final summary
-    total_products = summary['total_purchased'].sum()
-    total_customers = summary['customer_count'].sum()
-    print(f'\nTotal products across all segments: {total_products}')
-    print(f'Total customer records across all segments: {total_customers}')
+    total_records = summary['total_purchased'].sum()
+    print(f'\nTotal quantity across all segments: {total_records}')
     print('Segmentation complete!')
 
 if __name__ == '__main__':

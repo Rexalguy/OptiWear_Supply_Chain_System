@@ -43,19 +43,14 @@ def segment_customers(df, n_segments=8):
     return df
 
 def summarize_segments(df):
-    # For each segment, gender, age group, and shirt category, sum quantity and count customers
-    summary = df.groupby(['Segment_Label', 'Gender', 'Age_Group', 'Product Category']).agg({
-        'Quantity': 'sum',
-        'Customer ID': 'nunique'  # Count unique customers
-    }).reset_index()
-    
+    # For each segment, gender, age group, and shirt category, sum quantity
+    summary = df.groupby(['Segment_Label', 'Gender', 'Age_Group', 'Product Category'])['Quantity'].sum().reset_index()
     summary = summary.rename(columns={
         'Segment_Label': 'segment_label',
         'Gender': 'gender',
         'Age_Group': 'age_group',
         'Product Category': 'shirt_category',
-        'Quantity': 'total_purchased',
-        'Customer ID': 'customer_count'
+        'Quantity': 'total_purchased'
     })
     print('Summary columns:', summary.columns.tolist())  # Debug print
     return summary
@@ -75,57 +70,25 @@ def save_segments(summary):
     cursor = conn.cursor()
     for _, row in summary.iterrows():
         cursor.execute('''
-            INSERT INTO segmentation_results (segment_label, gender, age_group, shirt_category, total_purchased, customer_count, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+            INSERT INTO segmentation_results (segment_label, gender, age_group, shirt_category, total_purchased, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
         ''', (
             row['segment_label'],
             row['gender'],
             row['age_group'],
             row['shirt_category'],
-            int(row['total_purchased']),
-            int(row['customer_count'])
+            int(row['total_purchased'])
         ))
     conn.commit()
     cursor.close()
     conn.close()
 
 def main():
-    print('Starting customer segmentation...')
-    
-    # Clear existing data
-    clear_existing_segments()
-    
-    # Load and process data
     df = load_data()
-    print(f'Loaded {len(df)} records from dataset')
-    
     df = segment_customers(df)
-    print(f'Created segments, remaining records: {len(df)}')
-    
-    # Show segment distribution before saving
-    segment_counts = df['Segment_Label'].value_counts()
-    print('\nSegment distribution (customer transactions):')
-    for segment, count in segment_counts.items():
-        print(f'  {segment}: {count} transactions')
-    
-    # Show unique customer counts per segment
-    unique_customers = df.groupby('Segment_Label')['Customer ID'].nunique()
-    print('\nUnique customers per segment:')
-    for segment, count in unique_customers.items():
-        print(f'  {segment}: {count} unique customers')
-    
     summary = summarize_segments(df)
-    print(f'\nGenerated {len(summary)} summary records')
-    
     save_segments(summary)
     print('Segmentation results saved to database.')
-    
-    # Show final summary
-    total_products = summary['total_purchased'].sum()
-    total_customers = summary['customer_count'].sum()
-    print(f'\nTotal products across all segments: {total_products}')
-    print(f'Total customer records across all segments: {total_customers}')
-    print('Segmentation complete!')
 
 if __name__ == '__main__':
     main()
