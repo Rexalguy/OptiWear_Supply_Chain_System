@@ -1,0 +1,96 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* Modern Glass Morphism Widgets */
+@layer components {
+  .fi-section-content-ctn {
+    @apply bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-glass transition-all duration-300 overflow-hidden;
+  }
+
+  .fi-section-content-ctn:hover {
+    @apply -translate-y-0.5 shadow-glass-hover;
+  }
+
+  /* Stats Widget Styling */
+  .fi-wi-stats {
+    @apply p-6;
+  }
+
+  .fi-wi-stats .fi-section-content-ctn {
+    @apply h-auto min-h-[120px] max-h-[160px];
+  }
+
+  /* Chart Widget Base */
+  .fi-wi-chart .fi-section-content-ctn {
+    @apply p-6 min-h-[350px];
+  }
+
+  /* Individual Widget Gradients */
+  [data-widget="segment-distribution"] .fi-section-content-ctn {
+    @apply h-[420px] rounded-3xl;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  [data-widget="segment-purchase-behavior"] .fi-section-content-ctn {
+    @apply h-[380px] rounded-xl;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  [data-widget="category-preferences"] .fi-section-content-ctn {
+    @apply h-[450px] rounded-2xl;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  [data-widget="age-group-patterns"] .fi-section-content-ctn {
+    @apply h-[400px] rounded-xl;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+
+  /* Grid Layout */
+  .fi-section {
+    @apply p-3 m-2 bg-transparent;
+  }
+
+  /* Card Headers */
+  .fi-section-header {
+    @apply bg-white/10 rounded-t-xl p-4 backdrop-blur-sm;
+  }
+
+  .fi-section-header-heading {
+    @apply text-white font-semibold text-lg;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Stats Cards */
+  .fi-stats-card {
+    @apply bg-white/10 border border-white/20 rounded-xl backdrop-blur-lg transition-all duration-300;
+  }
+
+  .fi-stats-card:hover {
+    @apply bg-white/15 scale-[1.02];
+  }
+
+  /* Chart Canvas */
+  .fi-wi-chart canvas {
+    @apply rounded-lg;
+  }
+
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .fi-section-content-ctn {
+      @apply bg-gradient-to-br from-slate-900/80 to-slate-800/60 border-slate-400/10;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .fi-wi-chart .fi-section-content-ctn {
+      @apply h-[300px] min-h-[280px];
+    }
+    
+    .fi-section {
+      @apply p-2 m-1;
+    }
+  }
+}

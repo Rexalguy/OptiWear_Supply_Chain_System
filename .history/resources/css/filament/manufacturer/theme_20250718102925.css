@@ -1,0 +1,248 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* Modern Card-Based Widgets Styling */
+.fi-page-footer-widgets {
+    gap: 1.5rem !important;
+    padding: 2rem 0 !important;
+}
+
+/* Enhanced Card Widgets for Footer */
+.fi-page-footer-widgets .fi-wi-widget {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95)) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-radius: 20px !important;
+    box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform: translateY(0) scale(1) !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.fi-page-footer-widgets .fi-wi-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4) !important;
+    z-index: 1;
+}
+
+.fi-page-footer-widgets .fi-wi-widget:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.15),
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Filament Card Component Styling */
+.fi-page-footer-widgets .fi-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+/* Card Headers */
+.fi-page-footer-widgets .fi-card-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05)) !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.5rem !important;
+    margin: -1rem -1rem 1.5rem -1rem !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.fi-page-footer-widgets .fi-card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent) !important;
+}
+
+.fi-page-footer-widgets .fi-card-heading {
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    color: var(--gray-900) !important;
+    margin: 0 0 0.5rem 0 !important;
+    background: linear-gradient(135deg, #1e40af, #7c3aed) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.fi-page-footer-widgets .fi-card-description {
+    font-size: 0.875rem !important;
+    color: var(--gray-600) !important;
+    margin: 0 !important;
+    opacity: 0.8 !important;
+}
+
+/* Card Footers */
+.fi-page-footer-widgets .fi-card-footer {
+    background: rgba(248, 250, 252, 0.5) !important;
+    border-radius: 0 0 16px 16px !important;
+    padding: 1rem 1.5rem !important;
+    margin: 1.5rem -1rem -1rem -1rem !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.5) !important;
+    font-size: 0.875rem !important;
+    color: var(--gray-600) !important;
+}
+
+/* Segment Purchase Behavior Chart - Amber Theme */
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="segment-purchase-behavior-chart"],
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="purchase-behavior"] {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05)) !important;
+    border: 2px solid rgba(251, 191, 36, 0.2) !important;
+}
+
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="purchase-behavior"]::before {
+    background: linear-gradient(90deg, #f59e0b, #d97706, #b45309) !important;
+}
+
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="purchase-behavior"]:hover {
+    border-color: rgba(251, 191, 36, 0.4) !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(251, 191, 36, 0.2),
+        0 20px 25px -5px rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Age Group Chart - Emerald Theme */
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="age-group-purchase-pattern-chart"],
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="age-group"] {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(16, 185, 129, 0.05)) !important;
+    border: 2px solid rgba(52, 211, 153, 0.2) !important;
+    min-height: 350px !important;
+    max-height: 450px !important;
+}
+
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="age-group"]::before {
+    background: linear-gradient(90deg, #10b981, #059669, #047857) !important;
+}
+
+.fi-page-footer-widgets .fi-wi-widget[wire\\:id*="age-group"]:hover {
+    border-color: rgba(52, 211, 153, 0.4) !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(52, 211, 153, 0.2),
+        0 20px 25px -5px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Segment Recommendations Widget - Premium Purple Card */
+.fi-page-footer-widgets .segment-recommendations-widget {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%) !important;
+    border: 2px solid rgba(139, 92, 246, 0.3) !important;
+    color: white !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget::before {
+    background: linear-gradient(90deg, #ffffff40, #ffffff80, #ffffff40) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget:hover {
+    box-shadow: 
+        0 25px 50px -12px rgba(139, 92, 246, 0.4),
+        0 20px 25px -5px rgba(168, 85, 247, 0.2) !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .fi-card-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .fi-card-heading {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .fi-card-description {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .fi-card-footer {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-top-color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Table Styling for Recommendations */
+.fi-page-footer-widgets .segment-recommendations-widget table {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: none !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .border,
+.fi-page-footer-widgets .segment-recommendations-widget .border-gray-200,
+.fi-page-footer-widgets .segment-recommendations-widget .dark\\:border-gray-700 {
+    border: none !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .bg-gray-50,
+.fi-page-footer-widgets .segment-recommendations-widget .dark\\:bg-gray-800 {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget .bg-white,
+.fi-page-footer-widgets .segment-recommendations-widget .dark\\:bg-gray-900 {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget table td {
+    color: #1f2937 !important;
+}
+
+.fi-page-footer-widgets .segment-recommendations-widget table tr:hover td {
+    background: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Dark Mode Support */
+.dark .fi-page-footer-widgets .fi-wi-widget {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95)) !important;
+    border-color: rgba(75, 85, 99, 0.8) !important;
+}
+
+.dark .fi-page-footer-widgets .fi-card-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1)) !important;
+    border-bottom-color: rgba(75, 85, 99, 0.5) !important;
+}
+
+.dark .fi-page-footer-widgets .fi-card-footer {
+    background: rgba(31, 41, 55, 0.5) !important;
+    border-top-color: rgba(75, 85, 99, 0.5) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .fi-page-footer-widgets .fi-wi-widget {
+        border-radius: 16px !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .fi-page-footer-widgets .fi-card-header,
+    .fi-page-footer-widgets .fi-card-footer {
+        padding: 1rem !important;
+        margin-left: -0.75rem !important;
+        margin-right: -0.75rem !important;
+    }
+    
+    .fi-page-footer-widgets .fi-card-heading {
+        font-size: 1.125rem !important;
+    }
+}

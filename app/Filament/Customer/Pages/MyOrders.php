@@ -102,7 +102,7 @@ class MyOrders extends Page implements HasTable
         return $tokens >= 200 ? 10000 : 0;
     }
 
-    // --- CART TOTAL CALCULATION ---
+    //  CART TOTAL CALCULATION 
     protected function getCartTotal(): int
     {
         return collect($this->cart)->reduce(function ($total, $item) {
@@ -165,7 +165,7 @@ class MyOrders extends Page implements HasTable
         return $discount;
     }
 
-    // --- PLACE ORDER SAFELY ---
+    //  PLACE ORDER 
     public function placeOrder(): void
     {
         if (empty($this->cart)) {

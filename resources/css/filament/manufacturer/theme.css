@@ -1,0 +1,241 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+/* Custom styles for segment recommendations widget */
+.segment-recommendations-widget {
+    /* Override Filament's default widget styling */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+.segment-recommendations-widget .fi-wi-widget {
+    /* Override widget container styles */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.segment-recommendations-widget table {
+    /* Ensure table takes full width and has proper styling */
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+}
+
+.segment-recommendations-widget .fi-ta-table {
+    /* Override Filament table styles */
+    background: transparent !important;
+    border: none !important;
+}
+
+.segment-recommendations-widget .fi-ta-content {
+    /* Override table content wrapper */
+    padding: 0 !important;
+    overflow-x: auto !important;
+}
+
+/* Override column span if needed */
+.col-\[--col-span-default\].segment-recommendations-widget {
+    grid-column: 1 / -1 !important; /* Span full width */
+}
+
+/* Modern Footer Widgets Styling */
+.fi-page-footer-widgets {
+    gap: 1.5rem !important;
+    padding: 2rem 0 !important;
+}
+
+/* Chart Widgets - Modern Glass Effect */
+.fi-wi-chart {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform: translateY(0) !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.fi-wi-chart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+}
+
+.fi-wi-chart:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Chart Widget Headers */
+.fi-wi-chart .fi-wi-heading {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)) !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.5rem !important;
+    margin: -1rem -1rem 1rem -1rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.fi-wi-chart .fi-wi-heading h3 {
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    color: #1f2937 !important;
+    margin: 0 !important;
+}
+
+/* Recommendations Table - Premium Card Style */
+.segment-recommendations-widget {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 24px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.segment-recommendations-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent) !important;
+    pointer-events: none !important;
+}
+
+.segment-recommendations-widget:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 30px 60px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+}
+
+.segment-recommendations-widget .fi-wi-widget {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 2rem !important;
+    box-shadow: none !important;
+}
+
+.segment-recommendations-widget .fi-wi-heading {
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    margin-bottom: 1.5rem !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.segment-recommendations-widget table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 0.5rem !important;
+    margin: 0 !important;
+}
+
+.segment-recommendations-widget table th {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1rem !important;
+    border: none !important;
+    text-transform: uppercase !important;
+    font-size: 0.875rem !important;
+    letter-spacing: 0.05em !important;
+}
+
+.segment-recommendations-widget table th:first-child {
+    border-radius: 12px 0 0 12px !important;
+}
+
+.segment-recommendations-widget table th:last-child {
+    border-radius: 0 12px 12px 0 !important;
+}
+
+.segment-recommendations-widget table td {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #1f2937 !important;
+    padding: 1.25rem !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.segment-recommendations-widget table td:first-child {
+    border-radius: 12px 0 0 12px !important;
+    font-weight: 600 !important;
+    color: #667eea !important;
+}
+
+.segment-recommendations-widget table td:last-child {
+    border-radius: 0 12px 12px 0 !important;
+}
+
+.segment-recommendations-widget table tr:hover td {
+    background: white !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Age Group Chart - Compact Modern Style */
+.fi-wi-chart[wire\:id*="age-group"] {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05)) !important;
+    border: 2px solid rgba(16, 185, 129, 0.2) !important;
+    border-radius: 16px !important;
+    min-height: 300px !important;
+    max-height: 400px !important;
+}
+
+.fi-wi-chart[wire\:id*="age-group"]:hover {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Purchase Behavior Chart - Wide Modern Style */
+.fi-wi-chart[wire\:id*="purchase-behavior"] {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05)) !important;
+    border: 2px solid rgba(245, 158, 11, 0.2) !important;
+    border-radius: 20px !important;
+    min-height: 400px !important;
+}
+
+.fi-wi-chart[wire\:id*="purchase-behavior"]:hover {
+    border-color: rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .fi-wi-chart {
+        border-radius: 16px !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .segment-recommendations-widget {
+        border-radius: 16px !important;
+    }
+    
+    .segment-recommendations-widget .fi-wi-widget {
+        padding: 1.5rem !important;
+    }
+    
+    .segment-recommendations-widget table th,
+    .segment-recommendations-widget table td {
+        padding: 0.75rem !important;
+        font-size: 0.875rem !important;
+    }
+}
+
