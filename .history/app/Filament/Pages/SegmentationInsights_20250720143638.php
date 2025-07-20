@@ -27,7 +27,7 @@ class SegmentationInsights extends Page
                 ->modalContent(view('filament.modals.export-options'))
                 ->modalWidth(MaxWidth::TwoExtraLarge)
                 ->modalHeading('Export Segmentation Insights Charts')
-                ->modalDescription('Download all segmentation charts on this page as high-quality PNG images.')
+                ->modalDescription('Choose your export format and download your segmentation charts and data.')
                 ->modalSubmitActionLabel('Start Export')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function (array $data) {
