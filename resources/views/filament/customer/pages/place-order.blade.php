@@ -1,4 +1,68 @@
 <x-filament-panels::page>
+    <style>
+        .modal-fade-in { animation: modalFadeIn 0.3s ease; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-slide-up { animation: modalSlideUp 0.4s cubic-bezier(.4,0,.2,1); }
+        @keyframes modalSlideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close-btn-animate {
+            transition: transform 0.2s;
+        }
+        .close-btn-animate:hover {
+            transform: scale(1.2) rotate(90deg);
+        }
+        /* Custom scrollbar for cart items */
+        .cart-items-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cart-items-container::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+        .dark .cart-items-container::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        
+        /* Image container background - changed to white */
+        .image-container {
+            background-color: #ffffff; /* White background */
+        }
+        .dark .image-container {
+            background-color: #ffffff; /* Keep dark slate in dark mode */
+        }
+
+        /* Price styling */
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+        .current-price {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #10b981; /* Green for current price */
+        }
+        .original-price {
+            font-size: 1rem;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+        .discount-badge {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
 
     <div class="w-full">
         <x-filament::card class="custom-slider-section">
@@ -94,9 +158,31 @@
 
 
     <div class="p-6 space-y-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white"> Available Products</h2>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Available Products</h2>
 
-        
+        <!-- Category Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex space-x-4 overflow-x-auto pb-1" aria-label="Categories">
+                <!-- All Categories Tab -->
+                <button
+                    wire:click="$set('selectedCategory', '')"
+                    class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory === '' ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                >
+                    All Products
+                </button>
+                
+                <!-- Category Tabs -->
+                @foreach($this->categories as $category)
+                    <button
+                        wire:click="$set('selectedCategory', '{{ $category->id }}')"
+                        class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory == $category->id ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                    >
+                        {{ $category->category }}
+                    </button>
+                @endforeach
+            </nav>
+        </div>
+
         {{-- Cart token info --}}
 <div class="token-cart-wrapper flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm">
     <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-3 md:mb-0 font-medium">
@@ -119,9 +205,31 @@
     </a>
 </div>
 
-
-{{-- Products Grid --}}
-<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Products Grid -->
+        @if($products->isEmpty())
+            <div class="text-center py-12">
+                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                    <x-heroicon-o-exclamation-circle class="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">No products found</h3>
+                <p class="mt-1 text-gray-500 dark:text-gray-400">
+                    @if($selectedCategory)
+                        No products available in this category.
+                    @else
+                        No products available at the moment.
+                    @endif
+                </p>
+                @if($selectedCategory)
+                    <div class="mt-6">
+                        <x-filament::button wire:click="$set('selectedCategory', '')" color="gray">
+                            Clear filter
+                        </x-filament::button>
+                    </div>
+                @endif
+            </div>
+        @else
+            {{-- Products Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
     @foreach ($products as $product)
         <div class="product-card dark-gradient-card rounded-lg overflow-hidden">
 
@@ -151,81 +259,16 @@
                 </x-filament::button>
             </div>
         </div>
-    @endforeach
-</div>
-
-
+        @endforeach
+        </div>
+        @endif
 
     </div>
 
-{{-- Product Modal --}}
-@if ($selectedProduct && $clickedProduct)
-    <style>
-        .modal-fade-in { animation: modalFadeIn 0.3s ease; }
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-slide-up { animation: modalSlideUp 0.4s cubic-bezier(.4,0,.2,1); }
-        @keyframes modalSlideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .close-btn-animate {
-            transition: transform 0.2s;
-        }
-        .close-btn-animate:hover {
-            transform: scale(1.2) rotate(90deg);
-        }
-        /* Custom scrollbar for cart items */
-        .cart-items-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .cart-items-container::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 3px;
-        }
-        .dark .cart-items-container::-webkit-scrollbar-thumb {
-            background: #4b5563;
-        }
-        /* Image container background - changed to white */
-        .image-container {
-            background-color: #ffffff; /* White background */
-        }
-        .dark .image-container {
-            background-color: #ffffff; /* Keep dark slate in dark mode */
-        }
-
-                /* Price styling */
-        .price-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin: 0.5rem 0;
-        }
-        .current-price {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #10b981; /* Green for current price */
-        }
-        .original-price {
-            font-size: 1rem;
-            color: #9ca3af;
-            text-decoration: line-through;
-        }
-        .discount-badge {
-            background-color: #ef4444;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-    </style>
-
-    <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in"
-         wire:click.self="closeProductModal">
+    {{-- Product Modal --}}
+    @if ($selectedProduct && $clickedProduct)
+        <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in"
+             wire:click.self="closeProductModal">
 
         <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-2xl w-full mx-4 relative modal-slide-up"
              @click.stop>
