@@ -180,27 +180,27 @@ nav::-webkit-scrollbar-track {
 }
 
 /* Category Tab Hover Effects */
-nav[aria-label="Categories"] button {
+.category-nav button {
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-nav[aria-label="Categories"] button:hover {
+.category-nav button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.dark nav[aria-label="Categories"] button:hover {
+.dark .category-nav button:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Active tab glow effect */
-nav[aria-label="Categories"] button.border-primary-500 {
+.category-nav button.tab-active {
     position: relative;
 }
 
-nav[aria-label="Categories"] button.border-primary-500::before {
+.category-nav button.tab-active::before {
     content: '';
     position: absolute;
     top: 0;
@@ -213,11 +213,11 @@ nav[aria-label="Categories"] button.border-primary-500::before {
 }
 
 /* Hover ripple effect for non-active tabs */
-nav[aria-label="Categories"] button:not(.border-primary-500):hover {
+.category-nav button:not(.tab-active):hover {
     background: linear-gradient(135deg, rgba(156, 163, 175, 0.05), rgba(107, 114, 128, 0.05));
 }
 
-.dark nav[aria-label="Categories"] button:not(.border-primary-500):hover {
+.dark .category-nav button:not(.tab-active):hover {
     background: linear-gradient(135deg, rgba(75, 85, 99, 0.1), rgba(55, 65, 81, 0.1));
 }
 
