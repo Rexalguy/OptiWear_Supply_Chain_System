@@ -33,6 +33,7 @@ class MyOrders extends Page implements HasTable
     public string $address = '';
     public int $userTokens = 0;
     public int $discount = 0;
+    public bool $useTokens = false; // Add user choice for token usage
 
     public static function getNavigationBadge(): ?string
     {
@@ -134,7 +135,22 @@ class MyOrders extends Page implements HasTable
 
     public function getFinalAmountProperty(): int
     {
-        return max(0, $this->getCartTotal() - $this->discount + ($this->deliveryOption === 'delivery' ? 5000 : 0));
+        $discount = $this->useTokens ? $this->calculatePotentialDiscount() : 0;
+        return max(0, $this->getCartTotal() - $discount + ($this->deliveryOption === 'delivery' ? 5000 : 0));
+    }
+
+    public function calculatePotentialDiscount(): int
+    {
+        $availableTokens = $this->userTokens;
+        
+        if ($availableTokens >= 200) {
+            return 10000; // UGX 10,000 discount for 200 tokens
+        } elseif ($availableTokens > 0) {
+            $maxDiscount = min($availableTokens * 100, floor($this->getCartTotal() / 100) * 100);
+            return $maxDiscount;
+        }
+        
+        return 0;
     }
 
     public function calculatePotentialTokens(): void
@@ -143,8 +159,20 @@ class MyOrders extends Page implements HasTable
         $this->potentialTokens = $total >= 50000 ? floor($total / 15000) : 0;
     }
 
+    public function toggleTokenUsage(): void
+    {
+        $this->useTokens = !$this->useTokens;
+        // Recalculate discount when toggled
+        $this->discount = $this->useTokens ? $this->calculatePotentialDiscount() : 0;
+    }
+
     protected function deductUserTokensIfApplicable(): int
     {
+        // Only deduct tokens if user explicitly chose to use them
+        if (!$this->useTokens) {
+            return 0;
+        }
+
         $user = Auth::user();
         $availableTokens = $user->tokens ?? 0;
         $discount = 0;

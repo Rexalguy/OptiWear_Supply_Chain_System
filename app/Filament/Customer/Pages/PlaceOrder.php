@@ -4,6 +4,7 @@ namespace App\Filament\Customer\Pages;
 
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Models\ShirtCategory;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
@@ -15,6 +16,12 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
+    // Dynamic title method
+    public function getTitle(): string
+    {
+        return 'Welcome,  ' .  (Auth::user()->name ?? 'Guest');
+    }
+
     // UI / modal state
     public ?Product $clickedProduct = null;
     public bool $selectedProduct = false;
@@ -25,6 +32,11 @@ class PlaceOrder extends Page
 
     // Product list
     public $products;
+    
+    // Category filtering
+    public string $selectedCategory = '';
+    public $categories;
+    public $recommendedProducts;
 
     // Size selection UI
     public array $showSizeDropdown = [];
@@ -52,12 +64,31 @@ class PlaceOrder extends Page
         // Save back sanitized cart
         session()->put('cart', $this->cart);
 
-        // Load available products
-        $this->products = Product::where('quantity_available', '>', 0)->get();
+        // Load categories and products
+        $this->categories = ShirtCategory::all();
+        $this->recommendedProducts = Product::where('quantity_available', '>', 0)->inRandomOrder()->limit(4)->get();
+        $this->loadProducts();
 
         // Update tokens & wishlist
         $this->updateTokenCount();
         $this->loadWishlistProductIds();
+    }
+
+    /* Load products based on selected category */
+    protected function loadProducts(): void
+    {
+        if ($this->selectedCategory === 'recommendations') {
+            $this->products = $this->recommendedProducts;
+            return;
+        }
+        
+        $query = Product::where('quantity_available', '>', 0)->with('shirtCategory');
+        
+        if ($this->selectedCategory) {
+            $query->where('shirt_category_id', $this->selectedCategory);
+        }
+        
+        $this->products = $query->get();
     }
 
     /* Quick helper to show Filament notifications */
@@ -72,6 +103,18 @@ class PlaceOrder extends Page
         $this->wishlistProductIds = Wishlist::where('user_id', Auth::id())
             ->pluck('product_id')
             ->toArray();
+    }
+
+    /* Category filtering */
+    public function updatedSelectedCategory(): void
+    {
+        $this->loadProducts();
+    }
+
+    /* Computed property for categories */
+    public function getCategoriesProperty()
+    {
+        return ShirtCategory::all();
     }
 
     /* MODAL HANDLERS */
