@@ -69,7 +69,6 @@ class Product extends Page
     }
     public function addToCart($productId)
     {
-        ProductModel::findOrFail($productId);
         $baleSize = (int) $this->bale_size;
         if ($baleSize <= 0) {
             $this->notify('danger', 'Please select a valid Bale size before continuing');
@@ -77,7 +76,7 @@ class Product extends Page
         }
         $this->notify('success', 'Product added to cart successfully.');
         $this->cartCount += $baleSize;
-        $this->bale_size = null;
+        $this->bale_size = null; 
         // $target_product = ProductModel::find($productId);
         // if ($target_product) {
         //     $cartItem = [
