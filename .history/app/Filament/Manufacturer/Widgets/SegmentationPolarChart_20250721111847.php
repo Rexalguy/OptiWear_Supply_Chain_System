@@ -12,7 +12,7 @@ class SegmentationPolarChart extends ChartWidget
 
     protected static ?string $maxHeight = '400px';
 
-    protected static ?string $description = 'Number of Customers in each Segment';
+    protected static ?string $description = 'Number of customers in each segment';
     
     protected int | string | array $columnSpan = 1;
 

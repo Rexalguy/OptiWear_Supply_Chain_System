@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 use App\Filament\Manufacturer\Widgets\SegmentStatsWidget;
 use App\Filament\Manufacturer\Widgets\SegmentationPolarChart;
 use App\Filament\Manufacturer\Widgets\SegmentationBarChart;
-use App\Filament\Manufacturer\Widgets\SegmentTopProductsTable;
+use App\Filament\Manufacturer\Widgets\SegmentationTable;
 use Filament\Actions\Action;
 use Filament\Support\Enums\MaxWidth;
 
@@ -53,7 +53,6 @@ class SegmentationInsights extends Page
         return [
             SegmentationPolarChart::class,
             SegmentationBarChart::class,
-            SegmentTopProductsTable::class,
         ];
     }
 }

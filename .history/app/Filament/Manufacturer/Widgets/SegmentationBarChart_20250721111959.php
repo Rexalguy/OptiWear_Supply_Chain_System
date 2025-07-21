@@ -9,7 +9,7 @@ class SegmentationBarChart extends ChartWidget
 {
     protected static ?string $heading = 'Total Products Purchased Per Segment';
  
-    protected static ?string $description = 'Chart Showing Total Unit Products Purchased Per Segment across the 5 categories';
+    protected static ?string $description = 'Chart Showing Total Product Purchased Per Segment across ';
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array

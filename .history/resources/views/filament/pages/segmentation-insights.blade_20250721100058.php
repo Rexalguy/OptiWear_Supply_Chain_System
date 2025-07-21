@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    {{-- Demand Insights Page with Export Functionality --}}
+    {{-- Segmentation Insights Page with Export Functionality --}}
 
     @push('scripts')
         <!-- Simple Chart Export (independent of build system) -->
@@ -8,7 +8,7 @@
         <script>
             // Ensure chart detection runs after widgets are loaded
             document.addEventListener('DOMContentLoaded', function () {
-                console.log('Demand Insights page loaded');
+                console.log('Segmentation Insights page loaded');
 
                 // Check for Chart.js after a delay
                 setTimeout(() => {
@@ -16,7 +16,7 @@
 
                     if (typeof Chart !== 'undefined') {
                         const canvases = document.querySelectorAll('canvas');
-                        console.log(`Found ${canvases.length} canvas elements on Demand Insights`);
+                        console.log(`Found ${canvases.length} canvas elements on Segmentation Insights`);
 
                         canvases.forEach((canvas, index) => {
                             const chart = Chart.getChart(canvas);
@@ -33,6 +33,20 @@
                 window.Livewire.hook('morph.updated', () => {
                     setTimeout(() => {
                         console.log('Livewire updated - checking charts again');
+                    }, 500);
+                });
+            }
+        </script>
+    @endpush
+</x-filament-panels::page>
+
+            // Re-detect charts when Livewire updates (for filtered charts)
+            if (window.Livewire) {
+                window.Livewire.hook('morph.updated', () => {
+                    setTimeout(() => {
+                        if (window.chartExporter) {
+                            window.chartExporter.detectCharts();
+                        }
                     }, 500);
                 });
             }

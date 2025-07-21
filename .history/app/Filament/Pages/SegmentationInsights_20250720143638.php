@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 use App\Filament\Manufacturer\Widgets\SegmentStatsWidget;
 use App\Filament\Manufacturer\Widgets\SegmentationPolarChart;
 use App\Filament\Manufacturer\Widgets\SegmentationBarChart;
-use App\Filament\Manufacturer\Widgets\SegmentTopProductsTable;
+use App\Filament\Manufacturer\Widgets\SegmentationTable;
 use Filament\Actions\Action;
 use Filament\Support\Enums\MaxWidth;
 
@@ -27,7 +27,7 @@ class SegmentationInsights extends Page
                 ->modalContent(view('filament.modals.export-options'))
                 ->modalWidth(MaxWidth::TwoExtraLarge)
                 ->modalHeading('Export Segmentation Insights Charts')
-                ->modalDescription('Download all segmentation charts on this page as high-quality PNG images.')
+                ->modalDescription('Choose your export format and download your segmentation charts and data.')
                 ->modalSubmitActionLabel('Start Export')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function (array $data) {
@@ -53,7 +53,6 @@ class SegmentationInsights extends Page
         return [
             SegmentationPolarChart::class,
             SegmentationBarChart::class,
-            SegmentTopProductsTable::class,
         ];
     }
 }

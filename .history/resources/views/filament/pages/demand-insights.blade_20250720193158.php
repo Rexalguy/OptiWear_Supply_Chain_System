@@ -4,20 +4,20 @@
     @push('scripts')
         <!-- Simple Chart Export (independent of build system) -->
         <script src="{{ asset('js/simple-chart-export.js') }}"></script>
-
+        
         <script>
             // Ensure chart detection runs after widgets are loaded
             document.addEventListener('DOMContentLoaded', function () {
                 console.log('Demand Insights page loaded');
-
+                
                 // Check for Chart.js after a delay
                 setTimeout(() => {
                     console.log('Chart.js available:', typeof Chart !== 'undefined');
-
+                    
                     if (typeof Chart !== 'undefined') {
                         const canvases = document.querySelectorAll('canvas');
                         console.log(`Found ${canvases.length} canvas elements on Demand Insights`);
-
+                        
                         canvases.forEach((canvas, index) => {
                             const chart = Chart.getChart(canvas);
                             if (chart) {
