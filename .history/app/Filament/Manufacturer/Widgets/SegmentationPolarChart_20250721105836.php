@@ -8,11 +8,11 @@ use App\Models\SegmentationResult;
 
 class SegmentationPolarChart extends ChartWidget
 {
-    protected static ?string $heading = 'Top Product Segments - Customer Distribution';
+    protected static ?string $heading = 'Customer Segmentation Overview';
 
     protected static ?string $maxHeight = '400px';
 
-    protected static ?string $description = 'Number of customers in each segment for their most popular product category';
+    protected static ?string $description = 'Chart summarizing the number of customers in each segment';
     
     protected int | string | array $columnSpan = 1;
 
