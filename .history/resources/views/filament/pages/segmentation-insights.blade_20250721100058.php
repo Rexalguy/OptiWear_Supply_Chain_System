@@ -39,3 +39,17 @@
         </script>
     @endpush
 </x-filament-panels::page>
+
+            // Re-detect charts when Livewire updates (for filtered charts)
+            if (window.Livewire) {
+                window.Livewire.hook('morph.updated', () => {
+                    setTimeout(() => {
+                        if (window.chartExporter) {
+                            window.chartExporter.detectCharts();
+                        }
+                    }, 500);
+                });
+            }
+        </script>
+    @endpush
+</x-filament-panels::page>
