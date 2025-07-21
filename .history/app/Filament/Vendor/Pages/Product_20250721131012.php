@@ -69,36 +69,32 @@ class Product extends Page
     }
     public function addToCart($productId)
     {
-        ProductModel::findOrFail($productId);
         $baleSize = (int) $this->bale_size;
         if ($baleSize <= 0) {
             $this->notify('danger', 'Please select a valid Bale size before continuing');
             return;
         }
-        $this->notify('success', 'Product added to cart successfully.');
-        $this->cartCount += $baleSize;
-        $this->bale_size = null;
-        // $target_product = ProductModel::find($productId);
-        // if ($target_product) {
-        //     $cartItem = [
-        //         'id' => $target_product->id,
-        //         'name' => $target_product->name,
-        //         'price' => $target_product->price,
-        //         'quantity' => $baleSize,
-        //         'image' => $target_product->image,
+        $target_product = ProductModel::find($productId);
+        if ($target_product) {
+            $cartItem = [
+                'id' => $target_product->id,
+                'name' => $target_product->name,
+                'price' => $target_product->price,
+                'quantity' => $baleSize,
+                'image' => $target_product->image,
 
-        //     ];
-        //     if (isset($this->cart[$target_product->id])) {
-        //         $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
-        //         $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
-        //     } else {
-        //         $this->cart[$target_product->id] = $cartItem;
-        //         $this->notify('success', 'Product added to cart successfully.');
-        //     }
-        //     $this->cartCount = collect($this->cart)->sum('quantity');
-        //     session()->put('cart', $this->cart);
-        //     session()->put('cartCount', $this->cartCount);
-        // }
+            ];
+            if (isset($this->cart[$target_product->id])) {
+                $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
+                $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
+            } else {
+                $this->cart[$target_product->id] = $cartItem;
+                $this->notify('success', 'Product added to cart successfully.');
+            }
+            $this->cartCount = collect($this->cart)->sum('quantity');
+            session()->put('cart', $this->cart);
+            session()->put('cartCount', $this->cartCount);
+        }
     }
     public function closeProductModal()
     {

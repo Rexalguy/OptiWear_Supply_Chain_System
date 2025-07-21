@@ -8,16 +8,20 @@ use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Page
 
 {
     public $cartCount = 0;
-    public $bale_size;
+    public $bale_sizes = []; // Track bale size for each product
     public $cart = [];
-    public $clickedProduct;
-    public $selectedProduct = false;
     public $products;
+    
+    protected $rules = [
+        'bale_sizes.*' => 'nullable|string|in:100,350,750',
+    ];
+    
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?int $navigationSort = 1;
@@ -47,13 +51,14 @@ class Product extends Page
     public function mount()
     {
         $this->products = ProductModel::all();
-        if (session()->has('cart') || session()->has('cartCount')) {
-            $this->cart = session()->get('cart', []);
-            $this->cartCount = session()->get('cartCount', 0);
-        } else {
-            $this->cart = [];
-            $this->cartCount = 0;
-        }
+        $this->cart = session()->get('cart', []);
+        $this->cartCount = session()->get('cartCount', 0);
+        $this->bale_sizes = [];
+    }
+    
+    public function updatedBaleSizes($value, $key)
+    {
+        // Simple validation - no complex logic
     }
     public function notify(string $type, string $message): void
     {
@@ -62,43 +67,42 @@ class Product extends Page
             ->{$type}()
             ->send();
     }
-    public function openProductModal($productId)
-    {
-        $this->clickedProduct = ProductModel::find($productId);
-        $this->selectedProduct = true;
-    }
+    
     public function addToCart($productId)
     {
-        ProductModel::findOrFail($productId);
-        $baleSize = (int) $this->bale_size;
+        // Check if bale size is set for this specific product
+        $baleSize = isset($this->bale_sizes[$productId]) ? (int) $this->bale_sizes[$productId] : 0;
+        
         if ($baleSize <= 0) {
             $this->notify('danger', 'Please select a valid Bale size before continuing');
             return;
         }
-        $this->notify('success', 'Product added to cart successfully.');
-        $this->cartCount += $baleSize;
-        $this->bale_size = null;
-        // $target_product = ProductModel::find($productId);
-        // if ($target_product) {
-        //     $cartItem = [
-        //         'id' => $target_product->id,
-        //         'name' => $target_product->name,
-        //         'price' => $target_product->price,
-        //         'quantity' => $baleSize,
-        //         'image' => $target_product->image,
-
-        //     ];
-        //     if (isset($this->cart[$target_product->id])) {
-        //         $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
-        //         $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
-        //     } else {
-        //         $this->cart[$target_product->id] = $cartItem;
-        //         $this->notify('success', 'Product added to cart successfully.');
-        //     }
-        //     $this->cartCount = collect($this->cart)->sum('quantity');
-        //     session()->put('cart', $this->cart);
-        //     session()->put('cartCount', $this->cartCount);
-        // }
+        
+        $target_product = ProductModel::find($productId);
+        if ($target_product) {
+            $cartItem = [
+                'id' => $target_product->id,
+                'name' => $target_product->name,
+                'price' => $target_product->price,
+                'quantity' => $baleSize,
+                'image' => $target_product->image,
+            ];
+            
+            if (isset($this->cart[$target_product->id])) {
+                $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
+                $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
+            } else {
+                $this->cart[$target_product->id] = $cartItem;
+                $this->notify('success', 'Product added to cart successfully.');
+            }
+            
+            $this->cartCount = collect($this->cart)->sum('quantity');
+            session()->put('cart', $this->cart);
+            session()->put('cartCount', $this->cartCount);
+            
+            // Reset the bale size for this product after adding to cart
+            $this->bale_sizes[$productId] = '';
+        }
     }
     public function closeProductModal()
     {
