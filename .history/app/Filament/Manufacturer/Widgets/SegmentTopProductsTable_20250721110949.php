@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class SegmentTopProductsTable extends BaseWidget
 {
-    protected static ?string $heading = '🏆 Summary table for Segmentation of Customers';
+    protected static ?string $heading = '🏆 Top 8 Product Categories by Customer Segment';
     
     protected static ?string $description = 'Top product category for the 8 most active customer segments (excluding segments with zero customers)';
 
@@ -78,6 +78,27 @@ class SegmentTopProductsTable extends BaseWidget
                     ->numeric()
                     ->formatStateUsing(fn (int $state): string => number_format($state) . ' customers')
                     ->sortable()
+                    ->alignEnd(),
+
+                TextColumn::make('market_share')
+                    ->label('Market Share')
+                    ->getStateUsing(function ($record) {
+                        $totalPurchases = SegmentationResult::sum('total_purchased');
+                        if ($totalPurchases > 0) {
+                            return round(($record->total_purchased / $totalPurchases) * 100, 1);
+                        }
+                        return 0;
+                    })
+                    ->formatStateUsing(fn (float $state): string => $state . '%')
+                    ->badge()
+                    ->color(fn (float $state): string => match(true) {
+                        $state >= 20 => 'success',
+                        $state >= 15 => 'warning',
+                        $state >= 10 => 'info',
+                        default => 'gray',
+                    })
+                    ->sortable(false) // Disable sort for computed column
+                    ->searchable(false) // Disable search for computed column
                     ->alignEnd(),
             ])
             ->defaultSort('total_purchased', 'desc')

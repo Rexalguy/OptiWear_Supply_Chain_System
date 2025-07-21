@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class SegmentTopProductsTable extends BaseWidget
 {
-    protected static ?string $heading = '🏆 Summary table for Segmentation of Customers';
+    protected static ?string $heading = '🏆 Summary table for S';
     
     protected static ?string $description = 'Top product category for the 8 most active customer segments (excluding segments with zero customers)';
 
