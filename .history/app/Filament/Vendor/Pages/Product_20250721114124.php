@@ -46,7 +46,7 @@ class Product extends Page
     }
     public function mount()
     {
-        $this->products = ProductModel::all();
+        $thi
         if (session()->has('cart') || session()->has('cartCount')) {
             $this->cart = session()->get('cart', []);
             $this->cartCount = session()->get('cartCount', 0);

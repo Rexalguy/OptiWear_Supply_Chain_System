@@ -46,7 +46,6 @@ class Product extends Page
     }
     public function mount()
     {
-        $this->products = ProductModel::all();
         if (session()->has('cart') || session()->has('cartCount')) {
             $this->cart = session()->get('cart', []);
             $this->cartCount = session()->get('cartCount', 0);
@@ -76,6 +75,7 @@ class Product extends Page
         }
         $target_product = ProductModel::find($productId);
         if ($target_product) {
+            $price = $target_product->price ?? 0;
             $cartItem = [
                 'id' => $target_product->id,
                 'name' => $target_product->name,

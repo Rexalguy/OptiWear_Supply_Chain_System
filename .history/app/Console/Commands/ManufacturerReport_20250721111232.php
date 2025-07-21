@@ -52,7 +52,7 @@ class ManufacturerReport extends Command
         $date = now()->format('Y-m-d-H:i:s');
         $still = RawMaterial::whereColumn('current_stock', '>', DB::raw('reorder_level * 2'))->count();
         $low = RawMaterial::whereColumn('current_stock', '>=', 'reorder_level')
-            ->whereColumn('current_stock', '<', DB::raw('reorder_level * 2'))
+            ->whereColumn('current_stock', '<', \DB::raw('reorder_level * 2'))
             ->count();
         $out = RawMaterial::whereColumn('current_stock', '<', 'reorder_level')->count();
 
