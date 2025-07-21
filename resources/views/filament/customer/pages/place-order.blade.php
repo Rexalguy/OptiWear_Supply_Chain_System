@@ -162,13 +162,21 @@
 
         <!-- Category Tabs -->
         <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="category-nav flex space-x-4 overflow-x-auto pb-1" aria-label="Categories">
+             <nav class="category-nav flex space-x-4 overflow-x-auto pb-1" aria-label="Categories">
                 <!-- All Categories Tab -->
                 <button
                     wire:click="$set('selectedCategory', '')"
                     class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory === '' ? 'tab-active border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 >
                     All Products
+                </button>
+
+                <!-- Recommendations Tab -->
+                <button
+                    wire:click="$set('selectedCategory', 'recommendations')"
+                    class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory === 'recommendations' ? 'tab-active border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                >
+                    Recommendations
                 </button>
                 
                 <!-- Category Tabs -->
@@ -231,7 +239,7 @@
             {{-- Products Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
     @foreach ($products as $product)
-        <div class="product-card dark-gradient-card rounded-lg overflow-hidden">
+        <div class="product-card dark-gradient-card rounded-lg overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
 
             {{-- Image Section with Overlay --}}
             <div class="product-image-container relative w-full">

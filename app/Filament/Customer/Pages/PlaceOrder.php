@@ -30,6 +30,7 @@ class PlaceOrder extends Page
     // Category filtering
     public string $selectedCategory = '';
     public $categories;
+    public $recommendedProducts;
 
     // Size selection UI
     public array $showSizeDropdown = [];
@@ -59,6 +60,7 @@ class PlaceOrder extends Page
 
         // Load categories and products
         $this->categories = ShirtCategory::all();
+        $this->recommendedProducts = Product::where('quantity_available', '>', 0)->inRandomOrder()->limit(4)->get();
         $this->loadProducts();
 
         // Update tokens & wishlist
@@ -69,6 +71,11 @@ class PlaceOrder extends Page
     /* Load products based on selected category */
     protected function loadProducts(): void
     {
+        if ($this->selectedCategory === 'recommendations') {
+            $this->products = $this->recommendedProducts;
+            return;
+        }
+        
         $query = Product::where('quantity_available', '>', 0)->with('shirtCategory');
         
         if ($this->selectedCategory) {

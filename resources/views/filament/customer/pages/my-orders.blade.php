@@ -110,6 +110,38 @@
                         <span>UGX {{ number_format($this->subtotal) }}</span>
                     </div>
 
+                    {{-- Token Usage Toggle --}}
+                    @if ($userTokens > 0)
+                        <div class="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center space-x-2">
+                                <input 
+                                    type="checkbox" 
+                                    id="useTokens" 
+                                    wire:model.live="useTokens"
+                                    wire:click="toggleTokenUsage"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                >
+                                <label for="useTokens" class="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                    Use {{ min($userTokens, 200) }} tokens
+                                    @if ($userTokens >= 200)
+                                        (UGX 10,000 discount)
+                                    @else
+                                        (UGX {{ number_format($userTokens * 50) }} discount)
+                                    @endif
+                                </label>
+                            </div>
+                            <span class="text-blue-600 dark:text-blue-400 font-semibold">🎁</span>
+                        </div>
+                    @endif
+
+                    {{-- Show discount if tokens are being used --}}
+                    @if ($useTokens && $userTokens > 0)
+                        <div class="flex justify-between text-green-600 dark:text-green-400">
+                            <span>Token Discount</span>
+                            <span>- UGX {{ number_format($this->calculatePotentialDiscount()) }}</span>
+                        </div>
+                    @endif
+
                     @if ($this->deliveryOption === 'delivery')
                         <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-gray-400">Delivery</span>
