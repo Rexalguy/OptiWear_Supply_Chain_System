@@ -121,22 +121,22 @@
                 <!-- Slides -->
                 <template x-for="(slide, index) in [
                     {
-                        image: '{{ asset("Banners/men\'s collection.jpg") }}',
+                        image: '{{ asset("storage/Banners/men\'s collection.jpg") }}',
                         title: '🔥 50% OFF',
                         subtitle: 'Limited-time offer on classic shirts'
                     },
                     {
-                        image: '{{ asset("Banners/models.jpg") }}',
+                        image: '{{ asset("storage/Banners/models.jpg") }}',
                         title: '🆕 New Arrival',
                         subtitle: 'Modern casual collection just dropped'
                     },
                     {
-                        image: '{{ asset("Banners/tshirt rack.jpg") }}',
+                        image: '{{ asset("storage/Banners/tshirt rack.jpg") }}',
                         title: '🚚 Free Delivery',
                         subtitle: 'Enjoy free shipping on orders over UGX 150,000'
                     },
                     {
-                        image: '{{ asset("Banners/womens.jpg") }}',
+                        image: '{{ asset("storage/Banners/womens.jpg") }}',
                         title: '🎁 Rewards Program',
                         subtitle: 'Earn tokens every time you shop'
                     }
