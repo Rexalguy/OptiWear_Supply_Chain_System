@@ -16,6 +16,12 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
+    // Dynamic title method
+    public function getTitle(): string
+    {
+        return 'Welcome,  ' .  (Auth::user()->name ?? 'Guest');
+    }
+
     // UI / modal state
     public ?Product $clickedProduct = null;
     public bool $selectedProduct = false;
