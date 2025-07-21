@@ -15,7 +15,7 @@
             
         >
             <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                <img src="{{ $product->image}}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
+                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
             </div>
             <div>
                 <div>
