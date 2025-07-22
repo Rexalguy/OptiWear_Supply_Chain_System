@@ -188,7 +188,7 @@ class ShirtSupplyChainSeeder extends Seeder
         $productImages = [
     'Polo Tee' => 'storage/images/poloTee.jpg',
     'Henley Shirt' => 'storage/images/henleyShirt.jpg',
-    'V-Neck Shirt' => 'storage/images/vNeckShirt.jpg',
+    'V-Neck Shirt' => 'storage/images/vneckTee.jpg',
     'Basic Tee' => 'storage/images/basicTee.jpg',
     'Striped Shirt' => 'storage/images/stripedShirt.jpg',
     'Round Neck Tee' => 'storage/images/roundNeckTee.jpg',
@@ -278,7 +278,7 @@ class ShirtSupplyChainSeeder extends Seeder
                     'quantity_available' => rand(100, 600),
                     'shirt_category_id' => $category->id, // new correct relationship
                     'low_stock_threshold' => rand(80, 120),
-                    'image' => $productImages[$productName] ?? null,
+                    'image' => $productImages[$productName] ?? 'storage/images/default.jpg',
                     'available_sizes' => json_encode(
                         collect(['S', 'M', 'L', 'XL'])->shuffle()->take(rand(2, 4))->sort()->values()->all()
                     ),
