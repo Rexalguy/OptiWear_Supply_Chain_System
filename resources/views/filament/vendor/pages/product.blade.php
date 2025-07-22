@@ -15,14 +15,14 @@
             
         >
             <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
             </div>
             <div>
                 <div>
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
-                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
+                    <select wire:model="bale_size.{{ $product->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
@@ -74,7 +74,7 @@
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                        <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
+                        <select wire:model="bale_size.{{ $clickedProduct->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>

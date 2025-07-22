@@ -16,7 +16,7 @@ class Product extends Page
 
     public $cart = [];
     public $cartCount = 0;
-    public $bale_sizes = [];
+    public $bale_size = [];
     public $clickedProduct = null;
     public $selectedProduct = false;
     public $products;
@@ -64,8 +64,9 @@ class Product extends Page
     public function addToCart($productId)
     {
         ProductModel::findOrFail($productId);
-        $baleSize = (int) $this->bale_size;
+        $baleSize = (int) ($this->bale_size[$productId] ?? 0);
         if ($baleSize <= 0) {
+            $this->notify('Please select a bale size before adding to cart', 'danger');
             return;
         }
         $target_product = ProductModel::find($productId);
@@ -76,7 +77,6 @@ class Product extends Page
                 'price' => $target_product->unit_price,
                 'quantity' => $baleSize,
                 'image' => $target_product->image,
-
             ];
             if (isset($this->cart[$target_product->id])) {
                 $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];

@@ -1,7 +1,3 @@
-@php
-    \Illuminate\Pagination\Paginator::useTailwind();
-@endphp
-
 <x-filament-panels::page>
 <div>
     <h1 class="text-2xl font-bold mb-4 flex justify-center">
@@ -36,7 +32,7 @@
                     </div>
                 </div>
             </div>
-        @else
+    @empty
             <div class="text-center py-16">
                 <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
                     <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" Box="0 0 24 24">
@@ -55,8 +51,29 @@
                     </x-filament::button>
                 </a>
             </div>
-        @endif
-        {{ $this->orders->links() }}
+    @endforelse
+
+    @if (!empty($cart) && count($cart))
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-6 gap-4">
+            <div>
+                <label for="delivery_option" class="block font-semibold mb-1">Delivery Option:</label>
+                <select id="delivery_option" wire:model="delivery_option" class="form-select rounded-md shadow-sm" style="min-width: 200px;">
+                    <option value="pickup">Pickup</option>
+                    <option value="delivery">Delivery</option>
+                </select>
+            </div>
+            <div>
+                <x-filament::button 
+                    color="primary"
+                    wire:click="placeFullOrder"
+                    icon="heroicon-o-check-circle"
+                >
+                    Place Order
+                </x-filament::button>
+            </div>
+        </div>
+    @endif
+       
     </div>
 </x-filament-panels::page>
 
