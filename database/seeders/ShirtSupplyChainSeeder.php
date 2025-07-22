@@ -188,7 +188,7 @@ class ShirtSupplyChainSeeder extends Seeder
         $productImages = [
     'Polo Tee' => 'storage/images/poloTee.jpg',
     'Henley Shirt' => 'storage/images/henleyShirt.jpg',
-    'V-Neck Shirt' => 'storage/images/vneckShirt.jpg',
+    'V-Neck Shirt' => 'storage/images/vneckTee.jpg',
     'Basic Tee' => 'storage/images/basicTee.jpg',
     'Striped Shirt' => 'storage/images/stripedShirt.jpg',
     'Round Neck Tee' => 'storage/images/roundNeckTee.jpg',
