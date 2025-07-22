@@ -37,7 +37,7 @@ class VendorPanelProvider extends PanelProvider
             ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
             ->colors([
-                'primary' => Color::Sky,
+                'primary' => Color::Teal,
                 'info' => Color::Blue,
                 'success' => Color::Emerald,
                 'warning' => Color::Yellow,
