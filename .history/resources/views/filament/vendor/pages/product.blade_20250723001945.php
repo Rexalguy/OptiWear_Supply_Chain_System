@@ -97,12 +97,12 @@
         </style>
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in p-4 overflow-y-auto pt-16" style="cursor:pointer;" wire:click.self="closeProductModal">
             <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg relative modal-slide-up my-8 mx-auto" style="cursor:auto;" @click.stop>
-                <div class="w-full h-36 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden flex-shrink-0 pt-4">
+                <div class="w-full h-36 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden flex-shrink-0">
                 <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="max-w-full max-h-full object-contain rounded">
                 </div>
                 <div>
                     <div>
-                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}s</h3>
+                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
