@@ -186,29 +186,29 @@ class ShirtSupplyChainSeeder extends Seeder
         }
         // PRODUCT IMAGES (from your earlier URLs)
         $productImages = [
-    'Polo Tee' => 'https://www.sportsdirect.com/images/products/54203303_l.jpg',
-    'Henley Shirt' => 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ4uz0aDCTHoDQKiSGdj0yb0lRv_hyMNle-SNnufvRH1Xhd6XuLFs6cuUk6x-dUYsHhCmxMRJV2lA57yWceUyKe6R2bksQfybN9p4BCMH5r29AvLKHkeYvXgCj-4YBoZTLZhWdC8Kk&usqp=CAc',
-    'V-Neck Shirt' => 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTtAjeiP_6mBPl3xTUx4i2mLgj9MitxDvXcDaDXty36R9J923y2NUQDCm6MWBlcG9KC_aN2SofOTUJ89YGfEwh4oFXAJhsDxDGovAnDUJeih0AoMTmUaPOIXn2MWUwhbfwG7q369rn0xw&usqp=CAc',
-    'Basic Tee' => 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQhsjykTunYtNeedTqc0LvEB3nGuesyNopr6YyT9yDxKhFXp9teADv-1O8gsWHhRZl5XzrA0XbbRUr4jXXW5cMZjsOgujR6uTUo6S28b_gCn1jNmENv3J48Ojv8dN7uqpM43at64g&usqp=CAc',
-    'Striped Shirt' => 'https://idltbasics.com/cdn/shop/files/SKU-01-Bigblackapricotstrips.jpg?v=1749135433',
-    'Round Neck Tee' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaaB5dSkrLchEYTYkES8S7LWAkgDA54Zr3OQ&s',
-    'Oversized Tee' => 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQKmXEYtvjd9DJZ37jOuhR_Ez57LXX_SInFANPIHE6oxYVbjX6xfQk7n_IBBf4xdnjfxHji0izguUyc2lwF_yU1lReyadAOdwcYCp4cl_cp152A0mOFc1aoLEjiJ4AmPz6ZSp1hHw&usqp=CAc',
-    'Short Sleeve Tee' => 'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTZs0zJlmnRiLY-7IvkfbB8k-piXNXSaY9NWWf_H-OcKFz3Dr2JiHkgBU-qhFMnNv3YFX8iGF4oUwSnxrOw9JgeXEzJIs_ihE0bdTdoSeJbex9VcWv7Kh4TLVsLw_HpUKPxhsPddiHXQQ&usqp=CAc',
+    'Polo Tee' => 'storage/images/poloTee.jpg',
+    'Henley Shirt' => 'storage/images/henleyShirt.jpg',
+    'V-Neck Shirt' => 'storage/images/vneckTee.jpg',
+    'Basic Tee' => 'storage/images/basicTee.jpg',
+    'Striped Shirt' => 'storage/images/stripedShirt.jpg',
+    'Round Neck Tee' => 'storage/images/roundNeckTee.jpg',
+    'Oversized Tee' => 'storage/images/oversizedTee.jpg',
+    'Short Sleeve Tee' => 'storage/images/shortSleeveTee.jpg',
 
-    'Business Shirt' => 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQiX7bp5_blScEn7kd__NZ39U6lH9JWccAoeMGRPGqH_-1fvI2jkHAyzV0knQaAZn8hMGb_pZHBy3cxvhU1iujwBsfGmeA5KvoT__Fi9J4yTcakyrAddJlwpchS_Z8pTHfPnlQsSNI&usqp=CAc',
-    'Oxford Shirt' => 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcS4Aa153MSELZGV3wejadfQXMDZtS-C0wAsVh598bEehAkIkJavs6XHRrJepiVDa4AvkQq1eLcawTbQYEywOM4AwBWOxxAUfu1RwIdb6iGp6_UjstqHUNqQ3PTN7mAhvVu0IYqhiA&usqp=CAc',
-    'Spread Collar Shirt' => 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRNSEI0vUm2rOflnYQgRtSSZTvsoSLbXEBzDEPScrCoYxmdNNf2nAq_5WNoJnm_uD2hgzzsI4sTnMUq6QCoNByyZ4lOKVY7dOZVk3DRjXzDSIOTSghKH1phTjpgYny6vzPWHH0KYufC_g&usqp=CAc',
-    'Tuxedo Shirt' => 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRbyA-Ht98wIFvOck4yrmCD_6VrDKiC4WmiHrtQep4s03bytpPuncPAr8Ka24iswwJC6OnCV5kG3cag1OB2Updiqi6LAUhty-VKUe6AqrBrDmx3ky9TE-Ttx2x5ZDBLZENoJ58-c0pM-w&usqp=CAc',
-    'Classic Dress Shirt' => 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSeArP7bIdJJtZ8hbJmpBSyfkijTx963-fBM5byTvpOb9pxD_18cKsMgh7QNssri7YUFVGlKM3TVL3aU7bVLKexyX3cnVKNJyCSyqVQ6zpxFs9xpjlm6rNk4X-8pGQQLp9rwZjFIE1hUfA&usqp=CAc',
-    'French Cuff Shirt' => 'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTHhleh9y0jeaBW91kn7D0AlVqg-P9pdui0HtN_8RtPxnZ1OK_PdjrezIVyAeybLF1XRpW1eZQPuZoA9sK3tj0CMDJL04qIktaJCnYwVAEhm2QKdkmiTm8VNSPV14ZQHDNrF4yyWg&usqp=CAc',
-    'Slim Fit Shirt' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtr-8XnnKkoz1EE1iczHxHaU3vuEQI84JIA3nu-FUpjZ81TEu5a3i-HRZtU4BevdGMsvo&usqp=CAU',
-    'Pleated Front Shirt' => 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS6Hy7Z4kam8ciBe72qc8qB9KUzPrtidjsOjfuh8r_5ntf7vhHNp-H6PROWiGVzH4Lh1d7jLkHRE1Gyo07QzxgZC_2BAFbnaz6LqzsH9PjOzdPzfhVMeBQ-XFQLSJ0lrxNfzuGTorM&usqp=CAc',
+    'Business Shirt' => 'storage/images/businessShirt.jpg',
+    'Oxford Shirt' => 'storage/images/oxfordShirt.jpg',
+    'Spread Collar Shirt' => 'storage/images/spreadCollarShirt.jpg',
+    'Tuxedo Shirt' => 'storage/images/tuxedoShirt.jpg',
+    'Classic Dress Shirt' => 'storage/images/classicDressShirt.jpg',
+    'French Cuff Shirt' => 'storage/images/frenchCuffShirt.jpg',
+    'Slim Fit Shirt' => 'storage/images/slimFitShirt.jpg',
+    'Pleated Front Shirt' => 'storage/images/pleatedFrontShirt.jpg',
 
-    
-    'Athletic Shirt' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsbvIizzIwfBUf3L1hWArvha0nE3VGyzsufw&s',
-    'Running Shirt' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4debooxucGhhWpp_Xwb8NWWubeMvGd4p-0Q&s',
-    'Training Tee' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrAlCBRF3iHFlBIx2LVs0QC1dJuiRaZuMRcg&s',
-    'Dry-Fit Shirt' => 'https://m.media-amazon.com/images/I/51K32NtmBYL._AC_UY1000_.jpg',
+
+    'Athletic Shirt' => 'storage/images/athleticShirt.jpg',
+    'Running Shirt' => 'storage/images/runningShirt.jpg',
+    'Training Tee' => 'storage/images/trainingTee.jpg',
+    'Dry-Fit Shirt' => 'storage/images/dryFitShirt.jpg',
     'Compression Shirt' => 'storage/images/compressionShirt.jpg',
     'Gym Tank' => 'storage/images/gymTank.jpg',
     'Performance Polo' => 'storage/images/performancePolo.jpg',
@@ -278,7 +278,7 @@ class ShirtSupplyChainSeeder extends Seeder
                     'quantity_available' => rand(100, 600),
                     'shirt_category_id' => $category->id, // new correct relationship
                     'low_stock_threshold' => rand(80, 120),
-                    'image' => $productImages[$productName] ?? null,
+                    'image' => $productImages[$productName] ?? 'storage/images/default.jpg',
                     'available_sizes' => json_encode(
                         collect(['S', 'M', 'L', 'XL'])->shuffle()->take(rand(2, 4))->sort()->values()->all()
                     ),
