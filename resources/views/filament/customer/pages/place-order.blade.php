@@ -36,31 +36,36 @@
             background-color: #ffffff; /* Keep dark slate in dark mode */
         }
 
-        /* Price styling */
+        /* Enhanced price styling with better hierarchy */
         .price-container {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             flex-wrap: wrap;
-            margin: 0.5rem 0;
+            margin: 0.75rem 0;
         }
         .current-price {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #10b981; /* Green for current price */
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: #10b981;
+            letter-spacing: -0.025em;
         }
         .original-price {
             font-size: 1rem;
             color: #9ca3af;
             text-decoration: line-through;
+            font-weight: 500;
         }
         .discount-badge {
-            background-color: #ef4444;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
         }
 
         /* Improved image quality for banner slider */
@@ -82,6 +87,8 @@
             backface-visibility: hidden;
             contain: layout style paint;
             overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         /* Anti-aliasing and smoothing */
@@ -92,6 +99,48 @@
             transform: translateZ(0);
             -webkit-transform: translate3d(0,0,0);
             transform: translate3d(0,0,0);
+        }
+
+        /* Enhanced product grid spacing */
+        .products-grid {
+            gap: 1.5rem;
+        }
+        
+        /* Subtle product card enhancements */
+        .product-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Image zoom effect only */
+        .product-image-container {
+            overflow: hidden;
+        }
+        
+        .product-image-container img {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .product-image-container:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Better typography for product names */
+        .product-name {
+            line-height: 1.4;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+        }
+
+        /* Enhanced token section */
+        .token-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .dark .token-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
         }
     </style>
 
@@ -226,21 +275,21 @@
         </div>
 
         {{-- Cart token info --}}
-<div class="token-cart-wrapper flex flex-col md:flex-row justify-between items-center mb-10 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm">
-    <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-3 md:mb-0 font-medium">
+<div class="token-cart-wrapper token-section flex flex-col md:flex-row justify-between items-center mb-10 p-6 rounded-xl shadow-sm">
+    <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-4 md:mb-0 font-medium">
         @if ($potentialTokens > 0)
-            🎁 You will earn <strong class="text-primary-600 dark:text-primary-400">{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
+            🎁 You will earn <strong class="text-primary-600 dark:text-primary-400 font-bold">{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
         @else
-            Make a purchase above <strong class="text-primary-600 dark:text-primary-400">UGX 50,000</strong> to earn tokens 🎁
+            Make a purchase above <strong class="text-primary-600 dark:text-primary-400 font-bold">UGX 50,000</strong> to earn tokens 🎁
         @endif
     </div>
 
-    <a href="{{ url('/customer/my-orders') }}" class="relative inline-flex items-center gap-2 px-5 py-3 text-base font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-700 rounded-md transition hover:from-sky-600 hover:to-sky-800 custom-cart-btn">
+    <a href="{{ url('/customer/my-orders') }}" class="relative inline-flex items-center gap-2 px-6 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-sky-500 to-sky-700 rounded-xl transition-all duration-300 hover:from-sky-600 hover:to-sky-800 hover:shadow-lg hover:scale-105 custom-cart-btn">
         <x-heroicon-o-shopping-cart class="w-5 h-5" />
         View Cart
 
         @if ($this->cartCount > 0)
-            <span class="cart-badge absolute top-0 right-0 -mt-2 -mr-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full">
+            <span class="cart-badge absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full shadow-lg animate-pulse">
                 {{ $this->cartCount }}
             </span>
         @endif
@@ -271,29 +320,31 @@
             </div>
         @else
             {{-- Products Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 products-grid">
     @foreach ($products as $product)
-        <div class="product-card dark-gradient-card rounded-lg overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
+        <div class="product-card dark-gradient-card rounded-xl overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
 
             {{-- Image Section with Overlay --}}
             <div class="product-image-container relative w-full">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
-                <div class="top-quality-overlay">New Stock</div>
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
+                @if($product->quantity_available > ($product->low_stock_threshold + 200))
+                    <div class="top-quality-overlay">New Stock</div>
+                @endif
             </div>
 
-            <h3 class="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100 px-4 pt-3">
-                {{ $product->name }}
-            </h3>
+            <div class="p-4 space-y-3">
+                <h3 class="product-name text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100">
+                    {{ $product->name }}
+                </h3>
 
-            <p class="text-lg font-bold text-gray-900 dark:text-gray-200 px-4">
-                 UGX {{ number_format($product->unit_price) }}
-            </p>
+                <p class="text-xl font-bold text-gray-900 dark:text-gray-200">
+                     UGX {{ number_format($product->unit_price) }}
+                </p>
 
-            <div class="mt-4 px-4 pb-4">
                 <x-filament::button
                     size="sm"
                     color="primary"
-                    class="custom-order-btn full-width-animated-btn"
+                    class="custom-order-btn full-width-animated-btn w-full"
                     wire:click="openProductModal({{ $product->id }})"
                     icon="heroicon-o-shopping-cart"
                 >
@@ -312,7 +363,7 @@
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in"
              wire:click.self="closeProductModal">
 
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-2xl w-full mx-4 relative modal-slide-up"
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-4xl w-full mx-4 relative modal-slide-up border border-gray-200 dark:border-gray-700"
              @click.stop>
 
             {{-- Close Button --}}
@@ -324,7 +375,7 @@
             <div class="flex flex-col md:flex-row">
                 {{-- Left: Product Image (25% width) --}}
                 <div class="w-full md:w-1/4 p-4 flex items-center justify-center image-container">
-                    <img src="{{ $clickedProduct->image }}"
+                    <img src="{{ asset($clickedProduct->image) }}"
                          alt="{{ $clickedProduct->name }}"
                          class="max-h-[400px] w-auto object-contain" />
                 </div>

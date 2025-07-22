@@ -38,9 +38,8 @@ class Product extends Page
         return __('Purchase products in bulk at discounted rates.');
     }
     public function mount()
+    
     {
-        $this->cart = session()->get('cart', []);
-        $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
         $this->products = ProductModel::all();
     }
     public function openProductModal($productId)

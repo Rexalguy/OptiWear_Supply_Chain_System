@@ -40,7 +40,7 @@ class Product extends Page
     public function mount()
     {
         $this->cart = session()->get('cart', []);
-        $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
+        $this->cartCount = array_sum(array_column($this->cart, 'quantity'));   
         $this->products = ProductModel::all();
     }
     public function openProductModal($productId)

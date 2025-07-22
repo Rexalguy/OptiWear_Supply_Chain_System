@@ -13,7 +13,7 @@
                 <div class="flex gap-4 items-center align-top mt-0">
                     <div style="margin-top: -30px;" class="w-full text-start md:text-left">
                         <h4 class="font-semibold">{{ $item['name'] }}</h4>
-                        <p>Price: UGX {{ $item['price'] }}</p>
+                        <p>Price: I{{ $item['price'] }}</p>
                         <p>Quantity: {{ $item['quantity'] }}</p>
                     </div>
                     <div class="flex flex-col gap-4 items-center align-top mt-0">
