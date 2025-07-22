@@ -19,7 +19,7 @@
             </div>
             <div>
                 <div>
-                    <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
+                    <h3 class="text-lg font-semibold">{{ $product->name }}s</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
                     <select wire:model="bale_size.{{ $product->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
@@ -66,7 +66,7 @@
             <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
                 <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-4xl font-extrabold focus:outline-none close-btn-animate" style="right:1rem;top:1rem;" wire:click="closeProductModal" aria-label="Close">&times;</button>
                 <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
-                <img src="{{ $clickedProduct->image}}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
+                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
                 </div>
                 <div>
                     <div>

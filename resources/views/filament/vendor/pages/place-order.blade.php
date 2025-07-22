@@ -4,76 +4,93 @@
         Checkout Page <span style="color: orange" class="px-2"> {{ $cartCount }} </span> Items in the Cart
     </h1>
     @forelse ($cart as $item)
-        <div class="grid grid-cols-1 rounded-xl p-4 shadow bg-white dark:bg-gray-900 md:grid-cols-2  items-center justify-between mb-4">
-            <div>
-                <div class="">
-                <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                    <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" class="h-full w-auto object-contain">
+        {{-- Main cart item container with flex layout --}}
+        <div style="color: white !important; background-color: #4b5563; !important;" class="flex gap-6 p-4  rounded-lg mb-4 shadow-sm">
+            {{-- Left side: Product details and controls --}}
+            <div class="flex-1">
+                {{-- Product image --}}
+                <div style="background-color: white !important;" class="w-48 h-48 flex items-start justify-center bg-white rounded-md mb-3 overflow-hidden flex-shrink-0">
+                    <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
                 </div>
-                <div class="flex gap-4 items-center align-top mt-0">
-                    <div style="margin-top: -30px;" class="w-full text-start md:text-left">
-                        <h4 class="font-semibold">{{ $item['name'] }}</h4>
-                        <p>Price: UGX {{ $item['price'] }}</p>
-                        <p>Quantity: {{ $item['quantity'] }}</p>
+                
+                {{-- Product info and quantity controls in one row --}}
+                <div class="flex justify-between items-start mb-4">
+                    {{-- Product info --}}
+                    <div>
+                        <h4 class="font-semibold text-lg">{{ $item['name'] }}s</h4>
+                        <p class="">Price: UGX {{ $item['price'] }}</p>
+                        <p class="">Quantity: {{ $item['quantity'] }}</p>
                     </div>
-                    <div class="flex flex-col gap-4 items-center align-top mt-0">
-                        <div class="flex space-x-5 gap-3">
+                    
+                    {{-- Quantity control buttons --}}
+                    <div class="space-y-2 mt-3">
+                        <div class="flex gap-2 space-x-2">
                             <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 100)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">100</x-filament::button>
                             <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 100)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">100</x-filament::button>
                         </div>
-                        <div class="flex space-x-5 gap-3">
+                        <div class="flex gap-2 space-x-2">
                             <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 350)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">350</x-filament::button>
                             <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 350)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">350</x-filament::button>
                         </div>
-                        <div class="flex space-x-5 gap-3">
+                        <div class="flex gap-2 space-x-2">
                             <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 750)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">750</x-filament::button>
                             <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 750)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">750</x-filament::button>
                         </div>
                     </div>
                 </div>
-            </div>
-    @empty
-            <div class="text-center py-16">
-                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
-                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" Box="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
+                
+                {{-- Action buttons --}}
+                <div class="flex gap-3">
+                    <x-filament::button wire:click="removeItem({{ $item['id'] }})" padding="sm" color="danger" size="sm">Remove Item</x-filament::button>
+                    <x-filament::button wire:click="placeOrder({{ $item['id'] }})" padding="sm" color="success" size="sm">Place Order</x-filament::button>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">No orders yet</h3>
-                <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">You haven't placed any orders yet. Start shopping to see your order history here.</p>
-                <a href="{{ url('/vendor/product') }}">
-                    <x-filament::button 
-                        class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
-                        size="lg"
-                        icon="heroicon-m-shopping-bag"
-                    >
-                        Start Shopping
-                    </x-filament::button>
-                </a>
             </div>
-    @endforelse
+            
+            {{-- Right side: Package breakdown --}}
+            <div class="w-80 p-4 rounded-lg bg-slate-400">
+                <h2 style="font-weight:bold !important; color: rgb(31, 221, 31) !important;" class="font-semibold text-lg mb-3">Selected Package Breakdown</h2>
+                @if(isset($item['packages']['premium']) && $item['packages']['premium'] > 0)
+                    <div class="mb-2">
+                        <li class="text-sm">Premium Packages: {{ $item['packages']['premium'] }} (5% Discount)</li>
+                    </div>
+                @endif
+                @if(isset($item['packages']['standard']) && $item['packages']['standard'] > 0)
+                    <div class="mb-2">
+                        <li class="text-sm">Classic Packages: {{ $item['packages']['standard'] }} (3% Discount)</li>
+                    </div>
+                @endif
+                @if(isset($item['packages']['starter']) && $item['packages']['starter'] > 0)
+                    <div class="mb-2">
+                        <li class="text-sm">Starter Packages: {{ $item['packages']['starter'] }} (2% Discount)</li>
+                    </div>
+                @endif
+                <div style="margin-top: 5px !important;" class="mt-4">
+                    <h2 style="font-weight:bold !important; color: rgb(31, 221, 31) !important;">Pick Delivery Option</h2>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="standard" class="mr-2"> 
+                            <span>Standard Delivery (3-5 days) : UGX 3000</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="express" class="mr-2"> 
+                            <span>Express Delivery (1 day) : UGX 5000</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="pickup" class="mr-2"> 
+                            <span>Pick Up : UGX 0</span>
+                        </label>
+                    </div>
+                </div>
 
-    @if (!empty($cart) && count($cart))
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-6 gap-4">
-            <div>
-                <label for="delivery_option" class="block font-semibold mb-1">Delivery Option:</label>
-                <select id="delivery_option" wire:model="delivery_option" class="form-select rounded-md shadow-sm" style="min-width: 200px;">
-                    <option value="pickup">Pickup</option>
-                    <option value="delivery">Delivery</option>
-                </select>
-            </div>
-            <div>
-                <x-filament::button 
-                    color="primary"
-                    wire:click="placeFullOrder"
-                    icon="heroicon-o-check-circle"
-                >
-                    Place Order
-                </x-filament::button>
             </div>
         </div>
-    @endif
-       
-    </div>
+            
+            
+    @empty
+        <div class="text-center text-gray-500 my-5 py-5">
+            <p>Your cart is empty. Please add some products to proceed with checkout.</p>
+        </div>
+    @endforelse
+</div>
 </x-filament-panels::page>
 

@@ -5,6 +5,7 @@ namespace App\Filament\Vendor\Pages;
 use Filament\Forms;
 use App\Models\Product;
 use Filament\Pages\Page;
+
 use Filament\Notifications\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -32,6 +33,11 @@ class PlaceOrder extends Page
         self::getNavigationBadge();
         $this->cart = session()->get('cart', []);
         $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
+
+        // Calculate packages for each cart item
+        foreach ($this->cart as $id => $item) {
+            $this->cart[$id]['packages'] = $this->calculatePackages($id, $item['quantity']);
+        }
         $this->delivery_option = session()->get('delivery_option', 'pickup');
     }
 
@@ -45,12 +51,26 @@ class PlaceOrder extends Page
         $cartCount = session()->get('cartCount', 0);
         return (string) $cartCount;
     }
+    public function calculatePackages($productId, $quantity)
+    {
+        $premiumCount = floor($quantity / 750);
+        $remainder = $quantity % 750;
+        $standardCount = floor($remainder / 350);
+        $remainder = $remainder % 350;
+        $starterCount = floor($remainder / 100); // Changed from 150 to 100 to match your starter package size
 
+        return [
+            'premium' => $premiumCount,
+            'standard' => $standardCount,
+            'starter' => $starterCount,
+        ];
+    }
     public function reduceQuantity($id, $quantity = 1)
     {
         if (isset($this->cart[$id])) {
             if ($this->cart[$id]['quantity'] > $quantity) {
                 $this->cart[$id]['quantity'] -= $quantity;
+                $this->cart[$id]['packages'] = $this->calculatePackages($id, $this->cart[$id]['quantity']);
             } else {
                 unset($this->cart[$id]);
             }
@@ -65,6 +85,7 @@ class PlaceOrder extends Page
     {
         if (isset($this->cart[$id])) {
             $this->cart[$id]['quantity'] += $quantity;
+            $this->cart[$id]['packages'] = $this->calculatePackages($id, $this->cart[$id]['quantity']);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cart', $this->cart);
             session()->put('cartCount', array_sum(array_column($this->cart, 'quantity')));
