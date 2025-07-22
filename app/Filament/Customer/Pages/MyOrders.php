@@ -143,11 +143,9 @@ class MyOrders extends Page implements HasTable
     {
         $availableTokens = $this->userTokens;
         
-        if ($availableTokens >= 200) {
+        // Only allow redemption if user has MORE than 200 tokens
+        if ($availableTokens > 200) {
             return 10000; // UGX 10,000 discount for 200 tokens
-        } elseif ($availableTokens > 0) {
-            $maxDiscount = min($availableTokens * 100, floor($this->getCartTotal() / 100) * 100);
-            return $maxDiscount;
         }
         
         return 0;
@@ -178,16 +176,14 @@ class MyOrders extends Page implements HasTable
         $discount = 0;
         $tokensUsed = 0;
 
-        if ($availableTokens >= 200) {
+        // Only allow redemption if user has MORE than 200 tokens
+        if ($availableTokens > 200) {
             $tokensUsed = 200;
             $discount = 10000;
-        } elseif ($availableTokens > 0) {
-            $tokensUsed = min($availableTokens, floor($this->getCartTotal() / 100));
-            $discount = $tokensUsed * 100;
-        }
-
-        if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
-            $user->decrement('tokens', $tokensUsed);
+            
+            if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
+                $user->decrement('tokens', $tokensUsed);
+            }
         }
 
         return $discount;

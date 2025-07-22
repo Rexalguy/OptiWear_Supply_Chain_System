@@ -277,7 +277,7 @@
 
             {{-- Image Section with Overlay --}}
             <div class="product-image-container relative w-full">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
                 <div class="top-quality-overlay">New Stock</div>
             </div>
 
@@ -324,7 +324,7 @@
             <div class="flex flex-col md:flex-row">
                 {{-- Left: Product Image (25% width) --}}
                 <div class="w-full md:w-1/4 p-4 flex items-center justify-center image-container">
-                    <img src="{{ $clickedProduct->image }}"
+                    <img src="{{ asset($clickedProduct->image) }}"
                          alt="{{ $clickedProduct->name }}"
                          class="max-h-[400px] w-auto object-contain" />
                 </div>
