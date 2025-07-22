@@ -22,7 +22,7 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}s</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
-                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                    <select wire:model="bale_size.{{ $product->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
@@ -73,7 +73,7 @@
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                        <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                        <select wire:model="bale_size.{{ $clickedProduct->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>

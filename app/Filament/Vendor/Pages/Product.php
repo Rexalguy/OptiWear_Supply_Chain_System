@@ -47,6 +47,12 @@ class Product extends Page
         $this->cart = session()->get('cart', []);
         $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
         $this->products = ProductModel::all();
+        // Initialize bale_size for each product to 0 if not already set
+        foreach ($this->products as $product) {
+            if (!isset($this->bale_size[$product->id])) {
+                $this->bale_size[$product->id] = 0;
+            }
+        }
     }
 
     public function openProductModal($productId)
@@ -85,6 +91,8 @@ class Product extends Page
             $this->cartCount = collect($this->cart)->sum('quantity');
             session()->put('cart', $this->cart);
             session()->put('cartCount', $this->cartCount);
+            // Reset only the bale size for this product after adding to cart
+            $this->bale_size[$productId] = 0;
         }
     }
 
