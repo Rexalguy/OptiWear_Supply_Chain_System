@@ -10,7 +10,7 @@
             <div class="flex-1">
                 {{-- Product image --}}
                 <div style="background-color: white !important;" class="w-48 h-48 flex items-start justify-center bg-white rounded-md mb-3 overflow-hidden flex-shrink-0">
-                    <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
+                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
                 </div>
                 
                 {{-- Product info and quantity controls in one row --}}

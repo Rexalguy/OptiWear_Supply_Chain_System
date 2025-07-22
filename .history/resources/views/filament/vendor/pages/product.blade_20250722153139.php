@@ -15,7 +15,7 @@
             
         >
             <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
+                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
             </div>
             <div>
                 <div>
@@ -66,7 +66,7 @@
             <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
                 <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-4xl font-extrabold focus:outline-none close-btn-animate" style="right:1rem;top:1rem;" wire:click="closeProductModal" aria-label="Close">&times;</button>
                 <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
-                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
+                <img src="{{ $clickedProduct->image}}" alt="{{ $clickedProduct->name }}" class="h-full w-auto object-contain">
                 </div>
                 <div>
                     <div>
