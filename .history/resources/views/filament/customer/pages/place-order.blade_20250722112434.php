@@ -127,8 +127,50 @@
             -moz-osx-font-smoothing: grayscale;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
-            -webkit-transform: translate3d(0,0,0);
-            transform: translate3d(0,0,0);
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+        }
+
+        /* Enhanced product grid spacing */
+        .products-grid {
+            gap: 1.5rem;
+        }
+        
+        /* Subtle product card enhancements */
+        .product-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Image zoom effect only */
+        .product-image-container {
+            overflow: hidden;
+        }
+        
+        .product-image-container img {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .product-image-container:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Better typography for product names */
+        .product-name {
+            line-height: 1.4;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+        }
+
+        /* Enhanced token section */
+        .token-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .dark .token-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
         }
 
         /* Enhanced product grid spacing */
@@ -283,12 +325,12 @@
         </div>
 
         {{-- Cart token info --}}
-<div class="token-cart-wrapper token-section flex flex-col md:flex-row justify-between items-center mb-10 p-6 rounded-xl shadow-sm">
-    <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-4 md:mb-0 font-medium">
+<div class="token-cart-wrapper flex flex-col md:flex-row justify-between items-center mb-10 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm">
+    <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-3 md:mb-0 font-medium">
         @if ($potentialTokens > 0)
-            🎁 You will earn <strong class="text-primary-600 dark:text-primary-400 font-bold">{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
+            🎁 You will earn <strong class="text-primary-600 dark:text-primary-400">{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
         @else
-            Make a purchase above <strong class="text-primary-600 dark:text-primary-400 font-bold">UGX 50,000</strong> to earn tokens 🎁
+            Make a purchase above <strong class="text-primary-600 dark:text-primary-400">UGX 50,000</strong> to earn tokens 🎁
         @endif
     </div>
 
@@ -297,7 +339,7 @@
         View Cart
 
         @if ($this->cartCount > 0)
-            <span class="cart-badge absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full shadow-lg animate-pulse">
+            <span class="cart-badge absolute top-0 right-0 -mt-2 -mr-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full">
                 {{ $this->cartCount }}
             </span>
         @endif
@@ -328,31 +370,29 @@
             </div>
         @else
             {{-- Products Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 products-grid">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
     @foreach ($products as $product)
-        <div class="product-card dark-gradient-card rounded-xl overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
+        <div class="product-card dark-gradient-card rounded-lg overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
 
             {{-- Image Section with Overlay --}}
             <div class="product-image-container relative w-full">
-                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
-                @if($product->quantity_available > ($product->low_stock_threshold + 200))
-                    <div class="top-quality-overlay">New Stock</div>
-                @endif
+                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
+                <div class="top-quality-overlay">New Stock</div>
             </div>
 
-            <div class="p-4 space-y-3">
-                <h3 class="product-name text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100">
-                    {{ $product->name }}
-                </h3>
+            <h3 class="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100 px-4 pt-3">
+                {{ $product->name }}
+            </h3>
 
-                <p class="text-xl font-bold text-gray-900 dark:text-gray-200">
-                     UGX {{ number_format($product->unit_price) }}
-                </p>
+            <p class="text-lg font-bold text-gray-900 dark:text-gray-200 px-4">
+                 UGX {{ number_format($product->unit_price) }}
+            </p>
 
+            <div class="mt-4 px-4 pb-4">
                 <x-filament::button
                     size="sm"
                     color="primary"
-                    class="custom-order-btn full-width-animated-btn w-full"
+                    class="custom-order-btn full-width-animated-btn"
                     wire:click="openProductModal({{ $product->id }})"
                     icon="heroicon-o-shopping-cart"
                 >
@@ -371,7 +411,7 @@
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in"
             wire:click.self="closeProductModal">
 
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-4xl w-full mx-4 relative modal-slide-up border border-gray-200 dark:border-gray-700"
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-2xl w-full mx-4 relative modal-slide-up"
              @click.stop>
 
                 {{-- Close Button --}}
@@ -381,12 +421,13 @@
                     &times;
                 </button>
 
-                <div class="flex flex-col md:flex-row">
-                    {{-- Left: Product Image (25% width) --}}
-                    <div class="w-full md:w-1/4 p-4 flex items-center justify-center image-container">
-                        <img src="{{ asset($clickedProduct->image) }}" alt="{{ $clickedProduct->name }}"
-                            class="max-h-[400px] w-auto object-contain" />
-                    </div>
+            <div class="flex flex-col md:flex-row">
+                {{-- Left: Product Image (25% width) --}}
+                <div class="w-full md:w-1/4 p-4 flex items-center justify-center image-container">
+                    <img src="{{ $clickedProduct->image }}"
+                         alt="{{ $clickedProduct->name }}"
+                         class="max-h-[400px] w-auto object-contain" />
+                </div>
 
                     {{-- Right: Product Details and Controls (75% width) --}}
                     <div class="w-full md:w-3/4 p-6 space-y-4">
