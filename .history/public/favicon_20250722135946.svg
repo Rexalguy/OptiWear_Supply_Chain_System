@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- White background for better visibility -->
+  <rect width="32" height="32" fill="#ffffff"/>
+  
+  <!-- Blue t-shirt silhouette -->
+  <path d="M10 8c0-1 1-2 2-2h1c0-2 2-3 5-3s5 1 5 3h1c1 0 2 1 2 2l-1 3v15c0 1-1 2-2 2H12c-1 0-2-1-2-2V11l-1-3z" fill="#2563eb"/>
+  
+  <!-- Darker blue collar detail -->
+  <path d="M13 6h6v1.5h-6z" fill="#1d4ed8"/>
+  
+  <!-- Blue sleeve details -->
+  <ellipse cx="9" cy="12" rx="1.5" ry="2" fill="#2563eb"/>
+  <ellipse cx="23" cy="12" rx="1.5" ry="2" fill="#2563eb"/>
+  
+  <!-- Subtle highlights for depth -->
+  <path d="M12 10h8v2h-8z" fill="#3b82f6" opacity="0.6"/>
+</svg>
