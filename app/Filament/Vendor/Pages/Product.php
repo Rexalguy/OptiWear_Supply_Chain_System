@@ -19,6 +19,7 @@ class Product extends Page
     public $bale_sizes = [];
     public $clickedProduct = null;
     public $selectedProduct = false;
+    public $products;
 
     public $delivery_method = 'pickup';
     public $notes = '';
@@ -87,21 +88,5 @@ class Product extends Page
             session()->put('cartCount', $this->cartCount);
         }
     }
-    public function closeProductModal()
-    {
-        $newQuantity = (int) $newQuantity;
 
-        if ($newQuantity <= 0) {
-            $this->removeFromCart($productId);
-            return;
-        }
-
-        $cart = $this->cart;
-
-        // if (isset($cart[$productId])) {
-        //     $cart[$productId]['quantity'] = $newQuantity;
-        //     $this->cart = $cart;
-        //     session(['cart' => $cart]);
-        // }
-    }
 }
