@@ -3,105 +3,36 @@
 @endphp
 
 <x-filament-panels::page>
-    
-    <style>
-        .order-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #f3f4f6;
-            transition: all 0.3s ease;
-        }
-        
-        .order-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-processing { background: #dbeafe; color: #1e40af; }
-        .status-completed { background: #d1fae5; color: #065f46; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
-        
-        .gradient-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 1.5rem;
-            border-radius: 1rem 1rem 0 0;
-            color: white;
-        }
-        
-        @media (prefers-color-scheme: dark) {
-            .order-card {
-                background-color: #1e293b;
-                border-color: #334155;
-            }
-        }
-        
-        .dark .order-card {
-            background-color: #1e293b;
-            border-color: #334155;
-        }
-    </style>
-
-    <div class="space-y-8">
-        @if ($this->orders->count())
-            <div class="order-card overflow-hidden">
-                <div class="gradient-header">
-                    <h2 class="text-2xl font-bold">📋 Order History</h2>
-                    <p class="text-white text-opacity-80 mt-1">{{ $this->orders->count() }} orders found</p>
+<div>
+    <h1 class="text-2xl font-bold mb-4 flex justify-center">
+        Checkout Page <span style="color: orange" class="px-2"> {{ $cartCount }} </span> Items in the Cart
+    </h1>
+    @forelse ($cart as $item)
+        <div class="grid grid-cols-1 rounded-xl p-4 shadow bg-white dark:bg-gray-900 md:grid-cols-2  items-center justify-between mb-4">
+            <div>
+                <div class="">
+                <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
+                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="h-full w-auto object-contain">
                 </div>
-                
-                <div class="p-6">
-                    <div class="grid gap-6">
-                        @foreach ($this->orders as $order)
-                            <div class="p-6 bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-slate-600 transition-all hover:shadow-md">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Order #{{ $order->id }}</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->created_at->format('M d, Y - H:i') }}</p>
-                                    </div>
-                                    <span class="status-badge status-{{ $order->status }}">{{ ucfirst($order->status) }}</span>
-                                </div>
-                                
-                                <div class="space-y-2 mb-4">
-                                    @foreach ($order->orderItems as $item)
-                                        <div class="flex justify-between text-sm">
-                                            <span class="text-gray-700 dark:text-gray-300">
-                                                {{ $item->product->name ?? 'Product' }} ({{ $item->quantity }}x)
-                                            </span>
-                                            <span class="font-medium text-gray-900 dark:text-white">
-                                                UGX {{ number_format($item->unit_price * $item->quantity) }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                
-                                <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-slate-600">
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        <span class="inline-flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                            </svg>
-                                            {{ ucfirst($order->delivery_method) }}
-                                        </span>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
-                                        <span class="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                            UGX {{ number_format($order->total) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                <div class="flex gap-4 items-center align-top mt-0">
+                    <div style="margin-top: -30px;" class="w-full text-start md:text-left">
+                        <h4 class="font-semibold">{{ $item['name'] }}</h4>
+                        <p>Price: UGX {{ $item['price'] }}</p>
+                        <p>Quantity: {{ $item['quantity'] }}</p>
+                    </div>
+                    <div class="flex flex-col gap-4 items-center align-top mt-0">
+                        <div class="flex space-x-5 gap-3">
+                            <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 100)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">100</x-filament::button>
+                            <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 100)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">100</x-filament::button>
+                        </div>
+                        <div class="flex space-x-5 gap-3">
+                            <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 350)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">350</x-filament::button>
+                            <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 350)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">350</x-filament::button>
+                        </div>
+                        <div class="flex space-x-5 gap-3">
+                            <x-filament::button wire:click="reduceQuantity({{ $item['id'] }}, 750)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before">750</x-filament::button>
+                            <x-filament::button wire:click="increaseQuantity({{ $item['id'] }}, 750)" color="success" size="xs" icon="heroicon-m-plus" icon-position="before">750</x-filament::button>
+                        </div>
                     </div>
                 </div>
             </div>

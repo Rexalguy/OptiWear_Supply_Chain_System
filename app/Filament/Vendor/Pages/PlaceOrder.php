@@ -5,8 +5,6 @@ namespace App\Filament\Vendor\Pages;
 use Filament\Forms;
 use App\Models\Product;
 use Filament\Pages\Page;
-use Filament\Notifications\Notification;
-
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
@@ -34,13 +32,6 @@ class PlaceOrder extends Page
         $cartCount = session()->get('cartCount', 0);
         return (string) $cartCount;
     }
-    public function notify(string $type, string $message): void
-    {
-        Notification::make()
-            ->title($message)
-            ->{$type}()
-            ->send();
-    }
     public function reduceQuantity($id, $quantity = 1)
     {
         if (isset($this->cart[$id])) {
@@ -52,9 +43,6 @@ class PlaceOrder extends Page
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cart', $this->cart);
             session()->put('cartCount', $this->cartCount);
-            $this->notify('success', 'Quantity reduced successfully.');
-        } else {
-            $this->notify('error', 'Product not found in cart.');
         }
         self::getNavigationBadge();
     }
@@ -65,9 +53,6 @@ class PlaceOrder extends Page
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cart', $this->cart);
             session()->put('cartCount', array_sum(array_column($this->cart, 'quantity')));
-            $this->notify('success', 'Quantity increased successfully.');
-        } else {
-            $this->notify('error', 'Product not found in cart.');
         }
         self::getNavigationBadge();
     }
@@ -78,11 +63,7 @@ class PlaceOrder extends Page
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cart', $this->cart);
             session()->put('cartCount', $this->cartCount);
-            $this->notify('success', 'Item removed from cart.');
-        } else {
-            $this->notify('error', 'Product not found in cart.');
         }
-
         self::getNavigationBadge();
     }
     public function placeOrder($id)
@@ -90,7 +71,6 @@ class PlaceOrder extends Page
         if (isset($this->cart[$id])) {
             $product = Product::find($id);
             if (!$product) {
-                $this->notify('error', 'Product not found.');
                 return;
             }
 
@@ -100,10 +80,8 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cartCount', $this->cartCount);
-            $this->notify('success', 'Order placed successfully.');
         } else {
             if (empty($this->cart)) {
-                $this->notify('error', 'Your cart is empty.');
                 return;
             }
         }
