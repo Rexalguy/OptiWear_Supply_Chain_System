@@ -110,13 +110,11 @@ class PlaceOrder extends Page
         if (isset($this->cart[$id])) {
             $product = Product::find($id);
             if (!$product) {
-                $this->notify('Product not found', 'danger');
                 return;
             }
 
             // Check for bale size before placing order
             if (empty($this->cart[$id]['quantity']) || $this->cart[$id]['quantity'] <= 0) {
-                $this->notify('Please select a bale size before placing the order', 'danger');
                 return;
             }
 
@@ -126,9 +124,7 @@ class PlaceOrder extends Page
             session()->put('cart', $this->cart);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cartCount', $this->cartCount);
-            $this->notify('Order placed successfully!');
         } elseif (empty($this->cart)) {
-            $this->notify('Your cart is empty', 'danger');
             return;
         }
         self::getNavigationBadge();
