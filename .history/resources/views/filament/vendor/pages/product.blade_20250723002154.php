@@ -102,7 +102,7 @@
                 </div>
                 <div>
                     <div>
-                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}s</h3>
+                        <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
