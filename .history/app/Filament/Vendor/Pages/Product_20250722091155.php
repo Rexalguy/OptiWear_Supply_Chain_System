@@ -53,10 +53,12 @@ class Product extends Page
     {
         $baleSize = (int) $this->bale_size;
         if ($baleSize <= 0) {
+            $this->notify('danger', 'Please select a valid Bale size before continuing');
             return;
         }
         $target_product = ProductModel::find($productId);
         if ($target_product) {
+            $price = $target_product->price ?? 0;
             $cartItem = [
                 'id' => $target_product->id,
                 'name' => $target_product->name,

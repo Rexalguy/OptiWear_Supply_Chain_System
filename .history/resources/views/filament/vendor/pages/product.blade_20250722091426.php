@@ -14,9 +14,7 @@
             class="rounded-xl  p-4 cursor-pointer shadow bg-white dark:bg-gray-800" 
             
         >
-            <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
-            </div>
+            I
             <div>
                 <div>
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
