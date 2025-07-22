@@ -66,7 +66,6 @@ class Product extends Page
         ProductModel::findOrFail($productId);
         $baleSize = (int) ($this->bale_size[$productId] ?? 0);
         if ($baleSize <= 0) {
-            $this->notify('Please select a bale size before adding to cart', 'danger');
             return;
         }
         $target_product = ProductModel::find($productId);
