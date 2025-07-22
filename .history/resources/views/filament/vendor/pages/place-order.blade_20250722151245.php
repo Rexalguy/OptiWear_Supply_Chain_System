@@ -66,20 +66,9 @@
                 @endif
                 <div style="margin-top: 5px !important;" class="mt-4">
                     <h2 style="font-weight:bold !important; color: rgb(31, 221, 31) !important;">Pick Delivery Option</h2>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="standard" class="mr-2"> 
-                            <span>Standard Delivery (3-5 days) : UGX 3000</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="express" class="mr-2"> 
-                            <span>Express Delivery (1 day) : UGX 5000</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="pickup" class="mr-2"> 
-                            <span>Pick Up : UGX 0</span>
-                        </label>
-                    </div>
+                    <input type="radio" name="delivery_option" value="standard"> Standard Delivery (3-5 days) : UGX 3000 <br>
+                    <input type="radio" name="delivery_option" value="express"> Express Delivery (1 day) : UGX 5000 <br>
+                    <input type="radio" name="delivery_option" value="pickup"> Pick Up : UGX 0 <br>
                 </div>
 
             </div>
