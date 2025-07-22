@@ -3,7 +3,7 @@
     <div class="flex justify-end">
         <a href="{{ url('/vendor/place-order') }}" title="View Cart">
             {{-- Cart Button --}}
-            <x-filament::button color="" size="x-lg" weight="Semibold" icon="heroicon-o-shopping-cart">
+            <x-filament::button color="warning" size="x-lg" weight="Semibold" icon="heroicon-o-shopping-cart">
                 <H1 class="text-lg font-semibold p-2" ><span style="color: orange">{{ $cartCount }}</span> Items </H1>
             </x-filament::button>
         </a>

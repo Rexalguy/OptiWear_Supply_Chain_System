@@ -87,7 +87,7 @@
                         close
                         </x-filament::button>
 
-                        <x-filament::button wire:click="addToCart({{ $product->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
+                        <x-filament::button wire:click="addToCart({{ $clickedProduct->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
                         Add to Cart
                         </x-filament::button>
                     </div>

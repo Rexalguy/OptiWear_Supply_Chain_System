@@ -22,8 +22,8 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->price) }}</p>
-                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
-                        <option value="" >Select a Bale size</option>
+                    <select wire:model.live="bale_sizes.{{ $product->id }}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 my-2" style="background: #119ae9; color: #fffefe;">
+                        <option value="">Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
                         <option value="750">Premium Package: 750 pieces</option>
@@ -74,7 +74,7 @@
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                        <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
+                        <select wire:model="bale_sizes.{{ $clickedProduct->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
@@ -87,7 +87,7 @@
                         close
                         </x-filament::button>
 
-                        <x-filament::button wire:click="addToCart({{ $product->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
+                        <x-filament::button wire:click="addToCart({{ $clickedProduct->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
                         Add to Cart
                         </x-filament::button>
                     </div>
