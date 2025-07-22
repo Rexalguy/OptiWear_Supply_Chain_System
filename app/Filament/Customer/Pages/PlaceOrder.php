@@ -289,13 +289,12 @@ class PlaceOrder extends Page
 
     public function getDiscountProperty(): int
     {
-        $userTokens = Auth::user()->tokens ?? 0;
-        return $userTokens >= 200 ? 10000 : 0;
+        return 0; // No discount logic in place-order page
     }
 
     public function getFinalAmountProperty(): int
     {
-        return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
+        return max(0, $this->calculateCartTotal() + $this->getDeliveryFeeProperty());
     }
 
     /* ProductCartItems merges cart + product info */

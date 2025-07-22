@@ -51,6 +51,9 @@ class VendorPanelProvider extends PanelProvider
                 NavigationGroup::make('Orders')
                     ->icon('heroicon-o-shopping-cart')
                     ->collapsed(),
+                NavigationGroup::make('Chat')
+                    ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                    ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
