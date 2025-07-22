@@ -7,25 +7,39 @@
         <!-- Progress Fill -->
         <div
             class="token-progress-fill"
-            style="width: {{ min(100, ($userTokens / 200) * 100) }}%;"
+            style="width: {{ min(100, ($userTokens / 250) * 100) }}%;"
         ></div>
 
         <!-- Token Count Text -->
         <div class="absolute inset-0 flex justify-between items-center px-4 text-sm font-medium text-white">
-            <span>{{ $userTokens }} / 200 Tokens</span>
-            @if ($userTokens >= 200)
+            <span>{{ $userTokens }} / 250 Tokens</span>
+            @if ($userTokens > 200)
                 <span class="text-yellow-300 animate-pulse font-bold">🎉 Redeem Now!</span>
+            @elseif ($userTokens >= 200)
+                <span class="text-orange-300 font-bold">🔓 Almost there!</span>
             @endif
         </div>
 
         <!-- Milestone Markers -->
-        @foreach ([50, 100, 150, 200] as $milestone)
+        @foreach ([50, 100, 150, 200, 250] as $milestone)
             <div class="absolute top-full -mt-2 text-xs text-gray-300"
-                style="left: {{ ($milestone / 200) * 100 }}%;">
-                <div class="w-px h-4 mx-auto bg-gray-500"></div>
-                <span class="mt-1 block text-center">{{ $milestone }}</span>
+                style="left: {{ ($milestone / 250) * 100 }}%;">
+                <div class="w-px h-4 mx-auto {{ $milestone <= 200 ? 'bg-gray-500' : 'bg-green-500' }}"></div>
+                <span class="mt-1 block text-center {{ $milestone > 200 ? 'text-green-400 font-bold' : '' }}">
+                    {{ $milestone }}{{ $milestone > 200 ? '+' : '' }}
+                </span>
             </div>
         @endforeach
+    </div>
+    
+    <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        @if ($userTokens > 200)
+            ✅ You can redeem {{ floor(($userTokens - 200) / 200) + 1 }} time(s)!
+        @elseif ($userTokens >= 200)
+            🔒 Need {{ 201 - $userTokens }} more token(s) to unlock redemption
+        @else
+            💰 Collect {{ 201 - $userTokens }} more tokens to unlock rewards
+        @endif
     </div>
 </div>
 
@@ -109,6 +123,49 @@
                         <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
                         <span>UGX {{ number_format($this->subtotal) }}</span>
                     </div>
+
+                    {{-- Token Usage Toggle --}}
+                    @if ($userTokens > 200)
+                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
+                                        🎁 Token Redemption Available
+                                    </p>
+                                    <p class="text-xs text-blue-600 dark:text-blue-400">
+                                        Use 200 tokens for UGX 10,000 discount
+                                    </p>
+                                </div>
+                                <x-filament::button
+                                    :color="$useTokens ? 'danger' : 'success'"
+                                    size="sm"
+                                    wire:click="toggleTokenUsage"
+                                >
+                                    {{ $useTokens ? 'Cancel Redemption' : 'Redeem Now' }}
+                                </x-filament::button>
+                            </div>
+                        </div>
+                    @elseif ($userTokens >= 200)
+                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                                🔒 You need more than 200 tokens to redeem. Current: {{ $userTokens }} tokens
+                            </p>
+                        </div>
+                    @else
+                        <div class="p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg border border-gray-200 dark:border-gray-800">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                💰 Collect {{ 201 - $userTokens }} more tokens to unlock rewards (Current: {{ $userTokens }})
+                            </p>
+                        </div>
+                    @endif
+
+                    {{-- Show discount if tokens are being used --}}
+                    @if ($useTokens && $userTokens > 0)
+                        <div class="flex justify-between text-green-600 dark:text-green-400">
+                            <span>Token Discount</span>
+                            <span>- UGX {{ number_format($this->calculatePotentialDiscount()) }}</span>
+                        </div>
+                    @endif
 
                     @if ($this->deliveryOption === 'delivery')
                         <div class="flex justify-between">

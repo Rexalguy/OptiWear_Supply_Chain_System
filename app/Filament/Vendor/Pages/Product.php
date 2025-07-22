@@ -48,31 +48,14 @@ class Product extends Page
 
     public function mount()
     {
-        if (!session()->has('cart')) {
-           $this->cart= [];
-            session(['cart' => $this->cart]);
-        }else {
+        $this->products = ProductModel::all();
+        if (session()->has('cart') || session()->has('cartCount')) {
             $this->cart = session()->get('cart', []);
-        }
-        if (!session()->has('cartCount')) {
-            $this->cartCount = 0;
-            session(['cartCount' => $this->cartCount]);
-        } else {
             $this->cartCount = session()->get('cartCount', 0);
-            session(['cartCount' => 0]);
+        } else {
+            $this->cart = [];
+            $this->cartCount = 0;
         }
-        $this->cart = session()->get('cart', []);
-        $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
-        if (!session()->has('cartCount')) {
-    
-        }
-
-        $this->form->fill(['delivery_method' => 'pickup']);
-    }
-
-    public function getProductsProperty()
-    {
-        return ProductModel::select(['id', 'name', 'sku', 'unit_price', 'image'])->paginate(12);
     }
 
     protected function getFormSchema(): array
@@ -107,8 +90,8 @@ class Product extends Page
 
     public function addToCart($productId)
     {
-        $baleSize = (int) ($this->bale_sizes[$productId] ?? 0);
-
+        ProductModel::findOrFail($productId);
+        $baleSize = (int) $this->bale_size;
         if ($baleSize <= 0) {
             $this->notify('danger', 'Please select a valid Bale size before adding.');
             return;
@@ -119,40 +102,32 @@ class Product extends Page
             $this->notify('danger', 'Product not found.');
             return;
         }
+        $this->notify('success', 'Product added to cart successfully.');
+        $this->cartCount += $baleSize;
+        $this->bale_size = null;
+        // $target_product = ProductModel::find($productId);
+        // if ($target_product) {
+        //     $cartItem = [
+        //         'id' => $target_product->id,
+        //         'name' => $target_product->name,
+        //         'price' => $target_product->price,
+        //         'quantity' => $baleSize,
+        //         'image' => $target_product->image,
 
-        $cart = $this->cart;
-
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += $baleSize;
-            $this->notify('info', 'Updated quantity in cart.');
-        } else {
-            $cart[$productId] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'unit_price' => $product->price,
-                'quantity' => $baleSize,
-            ];
-            $this->notify('success', 'Added product to cart.');
-        }
-
-        $this->cart = $cart;
-        session(['cart' => $cart]);
-
-        $this->bale_sizes[$productId] = ''; // Clear input
+        //     ];
+        //     if (isset($this->cart[$target_product->id])) {
+        //         $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
+        //         $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
+        //     } else {
+        //         $this->cart[$target_product->id] = $cartItem;
+        //         $this->notify('success', 'Product added to cart successfully.');
+        //     }
+        //     $this->cartCount = collect($this->cart)->sum('quantity');
+        //     session()->put('cart', $this->cart);
+        //     session()->put('cartCount', $this->cartCount);
+        // }
     }
-
-    public function removeFromCart($productId)
-    {
-        $cart = $this->cart;
-        unset($cart[$productId]);
-
-        $this->cart = $cart;
-        session(['cart' => $cart]);
-
-        $this->notify('success', 'Removed item from cart.');
-    }
-
-    public function updateQuantity($productId, $newQuantity)
+    public function closeProductModal()
     {
         $newQuantity = (int) $newQuantity;
 

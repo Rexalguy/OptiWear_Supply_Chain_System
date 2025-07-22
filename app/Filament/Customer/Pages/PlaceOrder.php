@@ -16,6 +16,12 @@ class PlaceOrder extends Page
     protected static string $view = 'filament.customer.pages.place-order';
     protected static ?int $navigationSort = 1;
 
+    // Dynamic title method
+    public function getTitle(): string
+    {
+        return 'Welcome,  ' .  (Auth::user()->name ?? 'Guest');
+    }
+
     // UI / modal state
     public ?Product $clickedProduct = null;
     public bool $selectedProduct = false;
@@ -30,6 +36,7 @@ class PlaceOrder extends Page
     // Category filtering
     public string $selectedCategory = '';
     public $categories;
+    public $recommendedProducts;
 
     // Size selection UI
     public array $showSizeDropdown = [];
@@ -59,6 +66,7 @@ class PlaceOrder extends Page
 
         // Load categories and products
         $this->categories = ShirtCategory::all();
+        $this->recommendedProducts = Product::where('quantity_available', '>', 0)->inRandomOrder()->limit(4)->get();
         $this->loadProducts();
 
         // Update tokens & wishlist
@@ -69,6 +77,11 @@ class PlaceOrder extends Page
     /* Load products based on selected category */
     protected function loadProducts(): void
     {
+        if ($this->selectedCategory === 'recommendations') {
+            $this->products = $this->recommendedProducts;
+            return;
+        }
+        
         $query = Product::where('quantity_available', '>', 0)->with('shirtCategory');
         
         if ($this->selectedCategory) {
@@ -276,13 +289,12 @@ class PlaceOrder extends Page
 
     public function getDiscountProperty(): int
     {
-        $userTokens = Auth::user()->tokens ?? 0;
-        return $userTokens >= 200 ? 10000 : 0;
+        return 0; // No discount logic in place-order page
     }
 
     public function getFinalAmountProperty(): int
     {
-        return max(0, $this->calculateCartTotal() - $this->discountProperty + $this->deliveryFeeProperty);
+        return max(0, $this->calculateCartTotal() + $this->getDeliveryFeeProperty());
     }
 
     /* ProductCartItems merges cart + product info */

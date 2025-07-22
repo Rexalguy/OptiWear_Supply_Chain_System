@@ -62,10 +62,41 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+
+        /* Improved image quality for banner slider */
+        .banner-image {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: high-quality;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+            will-change: transform;
+            filter: contrast(1.1) saturate(1.1) brightness(1.02);
+            -webkit-filter: contrast(1.1) saturate(1.1) brightness(1.02);
+        }
+
+        /* Enhance slider container for better quality */
+        .slider-container {
+            image-rendering: optimizeQuality;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            contain: layout style paint;
+            overflow: hidden;
+        }
+
+        /* Anti-aliasing and smoothing */
+        .banner-image {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+        }
     </style>
 
-    <div class="w-full">
-        <x-filament::card class="custom-slider-section">
+    <div class="w-full mb-6">
+        <x-filament::card class="custom-slider-section overflow-hidden">
             <div 
                 x-data="{
                     currentSlide: 0,
@@ -84,27 +115,28 @@
                 }"
                 @mouseenter="stopAutoPlay()" 
                 @mouseleave="startAutoPlay()"
-                class="relative w-full h-90 sm:h-52 md:h-64 overflow-hidden"
+                class="relative w-full overflow-hidden slider-container"
+                style="height: 374px;"
             >
                 <!-- Slides -->
                 <template x-for="(slide, index) in [
                     {
-                        image: 'https://plus.unsplash.com/premium_photo-1688497830977-f9ab9f958ca7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dCUyMHNoaXJ0fGVufDB8MHwwfHx8MQ%3D%3D',
+                        image: '{{ asset("storage/Banners/men\'s collection.jpg") }}',
                         title: '🔥 50% OFF',
                         subtitle: 'Limited-time offer on classic shirts'
                     },
                     {
-                        image: 'https://images.unsplash.com/photo-1523199455310-87b16c0eed11?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHNoaXJ0c3xlbnwwfHwwfHx8MA%3D%3D',
+                        image: '{{ asset("storage/Banners/models.jpg") }}',
                         title: '🆕 New Arrival',
                         subtitle: 'Modern casual collection just dropped'
                     },
                     {
-                        image: 'https://plus.unsplash.com/premium_photo-1684952850890-08b775d7bc2e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dCUyMHNoaXJ0fGVufDB8MHwwfHx8MQ%3D%3D',
+                        image: '{{ asset("storage/Banners/tshirt rack.jpg") }}',
                         title: '🚚 Free Delivery',
                         subtitle: 'Enjoy free shipping on orders over UGX 150,000'
                     },
                     {
-                        image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHNoaXJ0c3xlbnwwfHwwfHx8MA%3D%3D',
+                        image: '{{ asset("storage/Banners/womens.jpg") }}',
                         title: '🎁 Rewards Program',
                         subtitle: 'Earn tokens every time you shop'
                     }
@@ -120,9 +152,11 @@
                          class="absolute inset-0 w-full h-full overflow-hidden rounded-md"
                     >
                         <img :src="slide.image" 
-                             class="w-full h-full object-cover transition-transform duration-700"
+                             class="w-full h-full object-cover transition-transform duration-700 banner-image"
                              :class="{'scale-105': currentSlide === index}" 
-                             alt="Slide image" />
+                             alt="Slide image"
+                             loading="eager"
+                             decoding="sync" />
                         <div class="absolute inset-0 flex items-end p-6 sm:p-8 pointer-events-none">
                             <!-- Bottom shadow overlay -->
                             <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -162,13 +196,21 @@
 
         <!-- Category Tabs -->
         <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="category-nav flex space-x-4 overflow-x-auto pb-1" aria-label="Categories">
+             <nav class="category-nav flex space-x-4 overflow-x-auto pb-1" aria-label="Categories">
                 <!-- All Categories Tab -->
                 <button
                     wire:click="$set('selectedCategory', '')"
                     class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory === '' ? 'tab-active border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 >
                     All Products
+                </button>
+
+                <!-- Recommendations Tab -->
+                <button
+                    wire:click="$set('selectedCategory', 'recommendations')"
+                    class="whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-colors duration-200 {{ $selectedCategory === 'recommendations' ? 'tab-active border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 bg-primary-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                >
+                    Recommendations
                 </button>
                 
                 <!-- Category Tabs -->
@@ -184,7 +226,7 @@
         </div>
 
         {{-- Cart token info --}}
-<div class="token-cart-wrapper flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm">
+<div class="token-cart-wrapper flex flex-col md:flex-row justify-between items-center mb-10 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm">
     <div class="token-message text-base md:text-lg text-gray-800 dark:text-gray-200 mb-3 md:mb-0 font-medium">
         @if ($potentialTokens > 0)
             🎁 You will earn <strong class="text-primary-600 dark:text-primary-400">{{ $potentialTokens }}</strong> token{{ $potentialTokens > 1 ? 's' : '' }} for this order!
@@ -231,11 +273,11 @@
             {{-- Products Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
     @foreach ($products as $product)
-        <div class="product-card dark-gradient-card rounded-lg overflow-hidden">
+        <div class="product-card dark-gradient-card rounded-lg overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
 
             {{-- Image Section with Overlay --}}
             <div class="product-image-container relative w-full">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
                 <div class="top-quality-overlay">New Stock</div>
             </div>
 
@@ -282,7 +324,7 @@
             <div class="flex flex-col md:flex-row">
                 {{-- Left: Product Image (25% width) --}}
                 <div class="w-full md:w-1/4 p-4 flex items-center justify-center image-container">
-                    <img src="{{ $clickedProduct->image }}"
+                    <img src="{{ asset($clickedProduct->image) }}"
                          alt="{{ $clickedProduct->name }}"
                          class="max-h-[400px] w-auto object-contain" />
                 </div>

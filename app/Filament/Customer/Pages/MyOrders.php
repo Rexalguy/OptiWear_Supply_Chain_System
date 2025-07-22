@@ -33,6 +33,7 @@ class MyOrders extends Page implements HasTable
     public string $address = '';
     public int $userTokens = 0;
     public int $discount = 0;
+    public bool $useTokens = false; // Add user choice for token usage
 
     public static function getNavigationBadge(): ?string
     {
@@ -134,7 +135,20 @@ class MyOrders extends Page implements HasTable
 
     public function getFinalAmountProperty(): int
     {
-        return max(0, $this->getCartTotal() - $this->discount + ($this->deliveryOption === 'delivery' ? 5000 : 0));
+        $discount = $this->useTokens ? $this->calculatePotentialDiscount() : 0;
+        return max(0, $this->getCartTotal() - $discount + ($this->deliveryOption === 'delivery' ? 5000 : 0));
+    }
+
+    public function calculatePotentialDiscount(): int
+    {
+        $availableTokens = $this->userTokens;
+        
+        // Only allow redemption if user has MORE than 200 tokens
+        if ($availableTokens > 200) {
+            return 10000; // UGX 10,000 discount for 200 tokens
+        }
+        
+        return 0;
     }
 
     public function calculatePotentialTokens(): void
@@ -143,23 +157,33 @@ class MyOrders extends Page implements HasTable
         $this->potentialTokens = $total >= 50000 ? floor($total / 15000) : 0;
     }
 
+    public function toggleTokenUsage(): void
+    {
+        $this->useTokens = !$this->useTokens;
+        // Recalculate discount when toggled
+        $this->discount = $this->useTokens ? $this->calculatePotentialDiscount() : 0;
+    }
+
     protected function deductUserTokensIfApplicable(): int
     {
+        // Only deduct tokens if user explicitly chose to use them
+        if (!$this->useTokens) {
+            return 0;
+        }
+
         $user = Auth::user();
         $availableTokens = $user->tokens ?? 0;
         $discount = 0;
         $tokensUsed = 0;
 
-        if ($availableTokens >= 200) {
+        // Only allow redemption if user has MORE than 200 tokens
+        if ($availableTokens > 200) {
             $tokensUsed = 200;
             $discount = 10000;
-        } elseif ($availableTokens > 0) {
-            $tokensUsed = min($availableTokens, floor($this->getCartTotal() / 100));
-            $discount = $tokensUsed * 100;
-        }
-
-        if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
-            $user->decrement('tokens', $tokensUsed);
+            
+            if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
+                $user->decrement('tokens', $tokensUsed);
+            }
         }
 
         return $discount;
