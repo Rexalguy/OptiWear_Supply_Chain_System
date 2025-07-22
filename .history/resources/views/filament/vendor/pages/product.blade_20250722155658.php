@@ -22,7 +22,7 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}s</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
-                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
@@ -62,10 +62,10 @@
                 transform: scale(1.3) rotate(90deg);
             }
         </style>
-        <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in p-4 overflow-y-auto" style="cursor:pointer;" wire:click.self="closeProductModal">
-            <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg relative modal-slide-up my-8 mx-auto" style="cursor:auto;" @click.stop>
-                <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden flex-shrink-0">
-                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="w-40 h-40 object-cover rounded">
+        <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-fade-in" style="cursor:pointer;" wire:click.self="closeProductModal">
+            <div class="shadow bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative modal-slide-up" style="cursor:auto;" @click.stop>
+                <div class="w-full h-32 flex items-center justify-center bg-gray-100 rounded-md mb-4 overflow-hidden">
+                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="w-32 h-32 object-cover rounded">
                 </div>
                 <div>
                     <div>

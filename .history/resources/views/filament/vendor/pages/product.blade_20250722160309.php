@@ -22,7 +22,7 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}s</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
-                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                    <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
                         <option value="350">Classic Package: 350 pieces</option>
