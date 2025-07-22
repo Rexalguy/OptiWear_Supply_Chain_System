@@ -10,14 +10,14 @@
             <div class="flex-1">
                 {{-- Product image --}}
                 <div style="background-color: white !important;" class="w-48 h-48 flex items-start justify-center bg-white rounded-md mb-3 overflow-hidden flex-shrink-0">
-                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
+                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}s" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
                 </div>
                 
                 {{-- Product info and quantity controls in one row --}}
                 <div class="flex justify-between items-start mb-4">
                     {{-- Product info --}}
                     <div>
-                        <h4 class="font-semibold text-lg">{{ $item['name'] }}s</h4>
+                        <h4 class="font-semibold text-lg">{{ $item['name'] }}</h4>
                         <p class="">Price: UGX {{ $item['price'] }}</p>
                         <p class="">Quantity: {{ $item['quantity'] }}</p>
                     </div>
