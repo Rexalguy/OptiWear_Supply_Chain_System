@@ -2,6 +2,7 @@
 
 namespace App\Filament\Vendor\Pages;
 
+use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
@@ -40,6 +41,13 @@ class Product extends Page
     public function mount()
     {
         $this->products = ProductModel::all();
+        if (session()->has('cart') || session()->has('cartCount')) {
+            $this->cart = session()->get('cart', []);
+            $this->cartCount = session()->get('cartCount', 0);
+        } else {
+            $this->cart = [];
+            $this->cartCount = 0;
+        }
     }
     public function openProductModal($productId)
     {
@@ -55,18 +63,21 @@ class Product extends Page
         }
         $target_product = ProductModel::find($productId);
         if ($target_product) {
+            $price = $target_product->price ?? 0;
             $cartItem = [
                 'id' => $target_product->id,
                 'name' => $target_product->name,
-                'price' => $target_product->unit_price,
+                'price' => $target_product->price,
                 'quantity' => $baleSize,
                 'image' => $target_product->image,
 
             ];
             if (isset($this->cart[$target_product->id])) {
                 $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
+                $this->notify('warning', 'Product already in cart. Only quantity has been updated.');
             } else {
                 $this->cart[$target_product->id] = $cartItem;
+                $this->notify('success', 'Product added to cart successfully.');
             }
             $this->cartCount = collect($this->cart)->sum('quantity');
             session()->put('cart', $this->cart);

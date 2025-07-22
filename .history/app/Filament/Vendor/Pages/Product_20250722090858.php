@@ -2,6 +2,7 @@
 
 namespace App\Filament\Vendor\Pages;
 
+use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;
@@ -39,6 +40,8 @@ class Product extends Page
     }
     public function mount()
     {
+        $this->cart = session()->get('cart', []);
+        $this->cartCount = session()->get('cartCount', 0);
         $this->products = ProductModel::all();
     }
     public function openProductModal($productId)
@@ -48,17 +51,18 @@ class Product extends Page
     }
     public function addToCart($productId)
     {
-        ProductModel::findOrFail($productId);
         $baleSize = (int) $this->bale_size;
         if ($baleSize <= 0) {
+            $this->notify('danger', 'Please select a valid Bale size before continuing');
             return;
         }
         $target_product = ProductModel::find($productId);
         if ($target_product) {
+            $price = $target_product->price ?? 0;
             $cartItem = [
                 'id' => $target_product->id,
                 'name' => $target_product->name,
-                'price' => $target_product->unit_price,
+                'price' => $target_product->price,
                 'quantity' => $baleSize,
                 'image' => $target_product->image,
 
@@ -67,6 +71,7 @@ class Product extends Page
                 $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
             } else {
                 $this->cart[$target_product->id] = $cartItem;
+                $this->notify('success', 'Product added to cart successfully.');
             }
             $this->cartCount = collect($this->cart)->sum('quantity');
             session()->put('cart', $this->cart);

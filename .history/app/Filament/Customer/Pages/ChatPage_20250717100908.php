@@ -10,7 +10,7 @@ class ChatPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
     protected static ?string $navigationGroup = 'Chat';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
     protected static string $view = 'filament.customer.pages.chat-page';
 
     public static function getNavigationBadge(): ?string
@@ -20,7 +20,7 @@ class ChatPage extends Page
 
     public static function getNavigationBadgeColor(): string|array|null
     {
-        return 'info';
+        return 'info'; 
     }
 
     protected static function getUnreadMessageCount(): int

@@ -20,7 +20,7 @@ class ChatPage extends Page
 
     public static function getNavigationBadgeColor(): string|array|null
     {
-        return 'info';
+        return 'info'; 
     }
 
     protected static function getUnreadMessageCount(): int

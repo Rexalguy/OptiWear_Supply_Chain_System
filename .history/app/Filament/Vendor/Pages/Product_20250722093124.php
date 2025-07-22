@@ -2,6 +2,7 @@
 
 namespace App\Filament\Vendor\Pages;
 
+use StatsOverview;
 use Filament\Pages\Page;
 use Filament\Support\Enums\MaxWidth;
 use App\Models\Product as ProductModel;

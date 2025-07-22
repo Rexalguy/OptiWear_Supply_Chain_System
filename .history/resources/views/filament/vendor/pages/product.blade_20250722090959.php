@@ -15,13 +15,13 @@
             
         >
             <div wire:click="openProductModal({{ $product->id }})" class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="h-32 w-auto object-contain">
+                <img src="{{ $product->image ? asset('storage/' . $product->image) : '/images/image.png' }}" alt="{{ $product->name }}" class="h-full w-auto object-contain">
             </div>
             <div>
                 <div>
                     <h3 class="text-lg font-semibold">{{ $product->name }}</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
-                    <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
+                    <p class="text-sm">Price: UGX {{ number_format($product->price) }}</p>
                     <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
                         <option value="100">Starter Package: 100 pieces</option>
@@ -72,7 +72,7 @@
                     <div>
                         <h3 class="text-lg font-semibold">{{ $clickedProduct->name }}</h3>
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
-                        <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
+                        <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
                         <select wire:model="bale_size"  class="form-select rounded-md shadow-sm my-2" style="background: #119ae9; color: #fffefe;">
                         <option value="" >Select a Bale size</option>
@@ -98,3 +98,28 @@
 </div>
 
 </x-filament-panels::page>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const cartCount = localStorage.getItem("cartCount") || 0;
+        const livewireEl = document.querySelector('[wire\\:id]');
+        if (window.Livewire && livewireEl) {
+            window.Livewire.find(livewireEl.getAttribute('wire:id'))?.call('syncCart', cart, cartCount);
+            console.log('Cart :', cart, 'Cart Count:', cartCount);
+        } else {
+            console.warn('Livewire not found. Cart synchronization may not work.');
+        }
+    });
+    window.addEventListener('beforeunload', function () {
+        const cart = @json(session('cart', []));
+        const cartCount = @json(session('cartCount', 0));
+        localStorage.setItem('cartCount', cartCount);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    });
+    window.addEventListener('beforeunload', function () {
+        const cart = @json(session('cart', []));
+        const cartCount = @json(session('cartCount', 0));
+        localStorage.setItem('cartCount', cartCount);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    });
+</script>

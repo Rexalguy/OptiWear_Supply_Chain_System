@@ -8,12 +8,12 @@
             <div>
                 <div class="">
                 <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-md mb-2 overflow-hidden">
-                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}" class="h-full w-auto object-contain">
+                    <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : '/images/image.png' }}" alt="{{ $item['name'] }}" class="h-full w-auto object-contain">
                 </div>
                 <div class="flex gap-4 items-center align-top mt-0">
                     <div style="margin-top: -30px;" class="w-full text-start md:text-left">
                         <h4 class="font-semibold">{{ $item['name'] }}</h4>
-                        <p>Price: {{ $item['price'] }}</p>
+                        <p>Price: {{ $item['unit_price'] }}</p>
                         <p>Quantity: {{ $item['quantity'] }}</p>
                     </div>
                     <div class="flex flex-col gap-4 items-center align-top mt-0">
