@@ -26,7 +26,7 @@ class SegmentationInsights extends Page
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading('Generate Fresh Segmentation Insights')
-                ->modalDescription('This will generate updated customer segmentation data. The process may take a few seconds.')
+                ->modalDescription('This will generate new customer segmentation data. The process may take a few minutes.')
                 ->modalSubmitActionLabel('Generate Data')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function () {

@@ -91,7 +91,7 @@
                             <div class="rounded-2xl p-4 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
                                 <div class="flex gap-4">
                                     <div class="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden flex-shrink-0">
-                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                     </div>
                                     <div class="flex-1">
                                         <h3 class="font-semibold text-gray-800 dark:text-white">{{ $product->name }}</h3>
