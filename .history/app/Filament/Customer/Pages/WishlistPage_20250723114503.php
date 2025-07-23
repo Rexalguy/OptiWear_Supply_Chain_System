@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Wishlist;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class WishlistPage extends Page
 {
@@ -55,22 +56,22 @@ class WishlistPage extends Page
 
     protected function notify(string $message, string $type = 'success'): void
     {
-        $icon = match ($type) {
+        $icon = match($type) {
             'success' => 'success',
             'danger' => 'error',
             'warning' => 'warning',
             'info' => 'info',
             default => 'success'
         };
-
-        $iconColor = match ($type) {
+        
+        $iconColor = match($type) {
             'success' => 'green',
             'danger' => 'red',
             'warning' => 'orange',
             'info' => 'blue',
             default => 'green'
         };
-
+        
         $this->dispatch('cart-updated', [
             'title' => $message,
             'icon' => $icon,
@@ -93,6 +94,7 @@ class WishlistPage extends Page
 
         if ($item) {
             $item->delete();
+            $this->notify('Removed from Wishlist');
             $this->refreshWishlist();
         }
     }
@@ -119,6 +121,7 @@ class WishlistPage extends Page
         $product = Product::find($productId);
 
         if (!$product || $product->quantity_available < 1) {
+            $this->notify('Product out of stock', 'danger');
             return;
         }
 
@@ -133,12 +136,14 @@ class WishlistPage extends Page
     {
         $product = Product::find($productId);
         if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
         $size = $this->selectedSize[$productId] ?? null;
 
         if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
             return;
         }
 
@@ -151,6 +156,7 @@ class WishlistPage extends Page
 
             $maxQty = min(50, $product->quantity_available);
             if ($currentQty >= $maxQty) {
+                $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
                 return;
             }
 
@@ -170,6 +176,7 @@ class WishlistPage extends Page
         unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
 
         $this->updateTokens();
+        $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
     /**
@@ -181,6 +188,7 @@ class WishlistPage extends Page
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->updateTokens();
+            $this->notify('Removed from cart');
         }
     }
 
@@ -195,6 +203,7 @@ class WishlistPage extends Page
         $product = $productId ? Product::find($productId) : null;
 
         if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
@@ -202,6 +211,7 @@ class WishlistPage extends Page
         $maxQty = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
+            $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
             return;
         }
 

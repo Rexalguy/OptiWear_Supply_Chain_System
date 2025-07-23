@@ -7,6 +7,7 @@ use App\Models\Wishlist;
 use App\Models\ShirtCategory;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class PlaceOrder extends Page
 {
@@ -31,7 +32,7 @@ class PlaceOrder extends Page
 
     // Product list
     public $products;
-
+    
     // Category filtering
     public string $selectedCategory = '';
     public $categories;
@@ -80,35 +81,35 @@ class PlaceOrder extends Page
             $this->products = $this->recommendedProducts;
             return;
         }
-
+        
         $query = Product::where('quantity_available', '>', 0)->with('shirtCategory');
-
+        
         if ($this->selectedCategory) {
             $query->where('shirt_category_id', $this->selectedCategory);
         }
-
+        
         $this->products = $query->get();
     }
 
     /* Quick helper to show SweetAlert notifications */
     protected function notify(string $message, string $type = 'success'): void
     {
-        $icon = match ($type) {
+        $icon = match($type) {
             'success' => 'success',
             'danger' => 'error',
             'warning' => 'warning',
             'info' => 'info',
             default => 'success'
         };
-
-        $iconColor = match ($type) {
+        
+        $iconColor = match($type) {
             'success' => 'green',
             'danger' => 'red',
             'warning' => 'orange',
             'info' => 'blue',
             default => 'green'
         };
-
+        
         $this->dispatch('cart-updated', [
             'title' => $message,
             'icon' => $icon,
@@ -161,12 +162,14 @@ class PlaceOrder extends Page
         $product = Product::find($productId);
 
         if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
         $size = $this->selectedSize[$productId] ?? null;
 
         if (!$size) {
+            $this->notify('Please select a size before confirming', 'danger');
             return;
         }
 
@@ -188,6 +191,8 @@ class PlaceOrder extends Page
         unset($this->showSizeDropdown[$productId], $this->selectedSize[$productId]);
 
         $this->updateTokenCount();
+
+        $this->notify("Added {$product->name} (Size: $size) to cart");
     }
 
     /* CART MANAGEMENT */
@@ -197,6 +202,7 @@ class PlaceOrder extends Page
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->updateTokenCount();
+            $this->notify('Removed from cart');
         }
     }
 
@@ -208,6 +214,7 @@ class PlaceOrder extends Page
         $product   = $productId ? Product::find($productId) : null;
 
         if (!$product) {
+            $this->notify('Product not found', 'danger');
             return;
         }
 
@@ -215,6 +222,7 @@ class PlaceOrder extends Page
         $maxQty     = min(50, $product->quantity_available);
 
         if ($currentQty >= $maxQty) {
+            $this->notify("Maximum stock limit reached for {$product->name}", 'warning');
             return;
         }
 
@@ -248,11 +256,13 @@ class PlaceOrder extends Page
 
         if ($existing) {
             $existing->delete();
+            $this->notify('Removed from wishlist');
         } else {
             Wishlist::create([
                 'user_id'    => $user->id,
                 'product_id' => $productId,
             ]);
+            $this->notify('Added to wishlist');
         }
 
         $this->loadWishlistProductIds();

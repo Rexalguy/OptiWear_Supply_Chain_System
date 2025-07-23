@@ -66,106 +66,106 @@ class RawMaterialsPurchaseOrderResource extends Resource
             ->orderByDesc('created_at');
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            Forms\Components\Wizard::make([
-                Forms\Components\Wizard\Step::make('Order')
-                    ->description('Choose the raw material and supplier')
-                    ->icon('heroicon-o-cube')
-                    ->schema([
-                        Select::make('raw_materials_id')
-                            ->label('Raw Material')
-                            ->options(RawMaterial::all()->pluck('name', 'id'))
-                            ->required()
-                            ->live()
-                            ->searchable()
-                            ->preload()
-                            ->native(false)
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $price = RawMaterial::find($state)?->price ?? null;
-                                $set('price_per_unit', $price);
-                                $set('total_price', intval($price) * intval($get('quantity')) ?? 0);
-                            }),
+public static function form(Form $form): Form
+{
+    return $form->schema([
+        Forms\Components\Wizard::make([
+            Forms\Components\Wizard\Step::make('Order')
+                ->description('Choose the raw material and supplier')
+                ->icon('heroicon-o-cube')
+                ->schema([
+                    Select::make('raw_materials_id')
+                        ->label('Raw Material')
+                        ->options(RawMaterial::all()->pluck('name', 'id'))
+                        ->required()
+                        ->live()
+                        ->searchable()
+                        ->preload()
+                        ->native(false)
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                            $price = RawMaterial::find($state)?->price ?? null;
+                            $set('price_per_unit', $price);
+                            $set('total_price', intval($price) * intval($get('quantity')) ?? 0);
+                        }),
 
-                        Select::make('supplier_id')
-                            ->label('Supplier')
-                            ->options(User::query()->where('role', 'supplier')->pluck('name', 'id'))
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->native(false),
-                    ]),
+                    Select::make('supplier_id')
+                        ->label('Supplier')
+                        ->options(User::query()->where('role', 'supplier')->pluck('name', 'id'))
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->native(false),
+                ]),
 
-                Forms\Components\Wizard\Step::make('Specifications')
-                    ->description('Set quantity and calculate pricing')
-                    ->icon('heroicon-o-calculator')
-                    ->schema([
-                        TextInput::make('quantity')
-                            ->required()
-                            ->live()
-                            ->numeric()
-                            ->minValue(1)
-                            ->suffix(fn($get) => RawMaterial::find($get('raw_materials_id'))?->unit_of_measure ?? 'units')
-                            ->default(1)
-                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                $price = $get('price_per_unit') ?? 0;
-                                $set('total_price', $state * $price);
-                            }),
+            Forms\Components\Wizard\Step::make('Specifications')
+                ->description('Set quantity and calculate pricing')
+                ->icon('heroicon-o-calculator')
+                ->schema([
+                    TextInput::make('quantity')
+                        ->required()
+                        ->live()
+                        ->numeric()
+                        ->minValue(1)
+                        ->suffix(fn($get) => RawMaterial::find($get('raw_materials_id'))?->unit_of_measure ?? 'units')
+                        ->default(1)
+                        ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                            $price = $get('price_per_unit') ?? 0;
+                            $set('total_price', $state * $price);
+                        }),
 
-                        TextInput::make('price_per_unit')
-                            ->numeric()
-                            ->required()
-                            ->prefix('UGX')
-                            ->reactive()
-                            ->readonly()
-                            ->disabled(fn($get) => !$get('raw_materials_id'))
-                            ->dehydrated(true)
-                            ->live()
-                            ->extraAttributes(['readonly' => true])
-                            ->visible(fn($get) => $get('raw_materials_id'))
-                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                $quantity = $get('quantity') ?? 0;
-                                $set('total_price', $quantity * $state);
-                            }),
-                    ]),
+                    TextInput::make('price_per_unit')
+                        ->numeric()
+                        ->required()
+                        ->prefix('UGX')
+                        ->reactive()
+                        ->readonly()
+                        ->disabled(fn($get) => !$get('raw_materials_id'))
+                        ->dehydrated(true)
+                        ->live()
+                        ->extraAttributes(['readonly' => true])
+                        ->visible(fn($get) => $get('raw_materials_id'))
+                        ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                            $quantity = $get('quantity') ?? 0;
+                            $set('total_price', $quantity * $state);
+                        }),
+                ]),
 
-                Forms\Components\Wizard\Step::make('Delivery')
-                    ->description('Select delivery option and review total')
-                    ->icon('heroicon-o-truck')
-                    ->schema([
-                        TextInput::make('total_price')
-                            ->disabled()
-                            ->numeric()
-                            ->dehydrated()
-                            ->prefix('UGX')
-                            ->extraAttributes(['readonly' => true])
-                            ->visible(fn($get) => $get('quantity') && $get('price_per_unit'))
-                            ->default(0)
-                            ->reactive(),
+            Forms\Components\Wizard\Step::make('Delivery')
+                ->description('Select delivery option and review total')
+                ->icon('heroicon-o-truck')
+                ->schema([
+                    TextInput::make('total_price')
+                        ->disabled()
+                        ->numeric()
+                        ->dehydrated()
+                        ->prefix('UGX')
+                        ->extraAttributes(['readonly' => true])
+                        ->visible(fn($get) => $get('quantity') && $get('price_per_unit'))
+                        ->default(0)
+                        ->reactive(),
 
-                        Select::make('delivery_option')
-                            ->options([
-                                'delivery' => 'Delivery',
-                                'pickup' => 'Pickup',
-                            ])
-                            ->default('delivery')
-                            ->native(false)
-                            ->required(),
-                    ]),
+                    Select::make('delivery_option')
+                        ->options([
+                            'delivery' => 'Delivery',
+                            'pickup' => 'Pickup',
+                        ])
+                        ->default('delivery')
+                        ->native(false)
+                        ->required(),
+                ]),
 
-                Forms\Components\Wizard\Step::make('Review & Notes')
-                    ->description('Add any final comments or notes')
-                    ->icon('heroicon-o-clipboard-document')
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label('Notes')
-                            ->rows(3)
-                            ->placeholder('Any additional notes regarding the order'),
-                    ]),
-            ])->columnSpanFull(),
-        ]);
-    }
+            Forms\Components\Wizard\Step::make('Review & Notes')
+                ->description('Add any final comments or notes')
+                ->icon('heroicon-o-clipboard-document')
+                ->schema([
+                    Textarea::make('notes')
+                        ->label('Notes')
+                        ->rows(3)
+                        ->placeholder('Any additional notes regarding the order'),
+                ]),
+        ])->columnSpanFull(),
+    ]);
+}
 
 
     public static function table(Table $table): Table
@@ -327,7 +327,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
     {
         return [
             'index' => Pages\ListRawMaterialsPurchaseOrders::route('/'),
-            'create' => Pages\CreateRawMaterialsPurchaseOrder::route('/create'),
+            // 'create' => Pages\CreateRawMaterialsPurchaseOrder::route('/create'),
             // 'view' => Pages\ViewRawMaterialsPurchaseOrder::route('/{record}'),
             // 'edit' => Pages\EditRawMaterialsPurchaseOrder::route('/{record}/edit'),
         ];

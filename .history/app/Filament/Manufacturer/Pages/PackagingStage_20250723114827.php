@@ -27,25 +27,25 @@ class PackagingStage extends Page implements HasTable
     protected static string $view = 'filament.manufacturer.pages.packaging-stage';
 
     public static function getNavigationBadge(): ?string
-    {
-        return (string) ProductionStage::where('stage', 'packaging')
-            ->where('status', 'in_progress')
-            ->count();
-    }
+{
+    return (string) ProductionStage::where('stage', 'packaging')
+        ->where('status', 'in_progress')
+        ->count();
+}
 
-    public static function getNavigationBadgeColor(): ?string
-    {
-        $count = ProductionStage::where('stage', 'packaging')
-            ->where('status', 'in_progress')
-            ->count();
+public static function getNavigationBadgeColor(): ?string
+{
+    $count = ProductionStage::where('stage', 'packaging')
+        ->where('status', 'in_progress')
+        ->count();
 
-        return $count > 0 ? 'info' : 'gray';
-    }
+    return $count > 0 ? 'info' : 'gray';
+}
 
-    public static function getNavigationBadgeTooltip(): ?string
-    {
-        return 'packaging tasks in progress';
-    }
+public static function getNavigationBadgeTooltip(): ?string
+{
+    return 'packaging tasks in progress';
+}
 
     public function getTableQuery(): Builder
     {
@@ -54,7 +54,7 @@ class PackagingStage extends Page implements HasTable
                 $query->where('stage', 'printing')->where('status', 'completed');
             })
             ->whereHas('productionStages', function ($query) {
-                $query->where('stage', 'packaging')->whereIn('status', ['pending', 'in_progress']);
+                $query->where('stage', 'packaging')->whereIn('status', ['pending','in_progress']);
             });
     }
 
@@ -66,17 +66,17 @@ class PackagingStage extends Page implements HasTable
             Tables\Columns\TextColumn::make('packaging_status')
                 ->label('Packaging Status')
                 ->badge()
-                ->color(fn(string $state): string => match ($state) {
+                ->color(fn (string $state): string => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
                     default => 'secondary',
                 })
-                ->getStateUsing(fn($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->status ?? '-'),
+                ->getStateUsing(fn ($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->status ?? '-'),
             Tables\Columns\TextColumn::make('packaging_worker')
                 ->label('Assigned To')
                 ->icon('heroicon-m-wrench')
-                ->getStateUsing(fn($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->workforce->name ?? 'Unassigned'),
+                ->getStateUsing(fn ($record) => optional($record->productionStages->firstWhere('stage', 'packaging'))->workforce->name ?? 'Unassigned'),
         ];
     }
 
@@ -116,8 +116,7 @@ class PackagingStage extends Page implements HasTable
                         'iconColor' => 'green',
                     ]);
                 })
-                ->visible(
-                    fn(ProductionOrder $record) =>
+                ->visible(fn (ProductionOrder $record) =>
                     optional($record->productionStages->firstWhere('stage', 'packaging'))->status === 'pending'
                 ),
 
@@ -176,17 +175,17 @@ class PackagingStage extends Page implements HasTable
                         }
                     }
                 })
-                ->visible(
-                    fn(ProductionOrder $record) =>
+                ->visible(fn (ProductionOrder $record) =>
                     optional($record->productionStages->firstWhere('stage', 'packaging'))->status === 'in_progress'
                 ),
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            StageStatsWidget::make(['stage' => 'packaging']),
-        ];
-    }
+        protected function getHeaderWidgets(): array
+{
+    return [
+        StageStatsWidget::make(['stage' => 'packaging']),
+    ];
+}
+
 }

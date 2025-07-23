@@ -15,6 +15,7 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
 use App\Filament\Customer\Widgets\MyStatsWidget;
 use Filament\Tables\Concerns\InteractsWithTable;
 
@@ -141,12 +142,12 @@ class MyOrders extends Page implements HasTable
     public function calculatePotentialDiscount(): int
     {
         $availableTokens = $this->userTokens;
-
+        
         // Only allow redemption if user has MORE than 200 tokens
         if ($availableTokens > 200) {
             return 10000; // UGX 10,000 discount for 200 tokens
         }
-
+        
         return 0;
     }
 
@@ -179,7 +180,7 @@ class MyOrders extends Page implements HasTable
         if ($availableTokens > 200) {
             $tokensUsed = 200;
             $discount = 10000;
-
+            
             if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
                 $user->decrement('tokens', $tokensUsed);
             }
@@ -281,20 +282,19 @@ class MyOrders extends Page implements HasTable
             session()->forget('cart');
             $this->calculatePotentialTokens();
 
-            $this->dispatch('cart-updated', [
-                'title' => 'Order placed successfully!',
-                'text' => "🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}",
-                'icon' => 'success',
-                'iconColor' => 'green',
-            ]);
+            Notification::make()
+                ->title('Order placed successfully!')
+                ->body("🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}")
+                ->success()
+                ->send();
+
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatch('cart-updated', [
-                'title' => 'Failed to place order',
-                'text' => $e->getMessage(),
-                'icon' => 'error',
-                'iconColor' => 'red',
-            ]);
+            Notification::make()
+                ->title('Failed to place order')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
         }
     }
 
@@ -304,11 +304,7 @@ class MyOrders extends Page implements HasTable
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
-            $this->dispatch('cart-updated', [
-                'title' => 'Removed from cart',
-                'icon' => 'success',
-                'iconColor' => 'green',
-            ]);
+            Notification::make()->title('Removed from cart')->success()->send();
         }
     }
 
@@ -329,8 +325,7 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('created_at')->label('Placed On')->dateTime()->since(),
                 TextColumn::make('expected_fulfillment_date')
                     ->label('Expected Fulfillment Date')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
+                    ->formatStateUsing(fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
                             : ($state ? Carbon::parse($state)->format('d M Y ') : 'N/A')
@@ -339,12 +334,10 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('orderItems')
                     ->label('Items')
                     ->html()
-                    ->formatStateUsing(
-                        fn($state, $record) =>
+                    ->formatStateUsing(fn($state, $record) =>
                         $record->orderItems
-                            ->map(
-                                fn($item) => e($item->product->name)
-                                    . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
+                            ->map(fn($item) => e($item->product->name)
+                                . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
                             )
                             ->implode('<br>')
                     ),
@@ -404,11 +397,7 @@ class MyOrders extends Page implements HasTable
                             'rating' => $data['rating'],
                             'review' => $data['review'],
                         ]);
-                        $this->dispatch('cart-updated', [
-                            'title' => 'Thank you for your feedback!',
-                            'icon' => 'success',
-                            'iconColor' => 'green',
-                        ]);
+                        Notification::make()->title('Thank you for your feedback!')->success()->send();
                     }),
             ])
             ->defaultSort('id', 'desc');
