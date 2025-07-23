@@ -141,12 +141,12 @@ class MyOrders extends Page implements HasTable
     public function calculatePotentialDiscount(): int
     {
         $availableTokens = $this->userTokens;
-
+        
         // Only allow redemption if user has MORE than 200 tokens
         if ($availableTokens > 200) {
             return 10000; // UGX 10,000 discount for 200 tokens
         }
-
+        
         return 0;
     }
 
@@ -179,7 +179,7 @@ class MyOrders extends Page implements HasTable
         if ($availableTokens > 200) {
             $tokensUsed = 200;
             $discount = 10000;
-
+            
             if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
                 $user->decrement('tokens', $tokensUsed);
             }
@@ -287,6 +287,7 @@ class MyOrders extends Page implements HasTable
                 'icon' => 'success',
                 'iconColor' => 'green',
             ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('cart-updated', [
@@ -329,8 +330,7 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('created_at')->label('Placed On')->dateTime()->since(),
                 TextColumn::make('expected_fulfillment_date')
                     ->label('Expected Fulfillment Date')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
+                    ->formatStateUsing(fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
                             : ($state ? Carbon::parse($state)->format('d M Y ') : 'N/A')
@@ -339,12 +339,10 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('orderItems')
                     ->label('Items')
                     ->html()
-                    ->formatStateUsing(
-                        fn($state, $record) =>
+                    ->formatStateUsing(fn($state, $record) =>
                         $record->orderItems
-                            ->map(
-                                fn($item) => e($item->product->name)
-                                    . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
+                            ->map(fn($item) => e($item->product->name)
+                                . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
                             )
                             ->implode('<br>')
                     ),

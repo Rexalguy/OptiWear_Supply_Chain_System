@@ -27,7 +27,7 @@ class ProductionOrderResource extends Resource
     protected static ?string $navigationGroup = 'Product';
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 
-    public static function getNavigationBadge(): ?string
+        public static function getNavigationBadge(): ?string
     {
         return (string) ProductionOrder::where('status', 'pending')->count();
     }
@@ -69,7 +69,7 @@ class ProductionOrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')->label('Product')->searchable()->sortable()->grow(false),
                 Tables\Columns\TextColumn::make('quantity')->label('Quantity')->numeric(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->badge()->color(fn($state) => match ($state) {
+                Tables\Columns\TextColumn::make('status')->label('Status')->badge()->color(fn ($state) => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
@@ -125,11 +125,10 @@ class ProductionOrderResource extends Resource
                             ->first();
 
                         if (! $worker) {
-                            $this->dispatch('cart-updated', [
-                                'title' => 'No available printing worker.',
-                                'icon' => 'error',
-                                'iconColor' => 'red',
-                            ]);
+                            Notification::make()
+                                ->title('No available printing worker.')
+                                ->danger()
+                                ->send();
                             return;
                         }
 
@@ -150,13 +149,12 @@ class ProductionOrderResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        $this->dispatch('cart-updated', [
-                            'title' => "Stitching started. Assigned worker: {$worker->name}",
-                            'icon' => 'success',
-                            'iconColor' => 'green',
-                        ]);
+                        Notification::make()
+                            ->title("Stitching started. Assigned worker: {$worker->name}")
+                            ->success()
+                            ->send();
                     })
-                    ->visible(fn(ProductionOrder $record) => $record->status === 'pending'),
+                    ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
 
                 ActionGroup::make([
                     Tables\Actions\Action::make('bom')
@@ -217,7 +215,7 @@ class ProductionOrderResource extends Resource
                         })
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Close')
-                        ->visible(fn(ProductionOrder $record) => $record->status !== 'pending'),
+                        ->visible(fn (ProductionOrder $record) => $record->status !== 'pending'),
                 ])
                     ->icon('heroicon-m-ellipsis-horizontal')
                     ->color('info')
@@ -242,7 +240,7 @@ class ProductionOrderResource extends Resource
         ];
     }
 
-    public static function getWidgets(): array
+        public static function getWidgets(): array
     {
         return [
             ProductionStats::class,

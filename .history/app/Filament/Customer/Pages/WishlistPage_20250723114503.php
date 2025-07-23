@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Wishlist;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class WishlistPage extends Page
 {
@@ -55,22 +56,22 @@ class WishlistPage extends Page
 
     protected function notify(string $message, string $type = 'success'): void
     {
-        $icon = match ($type) {
+        $icon = match($type) {
             'success' => 'success',
             'danger' => 'error',
             'warning' => 'warning',
             'info' => 'info',
             default => 'success'
         };
-
-        $iconColor = match ($type) {
+        
+        $iconColor = match($type) {
             'success' => 'green',
             'danger' => 'red',
             'warning' => 'orange',
             'info' => 'blue',
             default => 'green'
         };
-
+        
         $this->dispatch('cart-updated', [
             'title' => $message,
             'icon' => $icon,
