@@ -23,24 +23,60 @@ class SegmentationInsights extends Page
             Action::make('populateInsights')
                 ->label('Populate Insights')
                 ->icon('heroicon-o-cpu-chip')
-                ->color('success')
+                ->color('secondary')
                 ->requiresConfirmation()
                 ->modalHeading('Generate Fresh Segmentation Insights')
-                ->modalDescription('This will generate updated customer segmentation data. The process may take a few seconds.')
+                ->modalDescription('This will run the Python script to generate new customer segmentation data. The process may take a few minutes.')
                 ->modalSubmitActionLabel('Generate Data')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function () {
                     try {
-                        // Execute the Artisan command silently
+                        // Show loading notification
+                        \Filament\Notifications\Notification::make()
+                            ->title('Processing...')
+                            ->body('Generating segmentation insights data. Please wait...')
+                            ->info()
+                            ->duration(null) // Persistent until manually dismissed
+                            ->send();
+
+                        // Execute the Artisan command
                         $exitCode = \Illuminate\Support\Facades\Artisan::call('insights:populate-segmentation');
                         
-                        // Refresh the page to show new data after a short delay
+                        // Clear the processing notification first
+                        \Filament\Notifications\Notification::make()
+                            ->title('Processing complete')
+                            ->body('')
+                            ->duration(1) // Very short duration to clear
+                            ->send();
+                        
                         if ($exitCode === 0) {
-                            $this->js('setTimeout(() => window.location.reload(), 2000)');
+                            // Success notification
+                            \Filament\Notifications\Notification::make()
+                                ->title('Success!')
+                                ->body('Segmentation insights have been populated successfully. Charts will now show updated data.')
+                                ->success()
+                                ->duration(5000)
+                                ->send();
+                            
+                            // Refresh the page to show new data
+                            $this->js('setTimeout(() => window.location.reload(), 1000)');
+                        } else {
+                            // Error notification
+                            \Filament\Notifications\Notification::make()
+                                ->title('Error')
+                                ->body('Failed to populate segmentation insights. Please check the logs for details.')
+                                ->danger()
+                                ->duration(null)
+                                ->send();
                         }
                         
                     } catch (\Exception $e) {
-                        // Silent execution - no notifications
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error')
+                            ->body('An error occurred: ' . $e->getMessage())
+                            ->danger()
+                            ->duration(null)
+                            ->send();
                     }
                 }),
             Action::make('exportCharts')

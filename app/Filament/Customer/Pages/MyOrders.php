@@ -15,7 +15,6 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Notifications\Notification;
 use App\Filament\Customer\Widgets\MyStatsWidget;
 use Filament\Tables\Concerns\InteractsWithTable;
 
@@ -193,16 +192,10 @@ class MyOrders extends Page implements HasTable
     public function placeOrder(): void
     {
         if (empty($this->cart)) {
-            Notification::make()->title('Cart is empty')->danger()->send();
             return;
         }
 
         if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
-            Notification::make()
-                ->title('Address Required')
-                ->body('Please enter your delivery address.')
-                ->danger()
-                ->send();
             return;
         }
 
@@ -254,11 +247,6 @@ class MyOrders extends Page implements HasTable
 
             if ($validItems === 0) {
                 DB::rollBack();
-                Notification::make()
-                    ->title('No valid products found')
-                    ->body('Some items in your cart are no longer available. Please refresh your cart.')
-                    ->danger()
-                    ->send();
                 return;
             }
 
@@ -276,19 +264,8 @@ class MyOrders extends Page implements HasTable
             session()->forget('cart');
             $this->calculatePotentialTokens();
 
-            Notification::make()
-                ->title('Order placed successfully!')
-                ->body("🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}")
-                ->success()
-                ->send();
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Notification::make()
-                ->title('Failed to place order')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
         }
     }
 
@@ -298,7 +275,6 @@ class MyOrders extends Page implements HasTable
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
-            Notification::make()->title('Removed from cart')->success()->send();
         }
     }
 
@@ -391,7 +367,6 @@ class MyOrders extends Page implements HasTable
                             'rating' => $data['rating'],
                             'review' => $data['review'],
                         ]);
-                        Notification::make()->title('Thank you for your feedback!')->success()->send();
                     }),
             ])
             ->defaultSort('id', 'desc');

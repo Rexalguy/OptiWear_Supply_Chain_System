@@ -324,7 +324,7 @@ public static function form(Form $form): Form
     {
         return [
             'index' => Pages\ListRawMaterialsPurchaseOrders::route('/'),
-            // 'create' => Pages\CreateRawMaterialsPurchaseOrder::route('/create'),
+            'create' => Pages\CreateRawMaterialsPurchaseOrder::route('/create'),
             // 'view' => Pages\ViewRawMaterialsPurchaseOrder::route('/{record}'),
             // 'edit' => Pages\EditRawMaterialsPurchaseOrder::route('/{record}/edit'),
         ];
