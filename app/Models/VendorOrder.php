@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class VendorOrder extends Model
 {
-    protected $fillable = ['status', 'created_by', 'delivery_option', 'total'];
+    protected $fillable = [
+        'status',
+        'created_by',
+        'delivery_option',
+        'total',
+        'order_date',
+        'expected_fulfillment',
+    ];
 
     public function creator()
     {
