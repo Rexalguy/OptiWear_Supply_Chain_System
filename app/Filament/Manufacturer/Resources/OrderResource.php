@@ -50,11 +50,12 @@ class OrderResource extends Resource
         return $form
 
             ->schema([
-                Forms\Components\TextInput::make('status')
+                Forms\Components\TextInput::make('status'),
+                Forms\Components\Select::make('created_by')
+                    ->label('Created By')
+                    ->options(\App\Models\User::pluck('name', 'id')) // key = ID, value = name
+                    ->searchable()
                     ->required(),
-                Forms\Components\TextInput::make('created_by')
-                    ->required()
-                    ->numeric(),
                 Forms\Components\TextInput::make('delivery_option')
                     ->required(),
                 Forms\Components\TextInput::make('total')
