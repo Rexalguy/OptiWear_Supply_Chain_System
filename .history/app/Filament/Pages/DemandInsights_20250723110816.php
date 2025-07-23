@@ -2,20 +2,23 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Manufacturer\Widgets\casualWearChart;
+use App\Filament\Manufacturer\Widgets\childrenWearChart;
+use App\Filament\Manufacturer\Widgets\formalWearChart;
+use App\Filament\Manufacturer\Widgets\ManufacturerStatsOverview;
+use App\Filament\Manufacturer\Widgets\percentageContributionChart;
+use App\Filament\Manufacturer\Widgets\sportsWearChart;
+use App\Filament\Manufacturer\Widgets\workWearChart;
 use Filament\Pages\Page;
-use App\Filament\Manufacturer\Widgets\SegmentStatsWidget;
-use App\Filament\Manufacturer\Widgets\SegmentationPolarChart;
-use App\Filament\Manufacturer\Widgets\SegmentationBarChart;
-use App\Filament\Manufacturer\Widgets\SegmentTopProductsTable;
 use Filament\Actions\Action;
 use Filament\Support\Enums\MaxWidth;
 
-class SegmentationInsights extends Page
+class DemandInsights extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationLabel = 'Segmentation Insights';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $navigationLabel = 'Demand Insights';
     protected static ?string $navigationGroup = 'Analytics';
-    protected static string $view = 'filament.pages.segmentation-insights';
+    protected static string $view = 'filament.pages.demand-insights';
 
     protected function getActions(): array
     {
@@ -25,14 +28,14 @@ class SegmentationInsights extends Page
                 ->icon('heroicon-o-cpu-chip')
                 ->color('success')
                 ->requiresConfirmation()
-                ->modalHeading('Generate Fresh Segmentation Insights')
-                ->modalDescription('This will generate updated customer segmentation data. The process may take a few seconds.')
+                ->modalHeading('Generate Fresh Demand Insights')
+                ->modalDescription('This will generate new demand prediction data. The process may take a few minutes.')
                 ->modalSubmitActionLabel('Generate Data')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function () {
                     try {
                         // Execute the Artisan command silently
-                        $exitCode = \Illuminate\Support\Facades\Artisan::call('insights:populate-segmentation');
+                        $exitCode = \Illuminate\Support\Facades\Artisan::call('insights:populate-demand');
                         
                         // Refresh the page to show new data after a short delay
                         if ($exitCode === 0) {
@@ -49,8 +52,8 @@ class SegmentationInsights extends Page
                 ->color('primary')
                 ->modalContent(view('filament.modals.export-options'))
                 ->modalWidth(MaxWidth::TwoExtraLarge)
-                ->modalHeading('Export Segmentation Insights Charts')
-                ->modalDescription('Download all segmentation charts on this page as high-quality PNG images.')
+                ->modalHeading('Export Demand Insights Charts')
+                ->modalDescription('Download all charts on this page as high-quality PNG images.')
                 ->modalSubmitActionLabel('Start Export')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function (array $data) {
@@ -65,18 +68,21 @@ class SegmentationInsights extends Page
     }
 
     protected function getHeaderWidgets(): array
-    {
-        return [
-            SegmentStatsWidget::class,
-        ];
-    }
+{
+    return [
+        ManufacturerStatsOverview::class
+    ];
+}
 
     protected function getFooterWidgets(): array
-    {
-        return [
-            SegmentationPolarChart::class,
-            SegmentationBarChart::class,
-            SegmentTopProductsTable::class,
-        ];
-    }
+{
+    return [
+        casualWearChart::class,
+        childrenWearChart::class,
+        formalWearChart::class,
+        workWearChart::class,
+        sportsWearChart::class,
+        percentageContributionChart::class,
+    ];
+}
 }

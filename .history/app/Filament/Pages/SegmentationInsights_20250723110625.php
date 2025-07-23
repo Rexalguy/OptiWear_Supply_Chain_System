@@ -23,10 +23,10 @@ class SegmentationInsights extends Page
             Action::make('populateInsights')
                 ->label('Populate Insights')
                 ->icon('heroicon-o-cpu-chip')
-                ->color('success')
+                ->color('succes')
                 ->requiresConfirmation()
                 ->modalHeading('Generate Fresh Segmentation Insights')
-                ->modalDescription('This will generate updated customer segmentation data. The process may take a few seconds.')
+                ->modalDescription('This will run the Python script to generate new customer segmentation data. The process may take a few minutes.')
                 ->modalSubmitActionLabel('Generate Data')
                 ->modalCancelActionLabel('Cancel')
                 ->action(function () {
