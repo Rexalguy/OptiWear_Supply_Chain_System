@@ -14,6 +14,7 @@ class CreateRawMaterialsPurchaseOrder extends CreateRecord
     {
         $data['expected_delivery_date'] = now()->addDays(3);
         $data['created_by'] = Auth::id();
+        $data['status'] = 'pending';
 
         return $data;
     }
