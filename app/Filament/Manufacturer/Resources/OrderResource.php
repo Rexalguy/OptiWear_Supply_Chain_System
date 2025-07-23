@@ -78,7 +78,9 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-                    ->query(Order::with(['orderItems.product', 'creator'])->orderBy('id', 'desc'))
+                    ->query(function (Builder $query) {
+                        return $query->with(['orderItems.product', 'creator'])->orderBy('id', 'desc');
+                    })
             ->columns([
                 TextColumn::make('id')
                     ->label('Order #')
