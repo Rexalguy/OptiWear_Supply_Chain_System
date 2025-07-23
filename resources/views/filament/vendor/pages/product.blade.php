@@ -31,6 +31,21 @@
 .swal2-popup.swal2-toast {
     transform: none !important;
 }
+
+/* Form select styles */
+.select-container {
+    width: 100%;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.select-container select {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
 </style>
 <div>
     <div class="flex justify-end">
@@ -55,12 +70,14 @@
                     <h3 class="text-lg font-semibold">{{ $product->name }}s</h3>
                     <p class="text-sm">SKU: {{ $product->sku }}</p>
                     <p class="text-sm">Price: UGX {{ number_format($product->unit_price) }}</p>
-                    <select wire:model="bale_size.{{ $product->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
-                        <option value="" >Select a Bale size</option>
-                        <option value="100">Starter Package: 100 pieces</option>
-                        <option value="350">Classic Package: 350 pieces</option>
-                        <option value="750">Premium Package: 750 pieces</option>
-                    </select>
+                    <div class="select-container relative w-full">
+                        <select wire:model="bale_size.{{ $product->id }}" class="w-full form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                            <option value="">Select a Bale size</option>
+                            <option value="100">Starter Package: 100 pieces</option>
+                            <option value="350">Classic Package: 350 pieces</option>
+                            <option value="750">Premium Package: 750 pieces</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <x-filament::button wire:click="addToCart({{ $product->id }})" color="warning" size="sm" icon="heroicon-m-plus" icon-position="after">
@@ -106,12 +123,14 @@
                         <p class="text-sm ">SKU: {{ $clickedProduct->sku }}</p>
                         <p class="text-sm ">Price: UGX {{ number_format($clickedProduct->unit_price) }}</p>
                         <p class="text-sm text-gray-600">{{ $clickedProduct->description }}</p>
-                        <select wire:model="bale_size.{{ $clickedProduct->id }}"  class="form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
-                        <option value="" >Select a Bale size</option>
-                        <option value="100">Starter Package: 100 pieces</option>
-                        <option value="350">Classic Package: 350 pieces</option>
-                        <option value="750">Premium Package: 750 pieces</option>
-                    </select>
+                        <div class="select-container relative w-full">
+                            <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full form-select rounded-md shadow-sm my-2" style="background: #7293a7; color: #fffefe;">
+                                <option value="">Select a Bale size</option>
+                                <option value="100">Starter Package: 100 pieces</option>
+                                <option value="350">Classic Package: 350 pieces</option>
+                                <option value="750">Premium Package: 750 pieces</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex gap-2">
 

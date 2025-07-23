@@ -37,6 +37,7 @@ class VendorPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
+            ->viteTheme('resources/css/filament/vendor/theme.css')
             ->colors([
                 'primary' => Color::Teal,
                 'info' => Color::Blue,

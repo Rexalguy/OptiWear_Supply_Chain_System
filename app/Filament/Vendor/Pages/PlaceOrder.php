@@ -5,20 +5,19 @@ namespace App\Filament\Vendor\Pages;
 use Filament\Forms;
 use App\Models\Product;
 use Filament\Pages\Page;
-
-use Filament\Notifications\Notification;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\VendorOrder;
 use App\Models\VendorOrderItem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
    
 
 class PlaceOrder extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = 'Place Order';
+    protected static ?string $navigationLabel = 'Cart';
     protected static ?string $navigationGroup = 'Orders';
     protected static string $view = 'filament.vendor.pages.place-order';
 
@@ -107,26 +106,52 @@ class PlaceOrder extends Page
 
     public function placeOrder($id)
     {
-        if (isset($this->cart[$id])) {
-            $product = Product::find($id);
-            if (!$product) {
-                return;
-            }
+        if (!isset($this->cart[$id])) {
+            return;
+        }
 
-            // Check for bale size before placing order
-            if (empty($this->cart[$id]['quantity']) || $this->cart[$id]['quantity'] <= 0) {
-                return;
-            }
+        $product = Product::find($id);
+        if (!$product) {
+            return;
+        }
 
-            //    Creating an order is left here am testing still
+        // Check for bale size before placing order
+        if (empty($this->cart[$id]['quantity']) || $this->cart[$id]['quantity'] <= 0) {
+            return;
+        }
 
+        try {
+            // Calculate total for this item
+            $total = $this->cart[$id]['price'] * $this->cart[$id]['quantity'];
+
+            // Create the vendor order
+            $order = VendorOrder::create([
+                'created_by' => Auth::id(),
+                'status' => 'pending',
+                'total' => $total,
+                'delivery_option' => $this->delivery_option ?? 'pickup',
+                'order_date' => now(),
+                'expected_fulfillment' => now()->addDays(5),
+            ]);
+
+            // Create the order item
+            VendorOrderItem::create([
+                'vendor_order_id' => $order->id,
+                'product_id' => $id,
+                'quantity' => $this->cart[$id]['quantity'],
+                'unit_price' => $this->cart[$id]['price'],
+            ]);
+
+            // Remove item from cart
             unset($this->cart[$id]);
             session()->put('cart', $this->cart);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cartCount', $this->cartCount);
-        } elseif (empty($this->cart)) {
-            return;
+
+        } catch (\Exception $e) {
+            Log::error('Order placement failed: ' . $e->getMessage());
         }
+
         self::getNavigationBadge();
     }
     public function placeFullOrder()
