@@ -261,7 +261,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->icon('heroicon-o-truck')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(function ($record, $livewire) {
+                    ->action(function ($record) {
                         $rawMaterial = RawMaterial::find($record->raw_materials_id);
                         if ($rawMaterial) {
                             $rawMaterial->update([
@@ -270,7 +270,7 @@ class RawMaterialsPurchaseOrderResource extends Resource
                         }
                         $record->update(['status' => 'delivered']);
 
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order marked as delivered - Raw material received and current stock updated.',
                             'icon' => 'success',
                             'iconColor' => 'green',
@@ -282,9 +282,9 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->action(function ($record, $livewire) {
+                    ->action(function ($record) {
                         $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order cancelled',
                             'icon' => 'success',
                             'iconColor' => 'green',
@@ -295,9 +295,9 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->label('Confirm Order')
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->action(function ($record, $livewire) {
+                    ->action(function ($record) {
                         $record->update(['status' => 'confirmed']);
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order confirmed',
                             'icon' => 'success',
                             'iconColor' => 'green',

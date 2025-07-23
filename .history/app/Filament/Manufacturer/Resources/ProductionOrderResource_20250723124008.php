@@ -125,7 +125,7 @@ class ProductionOrderResource extends Resource
                             ->first();
 
                         if (! $worker) {
-                            $livewire->dispatch('cart-updated', [
+                            $this->dispatch('cart-updated', [
                                 'title' => 'No available printing worker.',
                                 'icon' => 'error',
                                 'iconColor' => 'red',
@@ -150,7 +150,7 @@ class ProductionOrderResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => "Stitching started. Assigned worker: {$worker->name}",
                             'icon' => 'success',
                             'iconColor' => 'green',

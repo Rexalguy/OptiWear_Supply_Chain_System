@@ -193,7 +193,7 @@ class OrderResource extends Resource
                             $record->creator->increment('tokens', $tokens);
                         }
 
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order marked as delivered and tokens awarded',
                             'icon' => 'success',
                             'iconColor' => 'green',
@@ -206,14 +206,14 @@ class OrderResource extends Resource
                     ->icon('heroicon-o-x-circle')
                     ->visible(fn(Order $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
-                    ->action(function (Order $record, $livewire) {
+                    ->action(function (Order $record) {
                         foreach ($record->orderItems as $item) {
                             $item->product->increment('quantity_available', $item->quantity);
                         }
 
                         $record->update(['status' => 'cancelled']);
 
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order cancelled and stock restored',
                             'icon' => 'warning',
                             'iconColor' => 'yellow',

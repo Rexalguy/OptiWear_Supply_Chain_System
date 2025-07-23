@@ -282,9 +282,9 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->action(function ($record, $livewire) {
+                    ->action(function ($record) {
                         $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order cancelled',
                             'icon' => 'success',
                             'iconColor' => 'green',
@@ -295,9 +295,9 @@ class RawMaterialsPurchaseOrderResource extends Resource
                     ->label('Confirm Order')
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->action(function ($record, $livewire) {
+                    ->action(function ($record) {
                         $record->update(['status' => 'confirmed']);
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order confirmed',
                             'icon' => 'success',
                             'iconColor' => 'green',

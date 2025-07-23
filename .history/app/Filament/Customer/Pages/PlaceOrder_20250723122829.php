@@ -253,13 +253,11 @@ class PlaceOrder extends Page
 
         if ($existing) {
             $existing->delete();
-            $this->notify('Removed from wishlist', 'success');
         } else {
             Wishlist::create([
                 'user_id'    => $user->id,
                 'product_id' => $productId,
             ]);
-            $this->notify('Added to wishlist', 'success');
         }
 
         $this->loadWishlistProductIds();

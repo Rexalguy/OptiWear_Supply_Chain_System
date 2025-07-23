@@ -213,7 +213,7 @@ class OrderResource extends Resource
 
                         $record->update(['status' => 'cancelled']);
 
-                        $livewire->dispatch('cart-updated', [
+                        $this->dispatch('cart-updated', [
                             'title' => 'Order cancelled and stock restored',
                             'icon' => 'warning',
                             'iconColor' => 'yellow',
