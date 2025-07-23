@@ -39,6 +39,12 @@ class Order extends Model
 
     public function manufacturer() 
     {
-        return $this->belongsTo(User::class, 'manufacturer_id');
+      
+      return $this->belongsTo(User::class, 'manufacturer_id');
     }
+    public function customerInfo()
+{
+    return $this->hasOne(CustomerInfo::class, 'user_id', 'created_by');
+}
+
 }

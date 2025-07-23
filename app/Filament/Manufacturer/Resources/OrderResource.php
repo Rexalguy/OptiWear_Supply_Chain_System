@@ -48,38 +48,53 @@ class OrderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+        ->schema([
+            Forms\Components\TextInput::make('status'),
+            Forms\Components\Select::make('created_by')
+                ->label('Created By')
+                ->options(\App\Models\User::pluck('name', 'id'))
+                ->searchable()
+                ->required(),
 
-            ->schema([
-                Forms\Components\TextInput::make('status'),
-                Forms\Components\Select::make('created_by')
-                    ->label('Created By')
-                    ->options(\App\Models\User::pluck('name', 'id')) // key = ID, value = name
-                    ->searchable()
-                    ->required(),
-                Forms\Components\TextInput::make('delivery_option')
-                    ->required(),
-                Forms\Components\TextInput::make('total')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\DateTimePicker::make('expected_fulfillment_date')
-                    ->label('Expected Fulfillment Date')
-                    ->required()
-                    ->default(now()->addDays(7))
-                    ->minDate(now())
-                    ->maxDate(now()->addMonths(3))
-                    ->displayFormat('d M Y '),
-                Forms\Components\TextInput::make('rating')
-                    ->numeric()
-                    ->default(null),
-                Forms\Components\Textarea::make('review')
-                    ->columnSpanFull(),
-            ]);
-    }
+Forms\Components\TextInput::make('delivery_option')
+    ->required(),
+
+Forms\Components\Textarea::make('delivery_address')
+    ->label('Delivery Address')
+    ->disabled()
+    ->columnSpanFull()
+    ->visible(fn (?Order $record) => $record?->delivery_option === 'delivery') // ✅ Only show when needed
+    ->afterStateHydrated(function ($state, callable $set, ?Order $record) {
+        if ($record && $record->delivery_option === 'delivery') {
+            $set('delivery_address', $record->customerInfo?->address ?? 'N/A');
+        }
+    }),
+
+            Forms\Components\TextInput::make('total')
+                ->required()
+                ->numeric(),
+
+            Forms\Components\DateTimePicker::make('expected_fulfillment_date')
+                ->label('Expected Fulfillment Date')
+                ->required()
+                ->default(now()->addDays(7))
+                ->minDate(now())
+                ->maxDate(now()->addMonths(3))
+                ->displayFormat('d M Y '),
+
+            Forms\Components\TextInput::make('rating')
+                ->numeric()
+                ->default(null),
+
+            Forms\Components\Textarea::make('review')
+                ->columnSpanFull(),
+        ]);
+}
 
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Order::with(['orderItems.product', 'creator'])->orderBy('id', 'desc'))
+            ->query(Order::with(['orderItems.product', 'creator', 'customerInfo'])->orderBy('id', 'desc'))
             ->columns([
                 TextColumn::make('id')
                     ->label('Order #')
