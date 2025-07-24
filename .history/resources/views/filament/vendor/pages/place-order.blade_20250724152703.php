@@ -183,7 +183,7 @@
                                        value="delivery" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'delivery')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'delivery') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
                                         <span class="text-gray-900 dark:text-white font-semibold">Standard Delivery</span>
@@ -198,7 +198,7 @@
                                        value="express" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'express')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'express') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
                                         <span class="text-gray-900 dark:text-white font-semibold">Express Delivery</span>
@@ -213,7 +213,7 @@
                                        value="pickup" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'pickup')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'pickup') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
                                         <span class="text-gray-900 dark:text-white font-semibold">Store Pickup</span>

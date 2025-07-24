@@ -41,6 +41,11 @@
                         <svg class="w-8 h-8 text-blue-600 dark:text-blue-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m2.6 8L6 5H3m4 8v6a2 2 0 002 2h8a2 2 0 002-2v-6m-6 6V9a2 2 0 00-2-2H9a2 2 0 00-2 2v8.01"></path>
                         </svg>
+                        @if($cartCount > 0)
+                            <div class="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                                {{ $cartCount }}
+                            </div>
+                        @endif
                     </div>
                     <div class="text-left">
                         <h1 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
@@ -57,20 +62,19 @@
     <div class="rounded border-gray-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
         @foreach ($products as $product)
         <div 
-            class="group relative rounded-2xl p-0 cursor-pointer shadow-lg hover:shadow-2xl bg-white dark:bg-gray-800 transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700 overflow-hidden" 
-            style="border-radius: 1rem !important;"
+            class="group relative rounded-[3rem] p-0 cursor-pointer shadow-lg hover:shadow-2xl bg-white dark:bg-gray-800 transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700 overflow-hidden" 
         >
             <!-- Subtle gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl" style="border-radius: 1rem !important;"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-gray-800/50 dark:to-gray-900/50 rounded-[3rem]"></div>
             
             <!-- Product image with enhanced styling -->
-            <div wire:click="openProductModal({{ $product->id }})" class="relative z-10 w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-t-2xl mb-4 overflow-hidden group-hover:scale-105 transition-transform duration-300 pt-4" style="border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important;">
-                <div class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-t-2xl" style="border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important;"></div>
-                <div class="relative z-10 w-56 h-56 rounded-xl overflow-hidden drop-shadow-lg group-hover:scale-110 transition-transform duration-300 bg-white border-2 border-white/30" style="border-radius: 0.75rem !important;">
-                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-56 h-56 object-cover object-center rounded-xl" style="width: 224px !important; height: 224px !important; border-radius: 0.75rem !important;">
+            <div wire:click="openProductModal({{ $product->id }})" class="relative z-10 w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-t-[3rem] mb-4 overflow-hidden group-hover:scale-105 transition-transform duration-300 pt-4">
+                <div class="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-t-[3rem]"></div>
+                <div class="relative z-10 w-56 h-56 rounded-[2rem] overflow-hidden drop-shadow-lg group-hover:scale-110 transition-transform duration-300 bg-white border-2 border-white/30">
+                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-56 h-56 object-cover object-center rounded-[2rem]" style="width: 224px !important; height: 224px !important;">
                 </div>
                 <!-- Hover effect overlay -->
-                <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-2xl" style="border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important;"></div>
+                <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-[3rem]"></div>
             </div>
             
             <div class="relative z-10 px-4 pb-4">
@@ -82,8 +86,8 @@
                     </div>
                     
                     <!-- Enhanced select dropdown -->
-                    <select wire:model="bale_size.{{ $product->id }}" class="w-full mt-3 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium" style="border-radius: 0.5rem !important;">
-                        <option value="" class="text-gray-500"> Select Package Size</option>
+                    <select wire:model="bale_size.{{ $product->id }}" class="w-full mt-3 px-4 py-3 rounded-[1.5rem] border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium">
+                        <option value="" class="text-gray-500">🎯 Select Package Size</option>
                         <option value="100" class="font-medium">🚀 Starter: 100 pieces</option>
                         <option value="350" class="font-medium">⭐ Classic: 350 pieces</option>
                         <option value="750" class="font-medium">💎 Premium: 750 pieces</option>
@@ -98,7 +102,7 @@
                         size="sm" 
                         icon="heroicon-m-plus" 
                         icon-position="after"
-                        class="w-full justify-center font-semibold py-3 px-6 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                        class="w-full justify-center font-semibold py-3 px-6 rounded-[1.5rem] bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                     >
                         Add to Cart
                     </x-filament::button>
@@ -106,7 +110,7 @@
             </div>
             
             <!-- Decorative corner accent -->
-            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-bl-xl"></div>
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-bl-[2rem]"></div>
         </div>
         @endforeach
     </div>
@@ -204,9 +208,9 @@
             }
         </style>
         <div class="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-lg modal-fade-in p-6 overflow-y-auto" style="cursor:pointer;" wire:click.self="closeProductModal">
-            <div class="relative shadow-2xl bg-white dark:bg-gray-900 rounded-xl p-0 w-full max-w-6xl modal-slide-up my-8 mx-auto overflow-hidden backdrop-blur-sm" style="cursor:auto; border-radius: 1rem !important;" @click.stop>
+            <div class="relative shadow-2xl bg-white dark:bg-gray-900 rounded-[3rem] p-0 w-full max-w-6xl modal-slide-up my-8 mx-auto overflow-hidden backdrop-blur-sm" style="cursor:auto;" @click.stop>
                 <!-- Enhanced gradient background overlay -->
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-purple-50/60 to-pink-50/80 dark:from-gray-800/90 dark:via-gray-900/80 dark:to-gray-800/90 rounded-xl" style="border-radius: 1rem !important;"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-purple-50/60 to-pink-50/80 dark:from-gray-800/90 dark:via-gray-900/80 dark:to-gray-800/90 rounded-[3rem]"></div>
                 
                 <!-- Premium close button -->
                 <button wire:click="closeProductModal" class="absolute top-6 right-6 z-30 w-12 h-12 rounded-full bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 backdrop-blur-sm border border-white/30 dark:border-gray-600/30 flex items-center justify-center close-btn-animate group transition-all duration-300">
@@ -218,9 +222,9 @@
                 <!-- Premium flex layout -->
                 <div class="relative z-10 flex gap-8 h-[650px]">
                     <!-- Enhanced image section -->
-                    <div class="w-2/5 relative bg-gradient-to-br from-gray-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-l-xl flex items-center justify-center pr-2 pt-2 pb-2 overflow-hidden" style="border-top-left-radius: 1rem !important; border-bottom-left-radius: 1rem !important;">
+                    <div class="w-2/5 relative bg-gradient-to-br from-gray-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-l-[3rem] flex items-center justify-center pr-2 pt-2 pb-2 overflow-hidden">
                         <!-- Animated background -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/90 to-purple-50/95 dark:from-gray-800/95 dark:via-gray-900/90 dark:to-gray-800/95 rounded-l-xl" style="border-top-left-radius: 1rem !important; border-bottom-left-radius: 1rem !important;"></div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/90 to-purple-50/95 dark:from-gray-800/95 dark:via-gray-900/90 dark:to-gray-800/95 rounded-l-[3rem]"></div>
                         
                         <!-- Floating particles effect -->
                         <div class="absolute top-10 left-10 w-3 h-3 bg-blue-400/30 rounded-full animate-pulse"></div>
@@ -229,12 +233,12 @@
                         
                         <!-- Main image container -->
                         <div class="relative z-10 w-full h-full flex items-center justify-center group">
-                            <div class="relative w-[420px] h-[420px] rounded-xl overflow-hidden drop-shadow-2xl border-4 border-white/50 dark:border-gray-700/50 bg-white dark:bg-gray-800 transition-all duration-500 group-hover:scale-105 group-hover:rotate-1 premium-glow float-animation">
+                            <div class="relative w-[420px] h-[420px] rounded-[2rem] overflow-hidden drop-shadow-2xl border-4 border-white/50 dark:border-gray-700/50 bg-white dark:bg-gray-800 transition-all duration-500 group-hover:scale-105 group-hover:rotate-1 premium-glow float-animation">
                                 <!-- Image glow effect -->
-                                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl"></div>
-                                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="w-full h-full object-cover object-center rounded-lg transition-all duration-500 group-hover:brightness-110 shimmer" style="width: 420px !important; height: 420px !important;">
+                                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-[2rem]"></div>
+                                <img src="{{ asset($clickedProduct->image)}}" alt="{{ $clickedProduct->name }}" class="w-full h-full object-cover object-center rounded-[1.7rem] transition-all duration-500 group-hover:brightness-110 shimmer" style="width: 420px !important; height: 420px !important;">
                                 <!-- Overlay shine effect -->
-                                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+                                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[1.7rem]"></div>
                             </div>
                         </div>
                         
@@ -245,7 +249,7 @@
                     </div>
                 
                     <!-- Enhanced content section -->
-                    <div class="flex-1 p-10 pr-20 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm rounded-r-xl" style="border-top-right-radius: 1rem !important; border-bottom-right-radius: 1rem !important; padding-right: 5rem !important;">
+                    <div class="flex-1 p-10 pr-16 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm rounded-r-[3rem]">
                         <!-- Title section -->
                         <div class="space-y-4">
                             <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-purple-900 dark:from-white dark:via-blue-200 dark:to-purple-200 mb-4 leading-tight animated-gradient">{{ $clickedProduct->name }}s</h3>
@@ -264,12 +268,13 @@
                         </div>
                         
                         <!-- Premium package selection -->
-                        <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800/80 dark:to-gray-700/80 rounded-xl p-8 backdrop-blur-sm shadow-xl premium-glow">
+                        <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800/80 dark:to-gray-700/80 rounded-[2rem] p-8 backdrop-blur-sm shadow-xl premium-glow">
                             <label class="block text-xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center space-x-2">
+                                <span class="text-2xl">🎁</span>
                                 <span>Choose Your Perfect Package</span>
                             </label>
-                            <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium">
-                                <option value="" class="text-gray-500"> Select Package Size</option>
+                            <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full px-4 py-3 rounded-[1rem] border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium">
+                                <option value="" class="text-gray-500">🎯 Select Package Size</option>
                                 <option value="100" class="font-medium">🚀 Starter: 100 pieces</option>
                                 <option value="350" class="font-medium">⭐ Classic: 350 pieces</option>
                                 <option value="750" class="font-medium">💎 Premium: 750 pieces</option>
@@ -282,7 +287,7 @@
                                 wire:click="closeProductModal" 
                                 color="gray" 
                                 size="xl"
-                                class="justify-center py-6 px-12 rounded-xl font-bold transition-all duration-300 hover:scale-105 text-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 backdrop-blur-sm shadow-xl hover:shadow-2xl premium-glow"
+                                class="justify-center py-6 px-12 rounded-[1.5rem] font-bold transition-all duration-300 hover:scale-105 text-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 backdrop-blur-sm shadow-xl hover:shadow-2xl premium-glow"
                             >
                                 Close
                             </x-filament::button>
@@ -293,7 +298,7 @@
                                 size="xl" 
                                 icon="heroicon-m-plus" 
                                 icon-position="after"
-                                class="justify-center py-6 px-12 rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white shadow-xl hover:shadow-2xl font-bold transition-all duration-300 hover:scale-105 text-xl backdrop-blur-sm premium-glow shimmer"
+                                class="justify-center py-6 px-12 rounded-[1.5rem] bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white shadow-xl hover:shadow-2xl font-bold transition-all duration-300 hover:scale-105 text-xl backdrop-blur-sm premium-glow shimmer"
                             >
                                 Add to Cart
                             </x-filament::button>
@@ -302,9 +307,9 @@
                 </div>
                 
                 <!-- Enhanced decorative corner accents -->
-                <div class="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-transparent rounded-br-xl backdrop-blur-sm"></div>
-                <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-purple-500/20 via-pink-500/15 to-transparent rounded-tl-xl backdrop-blur-sm"></div>
-                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-pink-500/15 via-purple-500/10 to-transparent rounded-bl-xl backdrop-blur-sm"></div>
+                <div class="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-transparent rounded-br-[2.5rem] backdrop-blur-sm"></div>
+                <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-purple-500/20 via-pink-500/15 to-transparent rounded-tl-[2.5rem] backdrop-blur-sm"></div>
+                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-pink-500/15 via-purple-500/10 to-transparent rounded-bl-[2.5rem] backdrop-blur-sm"></div>
             </div>
         </div>
     @endif
