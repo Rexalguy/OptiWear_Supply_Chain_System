@@ -31,7 +31,7 @@ class PlaceOrder extends Page
 
     // Product list
     public $products;
-    
+
     // Category filtering
     public string $selectedCategory = '';
     public $categories;
@@ -80,14 +80,32 @@ class PlaceOrder extends Page
             $this->products = $this->recommendedProducts;
             return;
         }
-        
+
         $query = Product::where('quantity_available', '>', 0)->with('shirtCategory');
-        
+
         if ($this->selectedCategory) {
             $query->where('shirt_category_id', $this->selectedCategory);
         }
-        
+
         $this->products = $query->get();
+    }
+
+    /* Quick helper to show SweetAlert notifications */
+    protected function notify(string $message, string $type = 'success'): void
+    {
+        $iconMap = [
+            'success' => ['icon' => 'success'],
+            'danger' => ['icon' => 'error'],
+            'warning' => ['icon' => 'warning'],
+            'info' => ['icon' => 'info'],
+        ];
+
+        $iconData = $iconMap[$type] ?? ['icon' => 'success'];
+
+        $this->dispatch('sweetalert', [
+            'title' => $message,
+            'icon' => $iconData['icon'],
+        ]);
     }
 
     /* Wishlist loading */

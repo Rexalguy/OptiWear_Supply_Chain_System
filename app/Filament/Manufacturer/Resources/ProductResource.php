@@ -139,7 +139,7 @@ class ProductResource extends Resource
                         ];
                     })
 
-                    ->action(function (array $data, Product $record): void {
+                    ->action(function (array $data, Product $record, $livewire): void {
                         ProductionOrder::create([
                             'product_id' => $record->id,
                             'quantity' => $data['quantity'],
@@ -147,10 +147,11 @@ class ProductResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        Notification::make()
-                            ->title("Production order created for {$record->name}")
-                            ->success()
-                            ->send();
+                        $livewire->dispatch('sweetalert', [
+                            'title' => "Production order created for {$record->name}",
+                            'icon' => 'success',
+
+                        ]);
                     }),
 
                 Tables\Actions\ViewAction::make(),

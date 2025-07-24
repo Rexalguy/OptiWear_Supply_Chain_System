@@ -27,7 +27,7 @@ class ProductionOrderResource extends Resource
     protected static ?string $navigationGroup = 'Product';
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 
-        public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
         return (string) ProductionOrder::where('status', 'pending')->count();
     }
@@ -69,7 +69,7 @@ class ProductionOrderResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')->label('Product')->searchable()->sortable()->grow(false),
                 Tables\Columns\TextColumn::make('quantity')->label('Quantity')->numeric(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->badge()->color(fn ($state) => match ($state) {
+                Tables\Columns\TextColumn::make('status')->label('Status')->badge()->color(fn($state) => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
@@ -96,7 +96,7 @@ class ProductionOrderResource extends Resource
                     ->icon('heroicon-o-cog-6-tooth')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(function (ProductionOrder $record) {
+                    ->action(function (ProductionOrder $record, $livewire) {
                         $materials = BillOfMaterial::where('product_id', $record->product_id)->get();
 
                         foreach ($materials as $material) {
@@ -104,10 +104,11 @@ class ProductionOrderResource extends Resource
                             $required = $material->quantity_required * $record->quantity;
 
                             if ($raw->current_stock < $required) {
-                                Notification::make()
-                                    ->title("Insufficient stock for {$raw->name}")
-                                    ->danger()
-                                    ->send();
+                                $livewire->dispatch('sweetalert', [
+                                    'title' => "Insufficient stock for {$raw->name}",
+                                    'icon' => 'error',
+
+                                ]);
                                 return;
                             }
                         }
@@ -124,10 +125,11 @@ class ProductionOrderResource extends Resource
                             ->first();
 
                         if (! $worker) {
-                            Notification::make()
-                                ->title('No available printing worker.')
-                                ->danger()
-                                ->send();
+                            $livewire->dispatch('sweetalert', [
+                                'title' => 'No available printing worker.',
+                                'icon' => 'error',
+
+                            ]);
                             return;
                         }
 
@@ -148,12 +150,13 @@ class ProductionOrderResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        Notification::make()
-                            ->title("Stitching started. Assigned worker: {$worker->name}")
-                            ->success()
-                            ->send();
+                        $livewire->dispatch('sweetalert', [
+                            'title' => "Stitching started. Assigned worker: {$worker->name}",
+                            'icon' => 'success',
+
+                        ]);
                     })
-                    ->visible(fn (ProductionOrder $record) => $record->status === 'pending'),
+                    ->visible(fn(ProductionOrder $record) => $record->status === 'pending'),
 
                 ActionGroup::make([
                     Tables\Actions\Action::make('bom')
@@ -214,7 +217,7 @@ class ProductionOrderResource extends Resource
                         })
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Close')
-                        ->visible(fn (ProductionOrder $record) => $record->status !== 'pending'),
+                        ->visible(fn(ProductionOrder $record) => $record->status !== 'pending'),
                 ])
                     ->icon('heroicon-m-ellipsis-horizontal')
                     ->color('info')
@@ -239,7 +242,7 @@ class ProductionOrderResource extends Resource
         ];
     }
 
-        public static function getWidgets(): array
+    public static function getWidgets(): array
     {
         return [
             ProductionStats::class,

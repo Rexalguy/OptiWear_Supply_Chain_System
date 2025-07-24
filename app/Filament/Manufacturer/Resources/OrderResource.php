@@ -40,7 +40,7 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
 
-        public static function canCreate(): bool
+    public static function canCreate(): bool
     {
         return false;
     }
@@ -78,7 +78,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-                    ->query(Order::with(['orderItems.product', 'creator'])->orderBy('id', 'desc'))
+            ->query(Order::with(['orderItems.product', 'creator'])->orderBy('id', 'desc'))
             ->columns([
                 TextColumn::make('id')
                     ->label('Order #')
@@ -134,7 +134,7 @@ class OrderResource extends Resource
                     ->since()
                     ->dateTooltip(),
 
-                
+
 
                 TextColumn::make('rating')
                     ->label('⭐ Rating')
@@ -146,141 +146,144 @@ class OrderResource extends Resource
             ])
             ->actions([
 
-             
-          
 
-                        Action::make('markConfirmed')
-                            ->label('Confirm')
-                            ->color('info')
-                            ->icon('heroicon-o-check-circle')
-                            ->visible(fn(Order $record) => $record->status === 'pending')
-                            ->action(function (Order $record) {
-                                foreach ($record->orderItems as $item) {
-                                    $product = $item->product;
-                                    if ($product->quantity_available < $item->quantity) {
-                                        Notification::make()
-                                            ->title("Not enough stock for {$product->name}")
-                                            ->danger()
-                                            ->send();
-                                        return;
-                                    }
-                                }
 
-                                foreach ($record->orderItems as $item) {
-                                    $item->product->decrement('quantity_available', $item->quantity);
-                                }
 
-                                $record->update(['status' => 'confirmed']);
+                Action::make('markConfirmed')
+                    ->label('Confirm')
+                    ->color('info')
+                    ->icon('heroicon-o-check-circle')
+                    ->visible(fn(Order $record) => $record->status === 'pending')
+                    ->action(function (Order $record, $livewire) {
+                        foreach ($record->orderItems as $item) {
+                            $product = $item->product;
+                            if ($product->quantity_available < $item->quantity) {
+                                $livewire->dispatch('sweetalert', [
+                                    'title' => "Not enough stock for {$product->name}",
+                                    'icon' => 'error',
 
-                                Notification::make()
-                                    ->title('Order confirmed and stock reduced')
-                                    ->success()
-                                    ->send();
-                            }),
+                                ]);
+                                return;
+                            }
+                        }
 
-                        Action::make('markDelivered')
-                            ->label('Deliver')
-                            ->color('success')
-                            ->icon('heroicon-o-truck')
-                            ->visible(fn(Order $record) => $record->status === 'confirmed')
-                                ->action(function (Order $record) {
-                            $record->update(['status' => 'delivered']);
+                        foreach ($record->orderItems as $item) {
+                            $item->product->decrement('quantity_available', $item->quantity);
+                        }
 
-                            if ($record->total >= 50000) {
-                                $tokens = floor($record->total / 15000);
-                                $record->creator->increment('tokens', $tokens);
-                                
+                        $record->update(['status' => 'confirmed']);
+
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order confirmed and stock reduced',
+                            'icon' => 'success',
+
+                        ]);
+                    }),
+
+                Action::make('markDelivered')
+                    ->label('Deliver')
+                    ->color('success')
+                    ->icon('heroicon-o-truck')
+                    ->visible(fn(Order $record) => $record->status === 'confirmed')
+                    ->action(function (Order $record, $livewire) {
+                        $record->update(['status' => 'delivered']);
+
+                        if ($record->total >= 50000) {
+                            $tokens = floor($record->total / 15000);
+                            $record->creator->increment('tokens', $tokens);
+                        }
+
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order marked as delivered and tokens awarded',
+                            'icon' => 'success',
+
+                        ]);
+                    }),
+
+                Action::make('markCancelled')
+                    ->label('Cancel')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->visible(fn(Order $record) => in_array($record->status, ['pending', 'confirmed']))
+                    ->requiresConfirmation()
+                    ->action(function (Order $record, $livewire) {
+                        foreach ($record->orderItems as $item) {
+                            $item->product->increment('quantity_available', $item->quantity);
+                        }
+
+                        $record->update(['status' => 'cancelled']);
+
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order cancelled and stock restored',
+                            'icon' => 'error',
+
+                        ]);
+                    }),
+
+                ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Action::make('viewItems')
+                        ->label('View Items')
+                        ->icon('heroicon-o-list-bullet')
+                        ->color('gray')
+                        ->modalHeading('Order Items')
+                        ->infolist(function ($record) {
+                            $items = OrderItem::with('product')
+                                ->where('order_id', $record->id)
+                                ->get();
+
+                            if ($items->isEmpty()) {
+                                return [
+                                    Section::make()
+                                        ->schema([
+                                            TextEntry::make('none')
+                                                ->default('No items found for this order.')
+                                                ->color('danger')
+                                                ->columnSpanFull(),
+                                        ]),
+                                ];
                             }
 
-                            Notification::make()
-                                ->title('Order marked as delivered and tokens awarded')
-                                ->success()
-                                ->send();
-                        }),
+                            return [
+                                Section::make('Items')
+                                    ->schema(
+                                        $items->map(function ($item) {
+                                            return Grid::make(3)->schema([
+                                                TextEntry::make('product')
+                                                    ->label('Product')
+                                                    ->default($item->product->name),
 
-                        Action::make('markCancelled')
-                            ->label('Cancel')
-                            ->color('danger')
-                            ->icon('heroicon-o-x-circle')
-                            ->visible(fn(Order $record) => in_array($record->status, ['pending', 'confirmed']))
-                            ->requiresConfirmation()
-                            ->action(function (Order $record) {
-                                foreach ($record->orderItems as $item) {
-                                    $item->product->increment('quantity_available', $item->quantity);
-                                }
+                                                TextEntry::make('quantity')
+                                                    ->label('Quantity')
+                                                    ->default($item->quantity),
 
-                                $record->update(['status' => 'cancelled']);
+                                                TextEntry::make('total')
+                                                    ->label('Total (UGX)')
+                                                    ->default('UGX ' . number_format($item->quantity * $item->product->price)),
+                                            ]);
+                                        })->toArray()
+                                    ),
+                            ];
+                        })
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Close'),
 
-                                Notification::make()
-                                    ->title('Order cancelled and stock restored')
-                                    ->danger()
-                                    ->send();
-                            }),
+                    Action::make('viewReview')
+                        ->label('Review')
+                        ->color('gray')
+                        ->icon('heroicon-o-eye')
+                        ->visible(fn($record) =>  $record?->status === 'delivered')
+                        ->modalHeading('Customer Review')
+                        ->modalDescription(fn($record) => 'Order #' . $record->id)
+                        ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
+                        ->modalSubmitAction(false),
+                ])->iconButton()
+                    ->color('info')
+                    ->tooltip('Details'),
 
-                            ActionGroup::make([
-            Tables\Actions\ViewAction::make(),
-            Action::make('viewItems')
-            ->label('View Items')
-            ->icon('heroicon-o-list-bullet')
-            ->color('gray')
-            ->modalHeading('Order Items')
-            ->infolist(function ($record) {
-                $items = OrderItem::with('product')
-                    ->where('order_id', $record->id)
-                    ->get();
+            ])
+            ->defaultSort('id', 'desc')
 
-                if ($items->isEmpty()) {
-                    return [
-                        Section::make()
-                            ->schema([
-                                TextEntry::make('none')
-                                    ->default('No items found for this order.')
-                                    ->color('danger')
-                                    ->columnSpanFull(),
-                            ]),
-                    ];
-                }
-
-                return [
-                    Section::make('Items')
-                        ->schema(
-                            $items->map(function ($item) {
-                                return Grid::make(3)->schema([
-                                    TextEntry::make('product')
-                                        ->label('Product')
-                                        ->default($item->product->name),
-
-                                    TextEntry::make('quantity')
-                                        ->label('Quantity')
-                                        ->default($item->quantity),
-
-                                    TextEntry::make('total')
-                                        ->label('Total (UGX)')
-                                        ->default('UGX ' . number_format($item->quantity * $item->product->price)),
-                                ]);
-                            })->toArray()
-                        ),
-                ];
-            })
-            ->modalSubmitAction(false)
-            ->modalCancelActionLabel('Close'),
-
-                            Action::make('viewReview')
-                            ->label('Review')
-                            ->color('gray')
-                            ->icon('heroicon-o-eye')
-                            ->visible(fn($record) =>  $record?->status === 'delivered')
-                            ->modalHeading('Customer Review')
-                            ->modalDescription(fn($record) => 'Order #' . $record->id)
-                            ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
-                            ->modalSubmitAction(false),
-            ])->iconButton()
-            ->color('info')
-            ->tooltip('Details'),     
-
-                    ])
-                    ->defaultSort('id', 'desc')
-            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -306,9 +309,9 @@ class OrderResource extends Resource
     }
 
     public static function getWidgets(): array
-{
-    return [
-        OrderStats::class,
-    ];
-}
+    {
+        return [
+            OrderStats::class,
+        ];
+    }
 }

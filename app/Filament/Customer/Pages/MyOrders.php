@@ -141,12 +141,12 @@ class MyOrders extends Page implements HasTable
     public function calculatePotentialDiscount(): int
     {
         $availableTokens = $this->userTokens;
-        
+
         // Only allow redemption if user has MORE than 200 tokens
         if ($availableTokens > 200) {
             return 10000; // UGX 10,000 discount for 200 tokens
         }
-        
+
         return 0;
     }
 
@@ -179,7 +179,7 @@ class MyOrders extends Page implements HasTable
         if ($availableTokens > 200) {
             $tokensUsed = 200;
             $discount = 10000;
-            
+
             if ($tokensUsed > 0 && $user instanceof \Illuminate\Database\Eloquent\Model) {
                 $user->decrement('tokens', $tokensUsed);
             }
@@ -192,10 +192,21 @@ class MyOrders extends Page implements HasTable
     public function placeOrder(): void
     {
         if (empty($this->cart)) {
+            $this->dispatch('sweetalert', [
+                'title' => 'Cart is empty',
+                'icon' => 'error',
+
+            ]);
             return;
         }
 
         if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
+            $this->dispatch('sweetalert', [
+                'title' => 'Address Required',
+                'text' => 'Please enter your delivery address.',
+                'icon' => 'error',
+
+            ]);
             return;
         }
 
@@ -247,6 +258,12 @@ class MyOrders extends Page implements HasTable
 
             if ($validItems === 0) {
                 DB::rollBack();
+                $this->dispatch('sweetalert', [
+                    'title' => 'No valid products found',
+                    'text' => 'Some items in your cart are no longer available. Please refresh your cart.',
+                    'icon' => 'error',
+
+                ]);
                 return;
             }
 
@@ -264,8 +281,20 @@ class MyOrders extends Page implements HasTable
             session()->forget('cart');
             $this->calculatePotentialTokens();
 
+            $this->dispatch('sweetalert', [
+                'title' => 'Order placed successfully!',
+                'text' => "🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}",
+                'icon' => 'success',
+
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            $this->dispatch('sweetalert', [
+                'title' => 'Failed to place order',
+                'text' => $e->getMessage(),
+                'icon' => 'error',
+
+            ]);
         }
     }
 
@@ -275,6 +304,11 @@ class MyOrders extends Page implements HasTable
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
+            $this->dispatch('sweetalert', [
+                'title' => 'Removed from cart',
+                'icon' => 'success',
+
+            ]);
         }
     }
 
@@ -295,7 +329,8 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('created_at')->label('Placed On')->dateTime()->since(),
                 TextColumn::make('expected_fulfillment_date')
                     ->label('Expected Fulfillment Date')
-                    ->formatStateUsing(fn($state, $record) =>
+                    ->formatStateUsing(
+                        fn($state, $record) =>
                         $record->status === 'delivered'
                             ? 'Done'
                             : ($state ? Carbon::parse($state)->format('d M Y ') : 'N/A')
@@ -304,10 +339,12 @@ class MyOrders extends Page implements HasTable
                 TextColumn::make('orderItems')
                     ->label('Items')
                     ->html()
-                    ->formatStateUsing(fn($state, $record) =>
+                    ->formatStateUsing(
+                        fn($state, $record) =>
                         $record->orderItems
-                            ->map(fn($item) => e($item->product->name)
-                                . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
+                            ->map(
+                                fn($item) => e($item->product->name)
+                                    . " <small>(Size: " . e($item->size ?? '-') . ", Qty: {$item->quantity})</small>"
                             )
                             ->implode('<br>')
                     ),
@@ -362,10 +399,15 @@ class MyOrders extends Page implements HasTable
                             ->placeholder('Write your review here...')
                             ->rows(4),
                     ])
-                    ->action(function (Order $record, array $data) {
+                    ->action(function (Order $record, array $data, $livewire) {
                         $record->update([
                             'rating' => $data['rating'],
                             'review' => $data['review'],
+                        ]);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Thank you for your feedback!',
+                            'icon' => 'success',
+
                         ]);
                     }),
             ])

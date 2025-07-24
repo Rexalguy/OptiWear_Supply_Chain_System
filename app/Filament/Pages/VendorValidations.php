@@ -91,7 +91,7 @@ class VendorValidations extends Page implements HasTable
                 ->icon('heroicon-m-paper-airplane')
                 ->visible(fn ($record) => !$record->notified_at)
                 ->requiresConfirmation()
-                ->action(function ($record) {
+                ->action(function ($record, $livewire) {
                     
 
             if ($record->is_valid) {
@@ -106,10 +106,11 @@ class VendorValidations extends Page implements HasTable
                     $record->notified_at = now();
                     $record->save();
 
-                    Notification::make()
-                        ->title('Vendor notified successfully')
-                        ->success()
-                        ->send();
+                    $livewire->dispatch('sweetalert', [
+                        'title' => 'Vendor notified successfully',
+                        'icon' => 'success',
+
+                    ]);
         }),
        
             
