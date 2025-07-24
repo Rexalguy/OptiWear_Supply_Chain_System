@@ -72,17 +72,12 @@ class VendorOrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expected_fulfillment')
                     ->label('Expected Fulfillment')
-                    ->getStateUsing(function ($record) {
-                        if ($record->created_at->addDays(3) < now() || $record->status == 'cancelled') {
-                            return 'Closed';
-                        } elseif ($record->status == 'delivered') {
-                            return 'Done';
-                        }
-                        return \Carbon\Carbon::parse($record->created_at->addDays(3))->diffForHumans([
-                            'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                            'parts' => 2,
-                        ]);
-                    })
+                    ->formatStateUsing(
+                        fn($state, $record) =>
+                        $record->status === 'delivered'
+                            ? 'Done'
+                            : ($state ? \Carbon\Carbon::parse($state)->format('d M Y ') : 'N/A')
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('items')
                     ->label('Items')
@@ -129,14 +124,7 @@ class VendorOrderResource extends Resource
                     ->label('Resume Order')
                     ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
-                    ->action(function(VendorOrder $record, $livewire) {
-                        $record->update(['status' => 'pending']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Resumed Successfully',
-                            'icon' => 'success',
-
-                        ]);
-                    }),
+                    ->action(fn(VendorOrder $record) => $record->update(['status' => 'pending'])),
 
                 Tables\Actions\Action::make('cancel')
                     ->color('danger')
@@ -144,14 +132,7 @@ class VendorOrderResource extends Resource
                     ->label('Cancel')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
-                    ->action(function($record, $livewire) {
-                        $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Cancelled Successfully',
-                            'icon' => 'info',
-
-                        ]);
-                    }),
+                    ->action(fn(VendorOrder $record) => $record->update(['status' => 'cancelled'])),
 
                 Tables\Actions\ViewAction::make()
                     ->label('View Details')

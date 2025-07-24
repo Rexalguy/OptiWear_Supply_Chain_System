@@ -129,13 +129,12 @@ class VendorOrderResource extends Resource
                     ->label('Resume Order')
                     ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
-                    ->action(function(VendorOrder $record, $livewire) {
+                    ->action(function(VendorOrder $record) {
                         $record->update(['status' => 'pending']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Resumed Successfully',
-                            'icon' => 'success',
-
-                        ]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Order Resumed Successfully')
+                            ->success()
+                            ->send();
                     }),
 
                 Tables\Actions\Action::make('cancel')
@@ -144,13 +143,12 @@ class VendorOrderResource extends Resource
                     ->label('Cancel')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
-                    ->action(function($record, $livewire) {
+                    ->action(function($record) {
                         $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Cancelled Successfully',
-                            'icon' => 'info',
-
-                        ]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Order Cancelled Successfully')
+                            ->info()
+                            ->send();
                     }),
 
                 Tables\Actions\ViewAction::make()

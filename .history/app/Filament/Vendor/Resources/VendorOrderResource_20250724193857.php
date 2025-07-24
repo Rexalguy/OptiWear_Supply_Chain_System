@@ -131,10 +131,11 @@ class VendorOrderResource extends Resource
                     ->requiresConfirmation()
                     ->action(function(VendorOrder $record, $livewire) {
                         $record->update(['status' => 'pending']);
+                        // Use the component dispatch method
+                        $livewire->getOwnerRecord();
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order Resumed Successfully',
                             'icon' => 'success',
-
                         ]);
                     }),
 
@@ -146,10 +147,10 @@ class VendorOrderResource extends Resource
                     ->requiresConfirmation()
                     ->action(function($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
+                        // Use the component dispatch method
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order Cancelled Successfully',
                             'icon' => 'info',
-
                         ]);
                     }),
 
