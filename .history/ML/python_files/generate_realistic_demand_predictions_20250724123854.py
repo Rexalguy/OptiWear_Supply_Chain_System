@@ -1,4 +1,13 @@
+"""
+Realistic Demand Prediction Data Generator for OptiWear Supply Chain System
 
+This script generates realistic demand forecasting data with:
+- Seasonal patterns (higher demand in certain months)
+- Category-specific trends (different demand patterns per category)  
+- Random variation (realistic fluctuations around trends)
+- Growth trends (gradual increases/decreases over time)
+- Day-of-week patterns (different demand on weekdays vs weekends)
+"""
 
 import mysql.connector
 import pandas as pd
@@ -11,8 +20,8 @@ import math
 DB_CONFIG = {
     'host': '127.0.0.1',
     'user': 'root',
-    'password': '',
-    'database': 'optiwear'
+    'password': '1234dadi',
+    'database': 'scm'
 }
 
 def get_db_connection():
@@ -175,7 +184,7 @@ def insert_demand_data(data):
         cursor.executemany(insert_query, insert_data)
         conn.commit()
         
-        print(f" Successfully inserted {len(data)} demand prediction records")
+        print(f"✅ Successfully inserted {len(data)} demand prediction records")
         
     except Exception as e:
         print(f" Error inserting demand data: {e}")
@@ -253,19 +262,19 @@ def main():
     all_data = []
     
     for timeframe in timeframes:
-        print(f"\n Generating realistic data for {timeframe}...")
+        print(f"\n🔄 Generating realistic data for {timeframe}...")
         timeframe_data = generate_demand_data_for_timeframe(categories, timeframe)
         all_data.extend(timeframe_data)
     
     # Insert all data into database
-    print(f"\n Inserting {len(all_data):,} total records into database...")
+    print(f"\n💾 Inserting {len(all_data):,} total records into database...")
     insert_demand_data(all_data)
     
     # Generate summary statistics
     generate_summary_stats(categories, timeframes)
     
-    print("\n Realistic demand prediction data generation completed!")
-    print(" Your demand forecasting charts should now show varied, realistic patterns!")
+    print("\n🎉 Realistic demand prediction data generation completed!")
+    print("✨ Your demand forecasting charts should now show varied, realistic patterns!")
 
 if __name__ == "__main__":
     main()
