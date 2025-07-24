@@ -83,17 +83,6 @@ class VendorOrderResource extends Resource
                             'parts' => 2,
                         ]);
                     })
-                    ->getStateUsing(function ($record) {
-                        if ($record->created_at->addDays(3) < now() || $record->status == 'cancelled') {
-                            return 'Closed';
-                        } elseif ($record->status == 'delivered') {
-                            return 'Done';
-                        }
-                        return \Carbon\Carbon::parse($record->created_at->addDays(3))->diffForHumans([
-                            'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                            'parts' => 2,
-                        ]);
-                    })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('items')
                     ->label('Items')
