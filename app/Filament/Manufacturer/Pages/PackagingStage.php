@@ -92,7 +92,7 @@ class PackagingStage extends Page implements HasTable
                         ->searchable()
                         ->required(),
                 ])
-                ->action(function (array $data, ProductionOrder $record) {
+                ->action(function (array $data, ProductionOrder $record, $livewire) {
                     $stage = $record->productionStages()->where('stage', 'packaging')->first();
 
                     if (! $stage) {
@@ -110,10 +110,10 @@ class PackagingStage extends Page implements HasTable
                         ]);
                     }
 
-                    $this->dispatch('cart-updated', [
+                    $livewire->dispatch('sweetalert', [
                         'title' => 'Packaging started',
                         'icon' => 'success',
-                        'iconColor' => 'green',
+
                     ]);
                 })
                 ->visible(
@@ -125,7 +125,7 @@ class PackagingStage extends Page implements HasTable
                 ->label('Mark as Completed')
                 ->color('success')
                 ->requiresConfirmation()
-                ->action(function (ProductionOrder $record) {
+                ->action(function (ProductionOrder $record, $livewire) {
                     $packaging = $record->productionStages()->where('stage', 'packaging')->first();
 
                     if ($packaging && $packaging->status === 'in_progress') {
@@ -162,16 +162,16 @@ class PackagingStage extends Page implements HasTable
                             // Mark delivery worker as unavailable
                             $deliveryWorker->update(['is_available' => false]);
 
-                            $this->dispatch('cart-updated', [
+                            $livewire->dispatch('sweetalert', [
                                 'title' => "Packaging completed and delivery started. Assigned worker: {$deliveryWorker->name}",
                                 'icon' => 'success',
-                                'iconColor' => 'green',
+
                             ]);
                         } else {
-                            $this->dispatch('cart-updated', [
+                            $livewire->dispatch('sweetalert', [
                                 'title' => 'Packaging completed. No available delivery worker to assign.',
                                 'icon' => 'warning',
-                                'iconColor' => 'orange',
+
                             ]);
                         }
                     }

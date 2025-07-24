@@ -147,10 +147,10 @@ class ProductResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        $livewire->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => "Production order created for {$record->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 

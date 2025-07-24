@@ -103,7 +103,7 @@ class DeliveryStage extends Page implements HasTable
                         ->searchable()
                         ->required(),
                 ])
-                ->action(function (array $data, ProductionOrder $record) {
+                ->action(function (array $data, ProductionOrder $record, $livewire) {
                     $stage = $record->productionStages()->where('stage', 'delivery')->first();
 
                     if (! $stage) {
@@ -121,10 +121,10 @@ class DeliveryStage extends Page implements HasTable
                         ]);
                     }
 
-                    $this->dispatch('cart-updated', [
+                    $livewire->dispatch('sweetalert', [
                         'title' => 'Delivery started',
                         'icon' => 'success',
-                        'iconColor' => 'green',
+
                     ]);
                 })
                 ->visible(
@@ -136,7 +136,7 @@ class DeliveryStage extends Page implements HasTable
                 ->label('Mark as Delivered')
                 ->color('success')
                 ->requiresConfirmation()
-                ->action(function (ProductionOrder $record) {
+                ->action(function (ProductionOrder $record, $livewire) {
                     $delivery = $record->productionStages()->where('stage', 'delivery')->first();
 
                     if ($delivery && $delivery->status === 'in_progress') {
@@ -150,10 +150,10 @@ class DeliveryStage extends Page implements HasTable
 
                         $record->update(['status' => 'completed']);
 
-                        $this->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Delivery completed. Product stock updated.',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }
                 })

@@ -99,11 +99,11 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
 
             // If no supporting document provided, notify and abort
             if (empty($supportPath) || !file_exists($supportPath)) {
-                $this->dispatch('cart-updated', [
+                $this->dispatch('sweetalert', [
                     'title' => 'Missing Supporting Documents',
                     'text' => 'Please upload at least one PDF containing your tax certificate, business license, or other support materials.',
                     'icon' => 'error',
-                    'iconColor' => 'red',
+
                 ]);
                 return;
             }
@@ -138,17 +138,17 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                     ->first();
             }
 
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Application submitted successfully!',
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         } catch (\Exception $e) {
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Error',
                 'text' => "Unable to connect to the validation service. Please try again later.",
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
         }
 
@@ -239,14 +239,14 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                 ->label('Confirm Notification')
                                 ->color('success')
                                 ->visible(fn($record) => $record->notified_at && !$record->viewed_at)
-                                ->action(function ($record) {
+                                ->action(function ($record, $livewire) {
                                     $record->update(['viewed_at' => now()]);
 
-                                    $this->dispatch('cart-updated', [
+                                    $livewire->dispatch('sweetalert', [
                                         'title' => 'Confirmed',
                                         'text' => 'Sign out and sign in again as a Vendor.',
                                         'icon' => 'success',
-                                        'iconColor' => 'green',
+
                                     ]);
 
                                     return redirect('http://optiwear_supply_chain_system.test/customer');

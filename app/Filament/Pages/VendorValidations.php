@@ -87,12 +87,12 @@ class VendorValidations extends Page implements HasTable
             ->filters(filters: [])
             ->actions([
                 Action::make('notify')
-                    ->label('Notify')
-                    ->icon('heroicon-m-paper-airplane')
-                    ->visible(fn($record) => !$record->notified_at)
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
-
+                ->label('Notify')
+                ->icon('heroicon-m-paper-airplane')
+                ->visible(fn ($record) => !$record->notified_at)
+                ->requiresConfirmation()
+                ->action(function ($record, $livewire) {
+                    
 
                         if ($record->is_valid) {
                             $user = $record->user;
@@ -105,27 +105,27 @@ class VendorValidations extends Page implements HasTable
                         $record->notified_at = now();
                         $record->save();
 
-                        $this->dispatch('cart-updated', [
-                            'title' => 'Vendor notified successfully',
-                            'icon' => 'success',
-                            'iconColor' => 'green',
-                        ]);
-                    }),
+                    $livewire->dispatch('sweetalert', [
+                        'title' => 'Vendor notified successfully',
+                        'icon' => 'success',
 
-
-                Action::make('viewDocuments')
-                    ->label('View Documents')
-                    ->icon('heroicon-o-eye')
-                    ->modalHeading('Supporting Documents')
-                    ->visible(fn($record) => !empty($record->supporting_documents))
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Close')
-                    ->modalWidth('lg')
-                    ->action(fn() => null)
-                    ->modalContent(function ($record) {
-                        $files = is_array($record->supporting_documents)
-                            ? $record->supporting_documents
-                            : json_decode($record->supporting_documents, true);
+                    ]);
+        }),
+       
+            
+            Action::make('viewDocuments')
+                ->label('View Documents')
+                ->icon('heroicon-o-eye')
+                ->modalHeading('Supporting Documents')
+                ->visible(fn ($record) => !empty($record->supporting_documents))
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Close')
+                ->modalWidth('lg')
+                ->action(fn () => null)
+                ->modalContent(function ($record) {
+                    $files = is_array($record->supporting_documents)
+                        ? $record->supporting_documents
+                        : json_decode($record->supporting_documents, true);
 
                         if (!$files || !is_array($files)) {
                             return new HtmlString('<p class="text-gray-500">No supporting documents uploaded.</p>');

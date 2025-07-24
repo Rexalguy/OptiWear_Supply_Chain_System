@@ -387,7 +387,7 @@
                     </p>
                 </div>
 
-               <!-- Team Photo -->
+                <!-- Team Photo -->
 <div class="mb-16 flex justify-center">
   <div class="glass-effect rounded-2xl p-8 max-w-2xl w-full">
     <div class="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-xl h-64 flex items-center justify-center">

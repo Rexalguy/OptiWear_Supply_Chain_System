@@ -93,26 +93,18 @@ class PlaceOrder extends Page
     /* Quick helper to show SweetAlert notifications */
     protected function notify(string $message, string $type = 'success'): void
     {
-        $icon = match ($type) {
-            'success' => 'success',
-            'danger' => 'error',
-            'warning' => 'warning',
-            'info' => 'info',
-            default => 'success'
-        };
+        $iconMap = [
+            'success' => ['icon' => 'success'],
+            'danger' => ['icon' => 'error'],
+            'warning' => ['icon' => 'warning'],
+            'info' => ['icon' => 'info'],
+        ];
 
-        $iconColor = match ($type) {
-            'success' => 'green',
-            'danger' => 'red',
-            'warning' => 'orange',
-            'info' => 'blue',
-            default => 'green'
-        };
+        $iconData = $iconMap[$type] ?? ['icon' => 'success'];
 
-        $this->dispatch('cart-updated', [
+        $this->dispatch('sweetalert', [
             'title' => $message,
-            'icon' => $icon,
-            'iconColor' => $iconColor,
+            'icon' => $iconData['icon'],
         ]);
     }
 

@@ -72,10 +72,9 @@ class Product extends Page
         ProductModel::findOrFail($productId);
         $baleSize = (int) ($this->bale_size[$productId] ?? 0);
         if ($baleSize <= 0) {
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => "Please select a bale size before adding to cart.",
                 'icon' => 'error',
-                'iconColor' => 'yellow',
             ]);
             return;
         }
@@ -91,16 +90,14 @@ class Product extends Page
             ];
             if (isset($this->cart[$target_product->id])) {
                 $this->cart[$target_product->id]['quantity'] += $cartItem['quantity'];
-                $this->dispatch('cart-updated', [
-                    'title' => "Products already exists in cart. Only quantity updated.",
+                $this->dispatch('sweetalert', [
+                    'title' => "Product already exists in cart. Only quantity updated.",
                     'icon' => 'info',
-                    'iconColr' => 'blue',
                 ]);
             } else {
-                $this->dispatch('cart-updated', [
-                    'title' => "Products added to cart Successfully.",
+                $this->dispatch('sweetalert', [
+                    'title' => "Product added to cart Successfully.",
                     'icon' => 'success',
-                    'iconColor' => 'green',
                 ]);
                 $this->cart[$target_product->id] = $cartItem;
             }

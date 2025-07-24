@@ -80,7 +80,7 @@ class PrintingStage extends Page implements HasTable
                 ->label('Mark as Completed')
                 ->requiresConfirmation()
                 ->color('success')
-                ->action(function (ProductionStage $record) {
+                ->action(function (ProductionStage $record, $livewire) {
                     // Complete current stage
                     $record->update([
                         'status' => 'completed',
@@ -112,17 +112,17 @@ class PrintingStage extends Page implements HasTable
 
                         $packagingWorker->update(['is_available' => false]);
 
-                        $this->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => "Packaging started. Assigned to: {$packagingWorker->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     } else {
-                        $this->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Printing completed.',
                             'text' => 'Moved to packaging. No available packaging worker.',
                             'icon' => 'warning',
-                            'iconColor' => 'orange',
+
                         ]);
                     }
                 })

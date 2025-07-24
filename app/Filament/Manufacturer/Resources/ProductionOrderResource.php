@@ -104,10 +104,10 @@ class ProductionOrderResource extends Resource
                             $required = $material->quantity_required * $record->quantity;
 
                             if ($raw->current_stock < $required) {
-                                $livewire->dispatch('cart-updated', [
+                                $livewire->dispatch('sweetalert', [
                                     'title' => "Insufficient stock for {$raw->name}",
                                     'icon' => 'error',
-                                    'iconColor' => 'red',
+
                                 ]);
                                 return;
                             }
@@ -125,10 +125,10 @@ class ProductionOrderResource extends Resource
                             ->first();
 
                         if (! $worker) {
-                            $livewire->dispatch('cart-updated', [
+                            $livewire->dispatch('sweetalert', [
                                 'title' => 'No available printing worker.',
                                 'icon' => 'error',
-                                'iconColor' => 'red',
+
                             ]);
                             return;
                         }
@@ -150,10 +150,10 @@ class ProductionOrderResource extends Resource
                             'created_by' => Auth::id(),
                         ]);
 
-                        $livewire->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => "Stitching started. Assigned worker: {$worker->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     })
                     ->visible(fn(ProductionOrder $record) => $record->status === 'pending'),

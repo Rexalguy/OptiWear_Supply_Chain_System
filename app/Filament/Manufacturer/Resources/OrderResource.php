@@ -48,48 +48,44 @@ class OrderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            Forms\Components\TextInput::make('status'),
-            Forms\Components\Select::make('created_by')
-                ->label('Created By')
-                ->options(\App\Models\User::pluck('name', 'id'))
-                ->searchable()
-                ->required(),
 
-Forms\Components\TextInput::make('delivery_option')
-    ->required(),
-
-Forms\Components\Textarea::make('delivery_address')
-    ->label('Delivery Address')
-    ->disabled()
-    ->columnSpanFull()
-    ->visible(fn (?Order $record) => $record?->delivery_option === 'delivery') // ✅ Only show when needed
-    ->afterStateHydrated(function ($state, callable $set, ?Order $record) {
-        if ($record && $record->delivery_option === 'delivery') {
-            $set('delivery_address', $record->customerInfo?->address ?? 'N/A');
-        }
-    }),
-
-            Forms\Components\TextInput::make('total')
-                ->required()
-                ->numeric(),
-
-            Forms\Components\DateTimePicker::make('expected_fulfillment_date')
-                ->label('Expected Fulfillment Date')
-                ->required()
-                ->default(now()->addDays(7))
-                ->minDate(now())
-                ->maxDate(now()->addMonths(3))
-                ->displayFormat('d M Y '),
-
-            Forms\Components\TextInput::make('rating')
-                ->numeric()
-                ->default(null),
-
-            Forms\Components\Textarea::make('review')
-                ->columnSpanFull(),
-        ]);
-}
+            ->schema([
+                Forms\Components\TextInput::make('status')
+                    ->required(),
+               Forms\Components\Select::make('created_by')
+                    ->label('Created By')
+                    ->options(\App\Models\User::pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
+                Forms\Components\TextInput::make('delivery_option')
+                    ->required(),
+                Forms\Components\Textarea::make('delivery_address')
+                    ->label('Delivery Address')
+                    ->disabled()
+                    ->columnSpanFull()
+                    ->visible(fn (?Order $record) => $record?->delivery_option === 'delivery')
+                    ->afterStateHydrated(function ($state, callable $set, ?Order $record) {
+                    if ($record && $record->delivery_option === 'delivery') {
+                        $set('delivery_address', $record->customerInfo?->address ?? 'N/A');
+                    }
+                }),
+                Forms\Components\TextInput::make('total')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\DateTimePicker::make('expected_fulfillment_date')
+                    ->label('Expected Fulfillment Date')
+                    ->required()
+                    ->default(now()->addDays(7))
+                    ->minDate(now())
+                    ->maxDate(now()->addMonths(3))
+                    ->displayFormat('d M Y '),
+                Forms\Components\TextInput::make('rating')
+                    ->numeric()
+                    ->default(null),
+                Forms\Components\Textarea::make('review')
+                    ->columnSpanFull(),
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -174,10 +170,10 @@ Forms\Components\Textarea::make('delivery_address')
                         foreach ($record->orderItems as $item) {
                             $product = $item->product;
                             if ($product->quantity_available < $item->quantity) {
-                                $livewire->dispatch('cart-updated', [
+                                $livewire->dispatch('sweetalert', [
                                     'title' => "Not enough stock for {$product->name}",
                                     'icon' => 'error',
-                                    'iconColor' => 'red',
+
                                 ]);
                                 return;
                             }
@@ -189,10 +185,10 @@ Forms\Components\Textarea::make('delivery_address')
 
                         $record->update(['status' => 'confirmed']);
 
-                        $livewire->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Order confirmed and stock reduced',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 
@@ -209,10 +205,10 @@ Forms\Components\Textarea::make('delivery_address')
                             $record->creator->increment('tokens', $tokens);
                         }
 
-                        $livewire->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Order marked as delivered and tokens awarded',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 
@@ -229,10 +225,10 @@ Forms\Components\Textarea::make('delivery_address')
 
                         $record->update(['status' => 'cancelled']);
 
-                        $livewire->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Order cancelled and stock restored',
-                            'icon' => 'warning',
-                            'iconColor' => 'yellow',
+                            'icon' => 'error',
+
                         ]);
                     }),
 
