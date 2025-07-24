@@ -19,6 +19,7 @@ class VendorOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 2;
     protected static ?string $navigationLabel = 'View Orders';
     protected static ?string $navigationGroup = 'Orders';
     public static function canCreate(): bool
@@ -140,6 +141,14 @@ class VendorOrderResource extends Resource
                     ->label('Resume Order')
                     ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
+                    ->action(function (VendorOrder $record, $livewire) {
+                        $record->update(['status' => 'pending']);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Resumed Successfully',
+                            'icon' => 'success',
+
+                        ]);
+                    }),
                     ->action(function(VendorOrder $record, $livewire) {
                         $record->update(['status' => 'pending']);
                         $livewire->dispatch('sweetalert', [
@@ -155,6 +164,14 @@ class VendorOrderResource extends Resource
                     ->label('Cancel')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
+                    ->action(function ($record, $livewire) {
+                        $record->update(['status' => 'cancelled']);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Cancelled Successfully',
+                            'icon' => 'info',
+
+                        ]);
+                    }),
                     ->action(function($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
                         $livewire->dispatch('sweetalert', [
