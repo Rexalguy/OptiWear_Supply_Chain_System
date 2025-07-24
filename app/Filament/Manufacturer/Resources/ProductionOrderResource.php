@@ -107,7 +107,7 @@ class ProductionOrderResource extends Resource
                                 $livewire->dispatch('sweetalert', [
                                     'title' => "Insufficient stock for {$raw->name}",
                                     'icon' => 'error',
-                                    'iconColor' => 'red',
+
                                 ]);
                                 return;
                             }
@@ -128,7 +128,7 @@ class ProductionOrderResource extends Resource
                             $livewire->dispatch('sweetalert', [
                                 'title' => 'No available printing worker.',
                                 'icon' => 'error',
-                                'iconColor' => 'red',
+
                             ]);
                             return;
                         }
@@ -153,7 +153,7 @@ class ProductionOrderResource extends Resource
                         $livewire->dispatch('sweetalert', [
                             'title' => "Stitching started. Assigned worker: {$worker->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     })
                     ->visible(fn(ProductionOrder $record) => $record->status === 'pending'),

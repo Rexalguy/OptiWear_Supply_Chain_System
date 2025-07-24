@@ -150,7 +150,7 @@ class ProductResource extends Resource
                         $livewire->dispatch('sweetalert', [
                             'title' => "Production order created for {$record->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 

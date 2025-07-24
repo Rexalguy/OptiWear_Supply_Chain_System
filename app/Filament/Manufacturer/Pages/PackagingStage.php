@@ -113,7 +113,7 @@ class PackagingStage extends Page implements HasTable
                     $livewire->dispatch('sweetalert', [
                         'title' => 'Packaging started',
                         'icon' => 'success',
-                        'iconColor' => 'green',
+
                     ]);
                 })
                 ->visible(
@@ -165,13 +165,13 @@ class PackagingStage extends Page implements HasTable
                             $livewire->dispatch('sweetalert', [
                                 'title' => "Packaging completed and delivery started. Assigned worker: {$deliveryWorker->name}",
                                 'icon' => 'success',
-                                'iconColor' => 'green',
+
                             ]);
                         } else {
                             $livewire->dispatch('sweetalert', [
                                 'title' => 'Packaging completed. No available delivery worker to assign.',
                                 'icon' => 'warning',
-                                'iconColor' => 'orange',
+
                             ]);
                         }
                     }

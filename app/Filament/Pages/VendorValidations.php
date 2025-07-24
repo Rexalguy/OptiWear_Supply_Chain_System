@@ -109,7 +109,7 @@ class VendorValidations extends Page implements HasTable
                     $livewire->dispatch('sweetalert', [
                         'title' => 'Vendor notified successfully',
                         'icon' => 'success',
-                        'iconColor' => 'green',
+
                     ]);
         }),
        

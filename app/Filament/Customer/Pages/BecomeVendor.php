@@ -104,7 +104,7 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                     'title' => 'Missing Supporting Documents',
                     'text' => 'Please upload at least one PDF containing your tax certificate, business license, or other support materials.',
                     'icon' => 'error',
-                    'iconColor' => 'red',
+
                 ]);
                 return;
             }
@@ -142,14 +142,14 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
             $this->dispatch('sweetalert', [
                 'title' => 'Application submitted successfully!',
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         } catch (\Exception $e) {
             $this->dispatch('sweetalert', [
                 'title' => 'Error',
                 'text' => "Unable to connect to the validation service. Please try again later.",
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
         }
 
@@ -247,7 +247,7 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                         'title' => 'Confirmed',
                                         'text' => 'Sign out and sign in again as a Vendor.',
                                         'icon' => 'success',
-                                        'iconColor' => 'green',
+
                                     ]);
 
                                     return redirect('http://optiwear_supply_chain_system.test/customer');

@@ -161,7 +161,7 @@ class OrderResource extends Resource
                                 $livewire->dispatch('sweetalert', [
                                     'title' => "Not enough stock for {$product->name}",
                                     'icon' => 'error',
-                                    'iconColor' => 'red',
+
                                 ]);
                                 return;
                             }
@@ -176,7 +176,7 @@ class OrderResource extends Resource
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order confirmed and stock reduced',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 
@@ -196,7 +196,7 @@ class OrderResource extends Resource
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order marked as delivered and tokens awarded',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
 
@@ -216,7 +216,7 @@ class OrderResource extends Resource
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order cancelled and stock restored',
                             'icon' => 'error',
-                            'iconColor' => 'red',
+
                         ]);
                     }),
 

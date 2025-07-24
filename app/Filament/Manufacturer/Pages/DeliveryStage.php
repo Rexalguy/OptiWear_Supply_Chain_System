@@ -124,7 +124,7 @@ class DeliveryStage extends Page implements HasTable
                     $livewire->dispatch('sweetalert', [
                         'title' => 'Delivery started',
                         'icon' => 'success',
-                        'iconColor' => 'green',
+
                     ]);
                 })
                 ->visible(
@@ -153,7 +153,7 @@ class DeliveryStage extends Page implements HasTable
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Delivery completed. Product stock updated.',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }
                 })
