@@ -234,6 +234,7 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                         'title' => 'Confirmed',
                                         'text' => 'Sign out and sign in again as a Vendor.',
                                         'icon' => 'success',
+
                                     ]);
                                     return redirect('http://optiwear_supply_chain_system.test/customer');
                                 }),

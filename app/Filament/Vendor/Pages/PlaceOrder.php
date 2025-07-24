@@ -38,9 +38,6 @@ class PlaceOrder extends Page
             $product = Product::find($id);
 
             // Add missing fields if not present
-            if (!isset($this->cart[$id]['id'])) {
-                $this->cart[$id]['id'] = $id;
-            }
             if (!isset($this->cart[$id]['name']) && $product) {
                 $this->cart[$id]['name'] = $product->name;
             }
@@ -58,7 +55,9 @@ class PlaceOrder extends Page
             if (!isset($this->cart[$id]['delivery_option'])) {
                 $this->cart[$id]['delivery_option'] = null; // No default selection
             }
-        }        // Save updated cart back to session
+        }
+
+        // Save updated cart back to session
         session()->put('cart', $this->cart);
 
         // Load delivery options from session or initialize
