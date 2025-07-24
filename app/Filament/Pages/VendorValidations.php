@@ -20,15 +20,10 @@ class VendorValidations extends Page implements HasTable
     protected static ?string $model = VendorValidation::class;
     protected static ?string $title = 'Vendor Validation';
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-
-     protected static ?string $navigationGroup = 'User Monitor';
-
-
-
-
+    protected static ?string $navigationGroup = 'User Monitor';
     protected static string $view = 'filament.pages.vendor-validation';
 
-    
+
 
     public static function getNavigationBadge(): ?string
     {
@@ -55,92 +50,90 @@ class VendorValidations extends Page implements HasTable
         return $table
             ->query(VendorValidation::query())
             ->columns([
-            TextColumn::make('business_name')
-                ->label('Vendor Name')
-                ->searchable()
-                ->sortable(),
-                
-            IconColumn::make('is_valid')
-                ->label('Valid Status')
-                ->boolean()
-                ->trueIcon('heroicon-o-check-circle')
-                ->falseIcon('heroicon-o-x-circle')
-                ->trueColor('success')
-                ->falseColor('danger'),
-                
-            TextColumn::make('visit_date')
-                ->label('Visit Date')
-                ->sortable()
-                ->date(),
-                
-            TextColumn::make('created_at')
-                ->label('Submitted On')
-                ->dateTime()
-                ->sortable(),
+                TextColumn::make('business_name')
+                    ->label('Vendor Name')
+                    ->searchable()
+                    ->sortable(),
 
-            TextColumn::make('reasons')
-                ->label('Failure Reasons')
-                ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
-                ->visible(fn ($record) => $record && $record->is_valid === false && !empty($record->reasons)),
+                IconColumn::make('is_valid')
+                    ->label('Valid Status')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+                TextColumn::make('visit_date')
+                    ->label('Visit Date')
+                    ->sortable()
+                    ->date(),
+
+                TextColumn::make('created_at')
+                    ->label('Submitted On')
+                    ->dateTime()
+                    ->sortable(),
+
+                TextColumn::make('reasons')
+                    ->label('Failure Reasons')
+                    ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state)
+                    ->visible(fn($record) => $record && $record->is_valid === false && !empty($record->reasons)),
             ])->defaultSort('created_at', 'desc')
 
             ->filters(filters: [])
             ->actions([
                 Action::make('notify')
-                ->label('Notify')
-                ->icon('heroicon-m-paper-airplane')
-                ->visible(fn ($record) => !$record->notified_at)
-                ->requiresConfirmation()
-                ->action(function ($record, $livewire) {
-                    
+                    ->label('Notify')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->visible(fn($record) => !$record->notified_at)
+                    ->requiresConfirmation()
+                    ->action(function ($record, $livewire) {
 
-            if ($record->is_valid) {
-            $user = $record->user;
 
-            // Only update role if the user is currently a 'customer'
-            if ($user && $user->role === 'customer') {
-                $user->update(['role' => 'vendor']);
-            }
+                        if ($record->is_valid) {
+                            $user = $record->user;
 
-        }
-                    $record->notified_at = now();
-                    $record->save();
+                            // Only update role if the user is currently a 'customer'
+                            if ($user && $user->role === 'customer') {
+                                $user->update(['role' => 'vendor']);
+                            }
+                        }
+                        $record->notified_at = now();
+                        $record->save();
 
-                    $livewire->dispatch('sweetalert', [
-                        'title' => 'Vendor notified successfully',
-                        'icon' => 'success',
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Vendor notified successfully',
+                            'icon' => 'success',
 
-                    ]);
-        }),
-       
-            
-            Action::make('viewDocuments')
-                ->label('View Documents')
-                ->icon('heroicon-o-eye')
-                ->modalHeading('Supporting Documents')
-                ->visible(fn ($record) => !empty($record->supporting_documents))
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Close')
-                ->modalWidth('lg')
-                ->action(fn () => null)
-                ->modalContent(function ($record) {
-                    $files = is_array($record->supporting_documents)
-                        ? $record->supporting_documents
-                        : json_decode($record->supporting_documents, true);
+                        ]);
+                    }),
 
-                    if (!$files || !is_array($files)) {
-                        return new HtmlString('<p class="text-gray-500">No supporting documents uploaded.</p>');
-                    }
 
-                    $html = collect($files)->map(function ($filePath) {
-                        $url = asset('storage/' . $filePath);
-                        $fileName = basename($filePath);
-                        return "<li><a href=\"{$url}\" target=\"_blank\" class=\"text-blue-500 underline\">📎 {$fileName}</a></li>";
-                    })->implode('');
+                Action::make('viewDocuments')
+                    ->label('View Documents')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading('Supporting Documents')
+                    ->visible(fn($record) => !empty($record->supporting_documents))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalWidth('lg')
+                    ->action(fn() => null)
+                    ->modalContent(function ($record) {
+                        $files = is_array($record->supporting_documents)
+                            ? $record->supporting_documents
+                            : json_decode($record->supporting_documents, true);
 
-                    return new HtmlString("<ul class='list-disc ml-5 space-y-2'>{$html}</ul>");
-                }),
+                        if (!$files || !is_array($files)) {
+                            return new HtmlString('<p class="text-gray-500">No supporting documents uploaded.</p>');
+                        }
+
+                        $html = collect($files)->map(function ($filePath) {
+                            $url = asset('storage/' . $filePath);
+                            $fileName = basename($filePath);
+                            return "<li><a href=\"{$url}\" target=\"_blank\" class=\"text-blue-500 underline\">📎 {$fileName}</a></li>";
+                        })->implode('');
+
+                        return new HtmlString("<ul class='list-disc ml-5 space-y-2'>{$html}</ul>");
+                    }),
             ]);
-            
     }
 }

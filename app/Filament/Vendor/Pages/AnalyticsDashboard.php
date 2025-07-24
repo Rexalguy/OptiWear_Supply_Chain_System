@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 
 class AnalyticsDashboard extends Page
 {
@@ -48,7 +49,7 @@ class AnalyticsDashboard extends Page
 
     public function loadAnalytics()
     {
-        $vendorId = auth()->id();
+        $vendorId = Auth::user()->id;
         
         // Basic metrics
         $this->totalRevenue = Order::where('vendor_id', $vendorId)->sum('total');
