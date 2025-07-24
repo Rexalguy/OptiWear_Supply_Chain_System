@@ -30,6 +30,21 @@
 .swal2-popup.swal2-toast {
     transform: none !important;
 }
+
+/* Form select styles */
+.select-container {
+    width: 100%;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.select-container select {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
 </style>
 <div>
     <div class="flex justify-end mb-6">
