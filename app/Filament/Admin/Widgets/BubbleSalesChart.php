@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class BubbleSalesChart extends ChartWidget
 {
-    
+
 
     protected static ?string $heading = 'Customer Purchase Behavior';
 
     protected static ?string $description = 'A bubble chart visualizing customer purchasing patterns—total orders vs. total revenue, with bubble size representing average order value';
-        protected static ?string $maxHeight = '400px';
+    protected static ?string $maxHeight = '400px';
 
     protected static ?int $sort = 3;
 
@@ -76,12 +76,10 @@ class BubbleSalesChart extends ChartWidget
             ],
 
             'animation' => [
-            'duration' => 2000,
-            'easing' => 'easeInOutCubic',
-        ],
-            'plugins' => [
-
+                'duration' => 2000,
+                'easing' => 'easeInOutCubic',
             ],
+            'plugins' => [],
         ];
     }
 

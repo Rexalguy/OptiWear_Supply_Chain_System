@@ -7,16 +7,16 @@ use Filament\Widgets\ChartWidget;
 
 class ProductsPolarChart extends ChartWidget
 {
-    
+
 
     protected static ?string $heading = '📦 Product Quantity by Category';
     protected static string $color = 'info';
 
     protected int | string | array $columnSpan = 2;
 
-    
+
     protected static ?string $description = 'Displays the quantity of products available in each shirt category using a polar area chart.';
-    
+
     protected static ?string $maxHeight = '450px';
 
 
@@ -26,7 +26,7 @@ class ProductsPolarChart extends ChartWidget
 
         $labels = $categories->pluck('category')->toArray();
 
-        $data = $categories->map(fn ($category) => $category->product?->sum('quantity_available') ?? 0)->toArray();
+        $data = $categories->map(fn($category) => $category->product?->sum('quantity_available') ?? 0)->toArray();
 
         // Use a set of pastel colors for a neat look
         $darkPastels = [
@@ -62,7 +62,7 @@ class ProductsPolarChart extends ChartWidget
                 'legend' => [
                     'position' => 'bottom',
                     'labels' => [
-                       'usePointStyle' => true,
+                        'usePointStyle' => true,
                         'padding' => 18,
                     ],
                 ],
