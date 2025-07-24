@@ -5,9 +5,9 @@ namespace App\Filament\Manufacturer\Resources;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
-use App\Models\Order;
+use App\Models\VendorOrder;
 use Filament\Forms\Form;
-use App\Models\OrderItem;
+use App\Models\VendorOrderItem;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -24,23 +24,16 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Manufacturer\Resources\OrderResource\Pages;
-use App\Filament\Manufacturer\Resources\OrderResource\Pages\EditOrder;
-use App\Filament\Manufacturer\Resources\OrderResource\Pages\ViewOrder;
-use App\Filament\Manufacturer\Resources\OrderResource\Pages\ListOrders;
-use App\Filament\Manufacturer\Resources\OrderResource\RelationManagers;
-use App\Filament\Manufacturer\Resources\OrderResource\Pages\CreateOrder;
-use App\Filament\Manufacturer\Resources\OrderResource\Widgets\OrderStats;
+use App\Filament\Manufacturer\Resources\VendorOrderResource\Pages;
+use App\Filament\Manufacturer\Resources\VendorOrderResource\RelationManagers;
 
-class OrderResource extends Resource
+class VendorOrderResource extends Resource
 {
-    protected static ?string $model = Order::class;
+    protected static ?string $model = VendorOrder::class;
 
-    protected static ?string $label = 'Customer Orders';
+    protected static ?int $navigationSort = 2;
 
-    protected static ?int $navigationSort = 1;
-
-    protected static ?string $navigationIcon = 'heroicon-o-receipt-refund';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
     public static function canCreate(): bool
     {
@@ -50,27 +43,14 @@ class OrderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-
             ->schema([
                 Forms\Components\TextInput::make('status')
                     ->required(),
-               Forms\Components\Select::make('created_by')
-                    ->label('Created By')
-                    ->options(\App\Models\User::pluck('name', 'id'))
-                    ->searchable()
-                    ->required(),
+                Forms\Components\TextInput::make('created_by')
+                    ->required()
+                    ->numeric(),
                 Forms\Components\TextInput::make('delivery_option')
                     ->required(),
-                Forms\Components\Textarea::make('delivery_address')
-                    ->label('Delivery Address')
-                    ->disabled()
-                    ->columnSpanFull()
-                    ->visible(fn (?Order $record) => $record?->delivery_option === 'delivery')
-                    ->afterStateHydrated(function ($state, callable $set, ?Order $record) {
-                    if ($record && $record->delivery_option === 'delivery') {
-                        $set('delivery_address', $record->customerInfo?->address ?? 'N/A');
-                    }
-                }),
                 Forms\Components\TextInput::make('total')
                     ->required()
                     ->numeric(),
@@ -92,14 +72,14 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Order::with(['orderItems.product', 'creator', 'customerInfo'])->orderBy('id', 'desc'))
+            ->query(VendorOrder::with(['items.product', 'creator'])->orderBy('id', 'desc'))
             ->columns([
                 TextColumn::make('id')
                     ->label('Order #')
                     ->sortable(),
 
                 TextColumn::make('creator.name')
-                    ->label('Customer')
+                    ->label('Vendor')
                     ->searchable()
                     ->sortable()
                     ->default('Unknown'),
@@ -117,7 +97,8 @@ class OrderResource extends Resource
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
-                TextColumn::make('expected_fulfillment_date')
+                    
+                TextColumn::make('expected_fulfillment')
                     ->label('Expected Delivery Date')
                     ->formatStateUsing(function ($state, $record) {
                         if ($record->status === 'delivered') {
@@ -149,57 +130,46 @@ class OrderResource extends Resource
                     ->dateTooltip(),
 
 
-
-                TextColumn::make('rating')
-                    ->label('⭐ Rating')
-                    ->formatStateUsing(fn($state) => $state ? str_repeat('⭐', $state) : '—')
-                    ->visible(fn($record) => $record?->status === 'delivered'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-
-
-
-
                 Action::make('markConfirmed')
                     ->label('Confirm')
                     ->color('info')
                     ->icon('heroicon-o-check-circle')
-                    ->visible(fn(Order $record) => $record->status === 'pending')
-                    ->action(function (Order $record, $livewire) {
-                        foreach ($record->orderItems as $item) {
+                    ->visible(fn(VendorOrder $record) => $record->status === 'pending')
+                    ->action(function (VendorOrder $record) {
+                        foreach ($record->items as $item) {
                             $product = $item->product;
                             if ($product->quantity_available < $item->quantity) {
-                                $livewire->dispatch('sweetalert', [
-                                    'title' => "Not enough stock for {$product->name}",
-                                    'icon' => 'error',
-
-                                ]);
+                                Notification::make()
+                                    ->title("Not enough stock for {$product->name}")
+                                    ->danger()
+                                    ->send();
                                 return;
                             }
                         }
 
-                        foreach ($record->orderItems as $item) {
+                        foreach ($record->items as $item) {
                             $item->product->decrement('quantity_available', $item->quantity);
                         }
 
                         $record->update(['status' => 'confirmed']);
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order confirmed and stock reduced',
-                            'icon' => 'success',
-
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order confirmed and stock reduced')
+                            ->success()
+                            ->send();
                     }),
 
                 Action::make('markDelivered')
                     ->label('Deliver')
                     ->color('success')
                     ->icon('heroicon-o-truck')
-                    ->visible(fn(Order $record) => $record->status === 'confirmed')
-                    ->action(function (Order $record, $livewire) {
+                    ->visible(fn(VendorOrder $record) => $record->status === 'confirmed')
+                    ->action(function (VendorOrder $record) {
                         $record->update(['status' => 'delivered']);
 
                         if ($record->total >= 50000) {
@@ -207,31 +177,29 @@ class OrderResource extends Resource
                             $record->creator->increment('tokens', $tokens);
                         }
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order marked as delivered and tokens awarded',
-                            'icon' => 'success',
-
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order marked as delivered and tokens awarded')
+                            ->success()
+                            ->send();
                     }),
 
                 Action::make('markCancelled')
                     ->label('Cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
-                    ->visible(fn(Order $record) => in_array($record->status, ['pending', 'confirmed']))
+                    ->visible(fn(VendorOrder $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
-                    ->action(function (Order $record, $livewire) {
-                        foreach ($record->orderItems as $item) {
+                    ->action(function (VendorOrder $record) {
+                        foreach ($record->items as $item) {
                             $item->product->increment('quantity_available', $item->quantity);
                         }
 
                         $record->update(['status' => 'cancelled']);
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order cancelled and stock restored',
-                            'icon' => 'error',
-
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order cancelled and stock restored')
+                            ->danger()
+                            ->send();
                     }),
 
                 ActionGroup::make([
@@ -240,10 +208,10 @@ class OrderResource extends Resource
                         ->label('View Items')
                         ->icon('heroicon-o-list-bullet')
                         ->color('gray')
-                        ->modalHeading('Order Items')
+                        ->modalHeading('Vendor Order Items')
                         ->infolist(function ($record) {
-                            $items = OrderItem::with('product')
-                                ->where('order_id', $record->id)
+                            $items = VendorOrderItem::with('product')
+                                ->where('vendor_order_id', $record->id)
                                 ->get();
 
                             if ($items->isEmpty()) {
@@ -251,7 +219,7 @@ class OrderResource extends Resource
                                     Section::make()
                                         ->schema([
                                             TextEntry::make('none')
-                                                ->default('No items found for this order.')
+                                                ->default('No items found for this vendor order.')
                                                 ->color('danger')
                                                 ->columnSpanFull(),
                                         ]),
@@ -286,18 +254,16 @@ class OrderResource extends Resource
                         ->label('Review')
                         ->color('gray')
                         ->icon('heroicon-o-eye')
-                        ->visible(fn($record) =>  $record?->status === 'delivered')
-                        ->modalHeading('Customer Review')
-                        ->modalDescription(fn($record) => 'Order #' . $record->id)
-                        ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-review', ['record' => $record]))
+                        ->visible(fn($record) => $record?->status === 'delivered')
+                        ->modalHeading('Vendor Review')
+                        ->modalDescription(fn($record) => 'Vendor Order #' . $record->id)
+                        ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-vendor-review', ['record' => $record]))
                         ->modalSubmitAction(false),
                 ])->iconButton()
-                    ->color('info')
-                    ->tooltip('Details'),
-
+                ->color('info')
+                ->tooltip('Details'),
             ])
             ->defaultSort('id', 'desc')
-
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -315,17 +281,10 @@ class OrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrders::route('/'),
-            // 'create' => Pages\CreateOrder::route('/create'),
-            // 'view' => Pages\ViewOrder::route('/{record}'),
-            // 'edit' => Pages\EditOrder::route('/{record}/edit'),
-        ];
-    }
-
-    public static function getWidgets(): array
-    {
-        return [
-            OrderStats::class,
+            'index' => Pages\ListVendorOrders::route('/'),
+            // 'create' => Pages\CreateVendorOrder::route('/create'),
+            // 'view' => Pages\ViewVendorOrder::route('/{record}'),
+            // 'edit' => Pages\EditVendorOrder::route('/{record}/edit'),
         ];
     }
 }

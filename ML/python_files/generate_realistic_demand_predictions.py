@@ -11,8 +11,8 @@ import math
 DB_CONFIG = {
     'host': '127.0.0.1',
     'user': 'root',
-    'password': '',
-    'database': 'optiwear'
+    'password': '1234dadi',
+    'database': 'scm'
 }
 
 def get_db_connection():
