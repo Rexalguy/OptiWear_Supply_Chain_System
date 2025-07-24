@@ -15,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
@@ -96,19 +97,23 @@ class VendorOrderResource extends Resource
                 TextColumn::make('delivery_option')
                     ->label('Delivery')
                     ->sortable(),
-
+                    
                 TextColumn::make('expected_fulfillment')
                     ->label('Expected Delivery Date')
-                    ->getStateUsing(function ($record) {
-                        if ($record->created_at->addDays(3) < now() || $record->status == 'cancelled') {
-                            return 'Closed';
-                        } elseif ($record->status == 'delivered') {
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($record->status === 'delivered') {
                             return 'Done';
                         }
-                        return \Carbon\Carbon::parse($record->created_at->addDays(3))->diffForHumans([
-                            'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                            'parts' => 2,
-                        ]);
+
+                        if (empty($state)) {
+                            return 'N/A';
+                        }
+
+                        try {
+                            return Carbon::parse($state)->format('d M Y H:i');
+                        } catch (\Exception $e) {
+                            return 'Invalid Date';
+                        }
                     })
                     ->sortable(),
 
@@ -135,14 +140,14 @@ class VendorOrderResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-check-circle')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
-                    ->action(function (VendorOrder $record, $livewire) {
+                    ->action(function (VendorOrder $record) {
                         foreach ($record->items as $item) {
                             $product = $item->product;
                             if ($product->quantity_available < $item->quantity) {
-                                $livewire->dispatch('sweetalert', [
-                                    'title' => 'Insufficient stock for product: ' . $product->name,
-                                    'icon' => 'error',
-                                ]);
+                                Notification::make()
+                                    ->title("Not enough stock for {$product->name}")
+                                    ->danger()
+                                    ->send();
                                 return;
                             }
                         }
@@ -153,19 +158,18 @@ class VendorOrderResource extends Resource
 
                         $record->update(['status' => 'confirmed']);
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Vendor order confirmed successfully',
-                            'icon' => 'success',
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order confirmed and stock reduced')
+                            ->success()
+                            ->send();
                     }),
 
                 Action::make('markDelivered')
                     ->label('Deliver')
                     ->color('success')
                     ->icon('heroicon-o-truck')
-                    ->requiresConfirmation()
                     ->visible(fn(VendorOrder $record) => $record->status === 'confirmed')
-                    ->action(function (VendorOrder $record, $livewire) {
+                    ->action(function (VendorOrder $record) {
                         $record->update(['status' => 'delivered']);
 
                         if ($record->total >= 50000) {
@@ -173,10 +177,10 @@ class VendorOrderResource extends Resource
                             $record->creator->increment('tokens', $tokens);
                         }
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Vendor order delivered successfully',
-                            'icon' => 'success',
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order marked as delivered and tokens awarded')
+                            ->success()
+                            ->send();
                     }),
 
                 Action::make('markCancelled')
@@ -185,17 +189,17 @@ class VendorOrderResource extends Resource
                     ->icon('heroicon-o-x-circle')
                     ->visible(fn(VendorOrder $record) => in_array($record->status, ['pending', 'confirmed']))
                     ->requiresConfirmation()
-                    ->action(function (VendorOrder $record, $livewire) {
+                    ->action(function (VendorOrder $record) {
                         foreach ($record->items as $item) {
                             $item->product->increment('quantity_available', $item->quantity);
                         }
 
                         $record->update(['status' => 'cancelled']);
 
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Vendor order cancelled and stock restored',
-                            'icon' => 'success',
-                        ]);
+                        Notification::make()
+                            ->title('Vendor order cancelled and stock restored')
+                            ->danger()
+                            ->send();
                     }),
 
                 ActionGroup::make([
@@ -256,8 +260,8 @@ class VendorOrderResource extends Resource
                         ->modalContent(fn($record) => view('filament.manufacturer.pages.partials.view-vendor-review', ['record' => $record]))
                         ->modalSubmitAction(false),
                 ])->iconButton()
-                    ->color('info')
-                    ->tooltip('Details'),
+                ->color('info')
+                ->tooltip('Details'),
             ])
             ->defaultSort('id', 'desc')
             ->bulkActions([

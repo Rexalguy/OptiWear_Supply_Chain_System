@@ -163,7 +163,6 @@ class VendorOrderResource extends Resource
                     ->label('Deliver')
                     ->color('success')
                     ->icon('heroicon-o-truck')
-                    ->requiresConfirmation()
                     ->visible(fn(VendorOrder $record) => $record->status === 'confirmed')
                     ->action(function (VendorOrder $record, $livewire) {
                         $record->update(['status' => 'delivered']);
