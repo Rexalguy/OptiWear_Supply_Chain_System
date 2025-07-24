@@ -48,4 +48,3 @@ class Order extends Model
     }     
 }
 
-}
