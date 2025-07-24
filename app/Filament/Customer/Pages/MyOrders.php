@@ -196,7 +196,7 @@ class MyOrders extends Page implements HasTable
             $this->dispatch('sweetalert', [
                 'title' => 'Cart is empty',
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
             return;
         }
@@ -206,7 +206,7 @@ class MyOrders extends Page implements HasTable
                 'title' => 'Address Required',
                 'text' => 'Please enter your delivery address.',
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
             return;
         }
@@ -263,7 +263,7 @@ class MyOrders extends Page implements HasTable
                     'title' => 'No valid products found',
                     'text' => 'Some items in your cart are no longer available. Please refresh your cart.',
                     'icon' => 'error',
-                    'iconColor' => 'red',
+
                 ]);
                 return;
             }
@@ -286,7 +286,7 @@ class MyOrders extends Page implements HasTable
                 'title' => 'Order placed successfully!',
                 'text' => "🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}",
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -294,7 +294,7 @@ class MyOrders extends Page implements HasTable
                 'title' => 'Failed to place order',
                 'text' => $e->getMessage(),
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
         }
     }
@@ -308,7 +308,7 @@ class MyOrders extends Page implements HasTable
             $this->dispatch('sweetalert', [
                 'title' => 'Removed from cart',
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         }
     }
@@ -408,7 +408,7 @@ class MyOrders extends Page implements HasTable
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Thank you for your feedback!',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
             ])

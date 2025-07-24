@@ -115,14 +115,14 @@ class PrintingStage extends Page implements HasTable
                         $livewire->dispatch('sweetalert', [
                             'title' => "Packaging started. Assigned to: {$packagingWorker->name}",
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     } else {
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Printing completed.',
                             'text' => 'Moved to packaging. No available packaging worker.',
                             'icon' => 'warning',
-                            'iconColor' => 'orange',
+
                         ]);
                     }
                 })
