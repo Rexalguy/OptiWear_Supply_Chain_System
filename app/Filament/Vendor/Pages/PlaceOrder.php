@@ -255,9 +255,6 @@ class PlaceOrder extends Page
             session()->put('delivery_options', $this->delivery_options);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cartCount', $this->cartCount);
-
-        } catch (\Exception $e) {
-            Log::error('Order placement failed: ' . $e->getMessage());
         }
 
         self::getNavigationBadge();

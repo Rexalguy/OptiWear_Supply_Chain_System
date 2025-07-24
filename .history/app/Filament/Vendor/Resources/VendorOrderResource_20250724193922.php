@@ -129,13 +129,24 @@ class VendorOrderResource extends Resource
                     ->label('Resume Order')
                     ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
-                    ->action(function (VendorOrder $record, $livewire) {
+                    ->action(function(VendorOrder $record, $livewire) {
                         $record->update(['status' => 'pending']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Resumed Successfully',
-                            'icon' => 'success',
-
+                        
+                        // Debug: Check if dispatch method exists
+                        \Log::info('VendorOrderResource: Attempting to dispatch sweetalert', [
+                            'livewire_class' => get_class($livewire),
+                            'has_dispatch_method' => method_exists($livewire, 'dispatch')
                         ]);
+                        
+                        // Try dispatching the event
+                        if (method_exists($livewire, 'dispatch')) {
+                            $livewire->dispatch('sweetalert', [
+                                'title' => 'Order Resumed Successfully',
+                                'icon' => 'success',
+                            ]);
+                        } else {
+                            \Log::warning('VendorOrderResource: dispatch method not found on livewire component');
+                        }
                     }),
 
                 Tables\Actions\Action::make('cancel')
@@ -144,13 +155,18 @@ class VendorOrderResource extends Resource
                     ->label('Cancel')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
-                    ->action(function ($record, $livewire) {
+                    ->action(function($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('sweetalert', [
-                            'title' => 'Order Cancelled Successfully',
-                            'icon' => 'info',
-
-                        ]);
+                        
+                        // Try dispatching the event
+                        if (method_exists($livewire, 'dispatch')) {
+                            $livewire->dispatch('sweetalert', [
+                                'title' => 'Order Cancelled Successfully',
+                                'icon' => 'info',
+                            ]);
+                        } else {
+                            \Log::warning('VendorOrderResource: dispatch method not found on livewire component');
+                        }
                     }),
 
                 Tables\Actions\ViewAction::make()

@@ -129,7 +129,7 @@ class VendorOrderResource extends Resource
                     ->label('Resume Order')
                     ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
-                    ->action(function (VendorOrder $record, $livewire) {
+                    ->action(function(VendorOrder $record, $livewire) {
                         $record->update(['status' => 'pending']);
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order Resumed Successfully',
@@ -144,7 +144,7 @@ class VendorOrderResource extends Resource
                     ->label('Cancel')
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
-                    ->action(function ($record, $livewire) {
+                    ->action(function($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order Cancelled Successfully',
