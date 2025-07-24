@@ -1,4 +1,13 @@
+"""
+Realistic Demand Prediction Data Generator for OptiWear Supply Chain System
 
+This script generates realistic demand forecasting data with:
+- Seasonal patterns (higher demand in certain months)
+- Category-specific trends (different demand patterns per category)  
+- Random variation (realistic fluctuations around trends)
+- Growth trends (gradual increases/decreases over time)
+- Day-of-week patterns (different demand on weekdays vs weekends)
+"""
 
 import mysql.connector
 import pandas as pd

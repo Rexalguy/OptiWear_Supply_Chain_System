@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 class CustomerSegmentsPolarChart extends ChartWidget
 {
     protected static ?string $heading = 'Customer Segment Distribution';
-    
+
     protected static ?int $sort = 2;
-    
+
     protected int | string | array $columnSpan = 2;
 
     protected function getData(): array
@@ -22,7 +22,7 @@ class CustomerSegmentsPolarChart extends ChartWidget
             ->get();
 
         $totalCustomers = $segments->sum('customer_count');
-        
+
         return [
             'datasets' => [
                 [

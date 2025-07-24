@@ -67,11 +67,7 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
         $this->latestApplication = VendorValidation::where('user_id', Auth::id())
             ->latest()
             ->first();
-
-        // ✅ Mark as viewed if it was notified
-        if ($this->latestApplication && $this->latestApplication->notified_at && !$this->latestApplication->viewed_at) {
-            $this->latestApplication->update(['viewed_at' => now()]);
-        }
+        // Do not update viewed_at here; only update after confirmViewed action
     }
 
 
@@ -196,11 +192,7 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
             ->latest()
             ->first();
 
-
-        if (
-            !$this->latestApplication ||
-            is_null($this->latestApplication->notified_at)
-        ) {
+        if (!$this->latestApplication || is_null($this->latestApplication->notified_at)) {
             return $infolist->schema([]);
         }
 
@@ -212,7 +204,6 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                         Section::make('Current Validation Status')
                             ->schema([
                                 TextEntry::make('business_name')->label('Business Name'),
-
                                 TextEntry::make('is_valid')
                                     ->label('Validation Status :')
                                     ->getStateUsing(
@@ -227,14 +218,11 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                             ? 'warning'
                                             : ($record->is_valid ? 'success' : 'danger')
                                     ),
-
                                 TextEntry::make('visit_date')
                                     ->label('Visit Date :')
                                     ->default(fn($record) => $record->visit_date ?? 'NOT ALLOCATED'),
                             ])
                             ->visible(fn($record) => filled($record->notified_at)),
-
-                        // ✅ Show Confirm Button Outside Section
                         Actions::make([
                             Action::make('confirmViewed')
                                 ->label('Confirm Notification')
@@ -242,19 +230,15 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                 ->visible(fn($record) => $record->notified_at && !$record->viewed_at)
                                 ->action(function ($record, $livewire) {
                                     $record->update(['viewed_at' => now()]);
-
                                     $livewire->dispatch('sweetalert', [
                                         'title' => 'Confirmed',
                                         'text' => 'Sign out and sign in again as a Vendor.',
                                         'icon' => 'success',
-
                                     ]);
-
                                     return redirect('http://optiwear_supply_chain_system.test/customer');
                                 }),
                         ]),
                     ]),
-
                     Tabs\Tab::make('Failure Reasons')->schema([
                         Section::make('Why You Were Not Approved')
                             ->schema([
@@ -264,18 +248,16 @@ class BecomeVendor extends Page implements HasForms, HasInfolists
                                         $reasons = is_array($record->reasons)
                                             ? $record->reasons
                                             : json_decode($record->reasons, true);
-
                                         if (!is_array($reasons)) {
                                             return 'None';
                                         }
-
                                         return implode('. ', array_map('ucfirst', $reasons)) . '.';
                                     }),
-                            ]),
+                            ])
+                        // Always show failure reasons tab if notified and not valid
                     ])
                         ->visible(
-                            fn($record) =>
-                            $record->notified_at && !$record->is_valid
+                            fn($record) => $record->notified_at && $record->is_valid === 0
                         ),
                 ]),
             ]);

@@ -1,4 +1,13 @@
+"""
+Realistic Demand Prediction Data Generator for OptiWear Supply Chain System
 
+This script generates realistic demand forecasting data with:
+- Seasonal patterns (higher demand in certain months)
+- Category-specific trends (different demand patterns per category)  
+- Random variation (realistic fluctuations around trends)
+- Growth trends (gradual increases/decreases over time)
+- Day-of-week patterns (different demand on weekdays vs weekends)
+"""
 
 import mysql.connector
 import pandas as pd
@@ -27,7 +36,7 @@ def clear_existing_demand_data():
     try:
         cursor.execute("DELETE FROM demand_prediction_results")
         conn.commit()
-        print(" Cleared existing demand prediction data")
+        print("✅ Cleared existing demand prediction data")
     except Exception as e:
         print(f" Error clearing data: {e}")
     finally:
@@ -122,7 +131,7 @@ def generate_demand_data_for_timeframe(categories, timeframe):
         end_date = today + timedelta(days=5*365)
         date_range = pd.date_range(start_date, end_date, freq='D')
     
-    print(f" Generating data for {timeframe}: {len(date_range)} days from {start_date.date()} to {end_date.date()}")
+    print(f"📅 Generating data for {timeframe}: {len(date_range)} days from {start_date.date()} to {end_date.date()}")
     
     for category in categories:
         base_demand = generate_base_demand(category)
@@ -175,10 +184,10 @@ def insert_demand_data(data):
         cursor.executemany(insert_query, insert_data)
         conn.commit()
         
-        print(f" Successfully inserted {len(data)} demand prediction records")
+        print(f"✅ Successfully inserted {len(data)} demand prediction records")
         
     except Exception as e:
-        print(f" Error inserting demand data: {e}")
+        print(f"❌ Error inserting demand data: {e}")
         conn.rollback()
     finally:
         cursor.close()
@@ -190,7 +199,7 @@ def generate_summary_stats(categories, timeframes):
     cursor = conn.cursor()
     
     try:
-        print("\n DEMAND PREDICTION DATA SUMMARY")
+        print("\n📊 DEMAND PREDICTION DATA SUMMARY")
         print("=" * 50)
         
         # Total records by timeframe
@@ -206,13 +215,13 @@ def generate_summary_stats(categories, timeframes):
             
             result = cursor.fetchone()
             print(f"\n{timeframe.upper()}:")
-            print(f"   Total Records: {result[0]:,}")
-            print(f"   Average Demand: {result[1]:.1f}")
-            print(f"   Min Demand: {result[2]}")
-            print(f"   Max Demand: {result[3]}")
+            print(f"  📈 Total Records: {result[0]:,}")
+            print(f"  📊 Average Demand: {result[1]:.1f}")
+            print(f"  ⬇️  Min Demand: {result[2]}")
+            print(f"  ⬆️  Max Demand: {result[3]}")
         
         # Records by category
-        print(f"\n RECORDS BY CATEGORY:")
+        print(f"\n📋 RECORDS BY CATEGORY:")
         for category in categories:
             cursor.execute("""
                 SELECT COUNT(*) as count, AVG(predicted_quantity) as avg_demand
@@ -224,14 +233,14 @@ def generate_summary_stats(categories, timeframes):
             print(f"  {category}: {result[0]:,} records (avg: {result[1]:.1f})")
             
     except Exception as e:
-        print(f" Error generating summary: {e}")
+        print(f"❌ Error generating summary: {e}")
     finally:
         cursor.close()
         conn.close()
 
 def main():
     """Main execution function"""
-    print(" Starting Realistic Demand Prediction Data Generation")
+    print("🚀 Starting Realistic Demand Prediction Data Generation")
     print("=" * 60)
     
     # Categories (matching existing database structure)
@@ -246,26 +255,26 @@ def main():
     timeframes = ['30_days', '12_months', '5_years']
     
     # Clear existing data
-    print(" Clearing existing demand prediction data...")
+    print("🧹 Clearing existing demand prediction data...")
     clear_existing_demand_data()
     
     # Generate new realistic data for each timeframe
     all_data = []
     
     for timeframe in timeframes:
-        print(f"\n Generating realistic data for {timeframe}...")
+        print(f"\n🔄 Generating realistic data for {timeframe}...")
         timeframe_data = generate_demand_data_for_timeframe(categories, timeframe)
         all_data.extend(timeframe_data)
     
     # Insert all data into database
-    print(f"\n Inserting {len(all_data):,} total records into database...")
+    print(f"\n💾 Inserting {len(all_data):,} total records into database...")
     insert_demand_data(all_data)
     
     # Generate summary statistics
     generate_summary_stats(categories, timeframes)
     
-    print("\n Realistic demand prediction data generation completed!")
-    print(" Your demand forecasting charts should now show varied, realistic patterns!")
+    print("\n🎉 Realistic demand prediction data generation completed!")
+    print("✨ Your demand forecasting charts should now show varied, realistic patterns!")
 
 if __name__ == "__main__":
     main()

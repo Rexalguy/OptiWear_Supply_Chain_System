@@ -15,7 +15,7 @@ class AdminSalesPieChart extends ChartWidget
 
 
 
-      protected function getData(): array
+    protected function getData(): array
     {
         $data = DB::table('order_items as oi')
             ->join('products as p', 'oi.product_id', '=', 'p.id')
@@ -31,7 +31,12 @@ class AdminSalesPieChart extends ChartWidget
                     'label' => 'Orders',
                     'data' => $data->pluck('order_count')->toArray(),
                     'backgroundColor' => [
-                        '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899',
+                        '#3B82F6',
+                        '#EF4444',
+                        '#10B981',
+                        '#F59E0B',
+                        '#8B5CF6',
+                        '#EC4899',
                     ],
                     'borderWidth' => 1,
                 ],
