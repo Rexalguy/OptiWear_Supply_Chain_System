@@ -249,7 +249,7 @@
                     </div>
                 
                     <!-- Enhanced content section -->
-                    <div class="flex-1 p-10 pr-16 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm rounded-r-[3rem]">
+                    <div class="flex-1 p-10 pr-8 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm">
                         <!-- Title section -->
                         <div class="space-y-4">
                             <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-purple-900 dark:from-white dark:via-blue-200 dark:to-purple-200 mb-4 leading-tight animated-gradient">{{ $clickedProduct->name }}s</h3>

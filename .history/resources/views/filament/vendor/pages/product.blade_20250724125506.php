@@ -220,7 +220,7 @@
                 </button>
                 
                 <!-- Premium flex layout -->
-                <div class="relative z-10 flex gap-8 h-[650px]">
+                <div class="relative z-10 flex justify-between h-[650px]">
                     <!-- Enhanced image section -->
                     <div class="w-2/5 relative bg-gradient-to-br from-gray-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-l-[3rem] flex items-center justify-center pr-2 pt-2 pb-2 overflow-hidden">
                         <!-- Animated background -->
@@ -249,7 +249,7 @@
                     </div>
                 
                     <!-- Enhanced content section -->
-                    <div class="flex-1 p-10 pr-16 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm rounded-r-[3rem]">
+                    <div class="w-3/5 p-10 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm">
                         <!-- Title section -->
                         <div class="space-y-4">
                             <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-purple-900 dark:from-white dark:via-blue-200 dark:to-purple-200 mb-4 leading-tight animated-gradient">{{ $clickedProduct->name }}s</h3>
@@ -268,16 +268,16 @@
                         </div>
                         
                         <!-- Premium package selection -->
-                        <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800/80 dark:to-gray-700/80 rounded-[2rem] p-8 backdrop-blur-sm shadow-xl premium-glow">
+                        <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800/80 dark:to-gray-700/80 rounded-[2rem] p-8 border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm shadow-xl premium-glow">
                             <label class="block text-xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center space-x-2">
                                 <span class="text-2xl">🎁</span>
                                 <span>Choose Your Perfect Package</span>
                             </label>
-                            <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full px-4 py-3 rounded-[1rem] border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium">
-                                <option value="" class="text-gray-500">🎯 Select Package Size</option>
-                                <option value="100" class="font-medium">🚀 Starter: 100 pieces</option>
-                                <option value="350" class="font-medium">⭐ Classic: 350 pieces</option>
-                                <option value="750" class="font-medium">💎 Premium: 750 pieces</option>
+                            <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full px-6 py-5 rounded-[1.5rem] border-2 border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-200/50 dark:focus:ring-blue-800/50 transition-all duration-300 font-semibold text-xl backdrop-blur-sm shadow-lg premium-glow">
+                                <option value="">🎯 Select Your Package Size</option>
+                                <option value="100">🚀 Starter Package: 100 pieces</option>
+                                <option value="350">⭐ Classic Package: 350 pieces</option>
+                                <option value="750">💎 Premium Package: 750 pieces</option>
                             </select>
                         </div>
                         
@@ -307,9 +307,9 @@
                 </div>
                 
                 <!-- Enhanced decorative corner accents -->
-                <div class="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-transparent rounded-br-[2.5rem] backdrop-blur-sm"></div>
-                <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-purple-500/20 via-pink-500/15 to-transparent rounded-tl-[2.5rem] backdrop-blur-sm"></div>
-                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-pink-500/15 via-purple-500/10 to-transparent rounded-bl-[2.5rem] backdrop-blur-sm"></div>
+                <div class="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-transparent rounded-br-[2rem] backdrop-blur-sm"></div>
+                <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-purple-500/20 via-pink-500/15 to-transparent rounded-tl-[2rem] backdrop-blur-sm"></div>
+                <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-pink-500/15 via-purple-500/10 to-transparent rounded-bl-[2rem] backdrop-blur-sm"></div>
             </div>
         </div>
     @endif

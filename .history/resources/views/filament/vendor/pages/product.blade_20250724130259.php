@@ -220,7 +220,7 @@
                 </button>
                 
                 <!-- Premium flex layout -->
-                <div class="relative z-10 flex gap-8 h-[650px]">
+                <div class="relative z-10 flex justify-between h-[650px]">
                     <!-- Enhanced image section -->
                     <div class="w-2/5 relative bg-gradient-to-br from-gray-100 via-blue-50 to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-l-[3rem] flex items-center justify-center pr-2 pt-2 pb-2 overflow-hidden">
                         <!-- Animated background -->
@@ -249,7 +249,7 @@
                     </div>
                 
                     <!-- Enhanced content section -->
-                    <div class="flex-1 p-10 pr-16 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm rounded-r-[3rem]">
+                    <div class="w-3/5 p-10 space-y-8 flex flex-col justify-center bg-gradient-to-b from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50 backdrop-blur-sm">
                         <!-- Title section -->
                         <div class="space-y-4">
                             <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-purple-900 dark:from-white dark:via-blue-200 dark:to-purple-200 mb-4 leading-tight animated-gradient">{{ $clickedProduct->name }}s</h3>
