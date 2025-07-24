@@ -34,7 +34,7 @@ class ProductsBarsLine extends ChartWidget
         $barColors = [];
         foreach ($barData as $i => $val) {
             // Each bar gets a unique random color
-            $barColors[] = 'rgba(' . rand(50,200) . ',' . rand(100,200) . ',' . rand(150,255) . ',0.7)';
+            $barColors[] = 'rgba(' . rand(50, 200) . ',' . rand(100, 200) . ',' . rand(150, 255) . ',0.7)';
         }
 
         return [

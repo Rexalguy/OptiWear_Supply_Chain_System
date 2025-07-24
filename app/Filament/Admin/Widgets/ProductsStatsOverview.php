@@ -9,7 +9,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class ProductsStatsOverview extends BaseWidget
 {
-        protected static ?string $pollingInterval = '60s';
+    protected static ?string $pollingInterval = '60s';
 
     protected function getStats(): array
     {

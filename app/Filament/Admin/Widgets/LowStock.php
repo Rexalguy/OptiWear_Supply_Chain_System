@@ -27,12 +27,12 @@ class LowStock extends BaseWidget
                 TextColumn::make('name')
                     ->label('Product')
                     ->sortable()
-                    ->description(fn ($record) => $record->ShirtCategory?->category ?? 'Uncategorized'),
+                    ->description(fn($record) => $record->ShirtCategory?->category ?? 'Uncategorized'),
 
                 TextColumn::make('quantity_available')
                     ->label('Qty Left')
                     ->badge()
-                    ->color(fn ($state) => $state < 5 ? 'danger' : 'warning')
+                    ->color(fn($state) => $state < 5 ? 'danger' : 'warning')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -40,6 +40,4 @@ class LowStock extends BaseWidget
                     ->date('M d, Y')
             ]);
     }
-
 }
-

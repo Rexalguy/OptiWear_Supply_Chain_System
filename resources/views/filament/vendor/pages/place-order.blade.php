@@ -11,6 +11,7 @@
                 {{-- Product image --}}
                 <div style="background-color: white !important;" class="w-48 h-48 flex items-start justify-center bg-white rounded-md mb-3 overflow-hidden flex-shrink-0">
                     <img src="{{ asset($item['image'] ?? 'images/default-product.png') }}" alt="{{ $item['name'] ?? 'Product' }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
+                    <img src="{{ asset($item['image'] ?? 'images/default-product.png') }}" alt="{{ $item['name'] ?? 'Product' }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
                 </div>
                 
                 {{-- Product info and quantity controls in one row --}}
@@ -93,28 +94,28 @@
                     <div class="space-y-2">
                         <label class="flex items-center">
                             <input type="radio" 
-                                   name="delivery_option_{{ $item['id'] }}" 
+                                   name="delivery_option_{{ $item['id'] ?? $loop->index }}" 
                                    value="delivery" 
-                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'delivery')"
-                                   @if(($delivery_options[$item['id']] ?? '') === 'delivery') checked @endif
+                                   wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'delivery')"
+                                   @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'delivery') checked @endif
                                    class="mr-2"> 
                             <span>Standard Delivery (3-5 days) : UGX 3000</span>
                         </label>
                         <label class="flex items-center">
                             <input type="radio" 
-                                   name="delivery_option_{{ $item['id'] }}" 
+                                   name="delivery_option_{{ $item['id'] ?? $loop->index }}" 
                                    value="express" 
-                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'express')"
-                                   @if(($delivery_options[$item['id']] ?? '') === 'express') checked @endif
+                                   wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'express')"
+                                   @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'express') checked @endif
                                    class="mr-2"> 
                             <span>Express Delivery (1 day) : UGX 5000</span>
                         </label>
                         <label class="flex items-center">
                             <input type="radio" 
-                                   name="delivery_option_{{ $item['id'] }}" 
+                                   name="delivery_option_{{ $item['id'] ?? $loop->index }}" 
                                    value="pickup" 
-                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'pickup')"
-                                   @if(($delivery_options[$item['id']] ?? '') === 'pickup') checked @endif
+                                   wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'pickup')"
+                                   @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'pickup') checked @endif
                                    class="mr-2"> 
                             <span>Pick Up : UGX 0</span>
                         </label>

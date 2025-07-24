@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\DB;
 class SegmentationSummary extends BaseWidget
 {
     protected static ?string $heading = 'Customer Segmentation Summary';
-    
+
     protected int | string | array $columnSpan = 'full';
-    
+
     protected static ?int $sort = 4;
 
     public function table(Table $table): Table
@@ -39,7 +39,7 @@ class SegmentationSummary extends BaseWidget
                     ->alignEnd(),
                 Tables\Columns\TextColumn::make('contribution_percentage')
                     ->label('Revenue %')
-                    ->formatStateUsing(fn ($state) => number_format($state, 1) . '%')
+                    ->formatStateUsing(fn($state) => number_format($state, 1) . '%')
                     ->alignCenter()
                     ->color('success'),
                 Tables\Columns\TextColumn::make('recommendations')

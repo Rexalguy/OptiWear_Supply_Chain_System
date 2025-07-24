@@ -9,9 +9,9 @@ use Filament\Forms\Components\Component;
 
 
 
-class CustomSignup extends Register 
+class CustomSignup extends Register
 {
-        protected function getForms(): array
+    protected function getForms(): array
     {
         return [
             'form' => $this->form(
@@ -30,24 +30,24 @@ class CustomSignup extends Register
     }
 
 
-            protected function getDateOfBirthFormComponent(): Component
-        {
-            return DatePicker::make('date_of_birth')
-                ->label('Date of Birth')
-                ->required()
-                ->maxDate(now());
-        }
+    protected function getDateOfBirthFormComponent(): Component
+    {
+        return DatePicker::make('date_of_birth')
+            ->label('Date of Birth')
+            ->required()
+            ->maxDate(now());
+    }
 
-        protected function getGenderFormComponent(): Component
-        {
-            return Select::make('gender')
-                ->label('Gender')
-                ->required()
-                ->options([
-                    'male' => 'Male',
-                    'female' => 'Female',
-                    'other' => 'Other',
-                ])
-                ->native(false); // Use dropdown UI
-        }
+    protected function getGenderFormComponent(): Component
+    {
+        return Select::make('gender')
+            ->label('Gender')
+            ->required()
+            ->options([
+                'male' => 'Male',
+                'female' => 'Female',
+                'other' => 'Other',
+            ])
+            ->native(false); // Use dropdown UI
+    }
 }
