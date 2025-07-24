@@ -24,37 +24,35 @@ class BillOfMaterials extends Page implements HasTable
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
     protected static string $view = 'filament.manufacturer.pages.bill-of-material';
-    
+
     public function table(Table $table): Table
     {
         // Define your table columns and configuration here
         return $table
             ->query(BillOfMaterial::query())
             ->columns([
-                    TextColumn::make('product.name')->label('Product')
+                TextColumn::make('product.name')->label('Product')
                     ->sortable()
                     ->searchable(),
-                    TextColumn::make('rawMaterial.name')->label('Raw Material'),
-                    TextColumn::make('quantity_required'),
-                    TextColumn::make('rawMaterial.unit_of_measure')
+                TextColumn::make('rawMaterial.name')->label('Raw Material'),
+                TextColumn::make('quantity_required'),
+                TextColumn::make('rawMaterial.unit_of_measure')
                     ->label('Unit of measure'),
-                ])
-                ->actions([
-                   //
-                ])
-                ->filters([
-                    SelectFilter::make('product_id')
-                        ->label('Product')
-                        ->options(Product::pluck('name', 'id')->toArray())
-                        ->searchable(),
-                ])
-                
-                ->bulkActions([
-                    BulkActionGroup::make([
-                        DeleteBulkAction::make(),
-                    ]),
-                ]); 
-                         
+            ])
+            ->actions([
+                //
+            ])
+            ->filters([
+                SelectFilter::make('product_id')
+                    ->label('Product')
+                    ->options(Product::pluck('name', 'id')->toArray())
+                    ->searchable(),
+            ])
+
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
     }
-    
 }
