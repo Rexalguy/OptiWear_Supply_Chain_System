@@ -19,6 +19,7 @@ class VendorOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 2;
     protected static ?string $navigationLabel = 'View Orders';
     protected static ?string $navigationGroup = 'Orders';
     public static function canCreate(): bool
@@ -148,6 +149,14 @@ class VendorOrderResource extends Resource
 
                         ]);
                     }),
+                    ->action(function(VendorOrder $record, $livewire) {
+                        $record->update(['status' => 'pending']);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Resumed Successfully',
+                            'icon' => 'success',
+
+                        ]);
+                    }),
 
                 Tables\Actions\Action::make('cancel')
                     ->color('danger')
@@ -156,6 +165,14 @@ class VendorOrderResource extends Resource
                     ->visible(fn(VendorOrder $record) => $record->status === 'pending')
                     ->requiresConfirmation()
                     ->action(function ($record, $livewire) {
+                        $record->update(['status' => 'cancelled']);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Cancelled Successfully',
+                            'icon' => 'info',
+
+                        ]);
+                    }),
+                    ->action(function($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
                         $livewire->dispatch('sweetalert', [
                             'title' => 'Order Cancelled Successfully',
