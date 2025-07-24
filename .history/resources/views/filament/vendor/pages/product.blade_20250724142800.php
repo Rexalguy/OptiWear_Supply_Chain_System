@@ -88,7 +88,7 @@
                     
                     <!-- Enhanced select dropdown -->
                     <select wire:model="bale_size.{{ $product->id }}" class="w-full mt-3 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium" style="border-radius: 0.5rem !important;">
-                        <option value="" class="text-gray-500"> Select Package Size</option>
+                        <option value="" class="text-gray-500">🎯 Select Package Size</option>
                         <option value="100" class="font-medium">🚀 Starter: 100 pieces</option>
                         <option value="350" class="font-medium">⭐ Classic: 350 pieces</option>
                         <option value="750" class="font-medium">💎 Premium: 750 pieces</option>
@@ -271,10 +271,11 @@
                         <!-- Premium package selection -->
                         <div class="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800/80 dark:to-gray-700/80 rounded-xl p-8 backdrop-blur-sm shadow-xl premium-glow">
                             <label class="block text-xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center space-x-2">
+                                <span class="text-2xl">🎁</span>
                                 <span>Choose Your Perfect Package</span>
                             </label>
                             <select wire:model="bale_size.{{ $clickedProduct->id }}" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all duration-300 font-medium">
-                                <option value="" class="text-gray-500"> Select Package Size</option>
+                                <option value="" class="text-gray-500">🎯 Select Package Size</option>
                                 <option value="100" class="font-medium">🚀 Starter: 100 pieces</option>
                                 <option value="350" class="font-medium">⭐ Classic: 350 pieces</option>
                                 <option value="750" class="font-medium">💎 Premium: 750 pieces</option>

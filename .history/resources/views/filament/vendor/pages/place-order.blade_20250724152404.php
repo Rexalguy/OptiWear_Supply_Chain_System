@@ -90,7 +90,7 @@
                     {{-- Clean quantity control buttons --}}
                     <div class="space-y-3">
                         <h5 class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center space-x-1">
-                            <span>Quick Actions</span>
+                            <span> Quick Actions</span>
                         </h5>
                         <div class="flex justify-between gap-2">
                             <x-filament::button wire:click="reduceQuantity({{ $item['id'] ?? $loop->index }}, 100)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before" class="font-semibold flex-1">100</x-filament::button>
@@ -117,7 +117,7 @@
                         icon-position="before"
                         class="flex-1 font-bold py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                        Remove Item
+                        🗑️ Remove Item
                     </x-filament::button>
                     <x-filament::button 
                         wire:click="placeOrder({{ $item['id'] ?? $loop->index }})" 
@@ -127,7 +127,7 @@
                         icon-position="before"
                         class="flex-1 font-bold py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                         Place Order
+                        ✅ Place Order
                     </x-filament::button>
                 </div>
             </div>
@@ -183,7 +183,7 @@
                                        value="delivery" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'delivery')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'delivery') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
                                         <span class="text-gray-900 dark:text-white font-semibold">Standard Delivery</span>
@@ -198,10 +198,10 @@
                                        value="express" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'express')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'express') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-gray-900 dark:text-white font-semibold">Express Delivery</span>
+                                        <span class="text-gray-900 dark:text-white font-semibold">⚡ Express Delivery</span>
                                         <span class="text-yellow-600 dark:text-yellow-400 font-bold">UGX 5,000</span>
                                     </div>
                                     <span class="text-gray-600 dark:text-gray-400 text-sm">Next day delivery</span>
@@ -213,10 +213,10 @@
                                        value="pickup" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'pickup')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'pickup') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-gray-900 dark:text-white font-semibold">Store Pickup</span>
+                                        <span class="text-gray-900 dark:text-white font-semibold"> Store Pickup</span>
                                         <span class="text-green-600 dark:text-green-400 font-bold">FREE</span>
                                     </div>
                                     <span class="text-gray-600 dark:text-gray-400 text-sm">Pick up at our store</span>

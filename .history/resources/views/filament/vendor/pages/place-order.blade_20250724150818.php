@@ -76,11 +76,11 @@
                         </h4>
                         <div class="space-y-2">
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Price:</span>
+                                <span class="text-gray-500 dark:text-gray-400">💰 Price:</span>
                                 <span class="text-green-600 dark:text-green-400 text-xl font-bold">UGX {{ number_format($item['price'] ?? 0) }}</span>
                             </p>
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Quantity:</span>
+                                <span class="text-gray-500 dark:text-gray-400">📦 Quantity:</span>
                                 <span class="text-xl font-semibold">{{ number_format($item['quantity'] ?? 0) }}</span>
                                 <span class="text-sm text-blue-600 dark:text-blue-400">pieces</span>
                             </p>
@@ -90,7 +90,7 @@
                     {{-- Clean quantity control buttons --}}
                     <div class="space-y-3">
                         <h5 class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center space-x-1">
-                            <span>Quick Actions</span>
+                            <span>⚡ Quick Actions</span>
                         </h5>
                         <div class="flex justify-between gap-2">
                             <x-filament::button wire:click="reduceQuantity({{ $item['id'] ?? $loop->index }}, 100)" color="danger" size="xs" icon="heroicon-m-minus" icon-position="before" class="font-semibold flex-1">100</x-filament::button>
@@ -117,7 +117,7 @@
                         icon-position="before"
                         class="flex-1 font-bold py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                        Remove Item
+                        🗑️ Remove Item
                     </x-filament::button>
                     <x-filament::button 
                         wire:click="placeOrder({{ $item['id'] ?? $loop->index }})" 
@@ -127,7 +127,7 @@
                         icon-position="before"
                         class="flex-1 font-bold py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
-                         Place Order
+                        ✅ Place Order
                     </x-filament::button>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                     <div class="flex items-center space-x-2 mb-4">
                         <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                         <h2 class="font-bold text-xl text-gray-900 dark:text-white flex items-center space-x-2">
-                            <span>Package Breakdown</span>
+                            <span>📊 Package Breakdown</span>
                         </h2>
                     </div>
                     
@@ -148,6 +148,7 @@
                     @if(isset($item['packages']['premium']) && $item['packages']['premium'] > 0)
                         <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-3 rounded-lg">
                             <div class="flex items-center space-x-2">
+                                <span class="text-2xl">💎</span>
                                 <span class="text-gray-900 dark:text-white font-bold">Premium Packages: {{ $item['packages']['premium'] }}</span>
                                 <span class="bg-gradient-to-r from-purple-400 to-pink-400 text-white text-xs px-2 py-1 rounded-full">5% Discount</span>
                             </div>
@@ -156,6 +157,7 @@
                     @if(isset($item['packages']['standard']) && $item['packages']['standard'] > 0)
                         <div class="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 p-3 rounded-lg">
                             <div class="flex items-center space-x-2">
+                                <span class="text-2xl">⭐</span>
                                 <span class="text-gray-900 dark:text-white font-bold">Classic Packages: {{ $item['packages']['standard'] }}</span>
                                 <span class="bg-gradient-to-r from-blue-400 to-cyan-400 text-white text-xs px-2 py-1 rounded-full">3% Discount</span>
                             </div>
@@ -164,6 +166,7 @@
                     @if(isset($item['packages']['starter']) && $item['packages']['starter'] > 0)
                         <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 p-3 rounded-lg">
                             <div class="flex items-center space-x-2">
+                                <span class="text-2xl">🚀</span>
                                 <span class="text-gray-900 dark:text-white font-bold">Starter Packages: {{ $item['packages']['starter'] }}</span>
                                 <span class="bg-gradient-to-r from-green-400 to-emerald-400 text-white text-xs px-2 py-1 rounded-full">2% Discount</span>
                             </div>
@@ -174,6 +177,7 @@
                     <!-- Enhanced delivery options -->
                     <div class="pt-4">
                         <div class="flex items-center space-x-2 mb-4">
+                            <span class="text-2xl">🚚</span>
                             <h3 class="font-bold text-lg text-gray-900 dark:text-white">Delivery Options</h3>
                         </div>
                         <div class="space-y-3">
@@ -183,10 +187,10 @@
                                        value="delivery" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'delivery')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'delivery') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-gray-900 dark:text-white font-semibold">Standard Delivery</span>
+                                        <span class="text-gray-900 dark:text-white font-semibold">🚚 Standard Delivery</span>
                                         <span class="text-green-600 dark:text-green-400 font-bold">UGX 3,000</span>
                                     </div>
                                     <span class="text-gray-600 dark:text-gray-400 text-sm">3-5 business days</span>
@@ -198,10 +202,10 @@
                                        value="express" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'express')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'express') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-gray-900 dark:text-white font-semibold">Express Delivery</span>
+                                        <span class="text-gray-900 dark:text-white font-semibold">⚡ Express Delivery</span>
                                         <span class="text-yellow-600 dark:text-yellow-400 font-bold">UGX 5,000</span>
                                     </div>
                                     <span class="text-gray-600 dark:text-gray-400 text-sm">Next day delivery</span>
@@ -213,10 +217,10 @@
                                        value="pickup" 
                                        wire:click="updateDeliveryOption({{ $item['id'] ?? $loop->index }}, 'pickup')"
                                        @if(($delivery_options[$item['id'] ?? $loop->index] ?? '') === 'pickup') checked @endif
-                                       class="mr-3 w-4 h-4 text-blue-500 self-start mt-1"> 
+                                       class="mr-3 w-4 h-4 text-blue-500"> 
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-gray-900 dark:text-white font-semibold">Store Pickup</span>
+                                        <span class="text-gray-900 dark:text-white font-semibold">🏪 Store Pickup</span>
                                         <span class="text-green-600 dark:text-green-400 font-bold">FREE</span>
                                     </div>
                                     <span class="text-gray-600 dark:text-gray-400 text-sm">Pick up at our store</span>
