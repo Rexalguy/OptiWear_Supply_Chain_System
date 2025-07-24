@@ -1,6 +1,5 @@
 <x-filament-panels::page>
-<script src="{{ asset('js/sweetalert-handler.js') }}"></script>
-<style>
+    <style>
 .small-toast {
     font-size: 14px !important;
     padding: 8px 12px !important;

@@ -53,6 +53,23 @@ class WishlistPage extends Page
         return collect($this->cart)->sum('quantity');
     }
 
+    protected function notify(string $message, string $type = 'success'): void
+    {
+        $iconMap = [
+            'success' => ['icon' => 'success'],
+            'danger' => ['icon' => 'error'],
+            'warning' => ['icon' => 'warning'],
+            'info' => ['icon' => 'info'],
+        ];
+
+        $iconData = $iconMap[$type] ?? ['icon' => 'success'];
+
+        $this->dispatch('sweetalert', [
+            'title' => $message,
+            'icon' => $iconData['icon'],
+        ]);
+    }
+
     public function refreshWishlist(): void
     {
         $this->wishlistItems = Wishlist::with('product')

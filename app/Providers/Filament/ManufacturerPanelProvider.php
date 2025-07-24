@@ -5,7 +5,6 @@ namespace App\Providers\Filament;
 use App\Http\Middleware\VerifyManufacturer;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Pages\Dashboard;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationGroup;

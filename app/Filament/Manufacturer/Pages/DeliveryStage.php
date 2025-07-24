@@ -5,6 +5,7 @@ namespace App\Filament\Manufacturer\Pages;
 use Filament\Tables;
 use Filament\Pages\Page;
 use App\Models\Workforce;;
+
 use App\Models\ProductionOrder;
 use App\Models\ProductionStage;
 use Filament\Tables\Actions\Action;
@@ -21,31 +22,31 @@ class DeliveryStage extends Page implements HasTable
     protected static ?string $navigationIcon = 'heroicon-o-truck';
     protected static ?string $navigationGroup = 'Production Workflow';
 
-   
+
     protected static ?int $navigationSort = 3;
     protected static ?string $title = 'Delivery';
     protected static string $view = 'filament.manufacturer.pages.delivery-stage';
 
     public static function getNavigationBadge(): ?string
-{
-    return (string) ProductionStage::where('stage', 'delivery')
-        ->where('status', 'in_progress')
-        ->count();
-}
+    {
+        return (string) ProductionStage::where('stage', 'delivery')
+            ->where('status', 'in_progress')
+            ->count();
+    }
 
-public static function getNavigationBadgeColor(): ?string
-{
-    $count = ProductionStage::where('stage', 'delivery')
-        ->where('status', 'in_progress')
-        ->count();
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $count = ProductionStage::where('stage', 'delivery')
+            ->where('status', 'in_progress')
+            ->count();
 
-    return $count > 0 ? 'info' : 'gray';
-}
+        return $count > 0 ? 'info' : 'gray';
+    }
 
-public static function getNavigationBadgeTooltip(): ?string
-{
-    return 'delivery tasks in progress';
-}
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'delivery tasks in progress';
+    }
 
     public function getTableQuery(): Builder
     {
@@ -58,7 +59,7 @@ public static function getNavigationBadgeTooltip(): ?string
             })
             ->whereHas('productionStages', function ($query) {
                 $query->where('stage', 'delivery')
-                      ->whereIn('status', ['pending', 'in_progress']);
+                    ->whereIn('status', ['pending', 'in_progress']);
             });
     }
 
@@ -70,19 +71,21 @@ public static function getNavigationBadgeTooltip(): ?string
             Tables\Columns\TextColumn::make('delivery_status')
                 ->label('Delivery Status')
                 ->badge()
-                ->color(fn (string $state): string => match ($state) {
+                ->color(fn(string $state): string => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
                     default => 'secondary',
                 })
-                ->getStateUsing(fn ($record) =>
+                ->getStateUsing(
+                    fn($record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->status ?? '-'
                 ),
             Tables\Columns\TextColumn::make('delivery_worker')
                 ->label('Assigned To')
                 ->icon('heroicon-m-wrench')
-                ->getStateUsing(fn ($record) =>
+                ->getStateUsing(
+                    fn($record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->workforce->name ?? 'Unassigned'
                 ),
         ];
@@ -100,7 +103,7 @@ public static function getNavigationBadgeTooltip(): ?string
                         ->searchable()
                         ->required(),
                 ])
-                ->action(function (array $data, ProductionOrder $record) {
+                ->action(function (array $data, ProductionOrder $record, $livewire) {
                     $stage = $record->productionStages()->where('stage', 'delivery')->first();
 
                     if (! $stage) {
@@ -118,12 +121,14 @@ public static function getNavigationBadgeTooltip(): ?string
                         ]);
                     }
 
-                    Notification::make()
-                        ->title('Delivery started')
-                        ->success()
-                        ->send();
+                    $livewire->dispatch('sweetalert', [
+                        'title' => 'Delivery started',
+                        'icon' => 'success',
+
+                    ]);
                 })
-                ->visible(fn (ProductionOrder $record) =>
+                ->visible(
+                    fn(ProductionOrder $record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->status === 'pending'
                 ),
 
@@ -131,27 +136,29 @@ public static function getNavigationBadgeTooltip(): ?string
                 ->label('Mark as Delivered')
                 ->color('success')
                 ->requiresConfirmation()
-                ->action(function (ProductionOrder $record) {
+                ->action(function (ProductionOrder $record, $livewire) {
                     $delivery = $record->productionStages()->where('stage', 'delivery')->first();
 
                     if ($delivery && $delivery->status === 'in_progress') {
-                            $delivery->update([
-                                'status' => 'completed',
-                                'completed_at' => now(),
-                            ]);
+                        $delivery->update([
+                            'status' => 'completed',
+                            'completed_at' => now(),
+                        ]);
 
-                            // ✅ Increase product quantity
-                            $record->product->increment('quantity_available', $record->quantity);
+                        // ✅ Increase product quantity
+                        $record->product->increment('quantity_available', $record->quantity);
 
-                            $record->update(['status' => 'completed']);
+                        $record->update(['status' => 'completed']);
 
-                            Notification::make()
-                                ->title('Delivery completed. Product stock updated.')
-                                ->success()
-                                ->send();
-                        }
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Delivery completed. Product stock updated.',
+                            'icon' => 'success',
+
+                        ]);
+                    }
                 })
-                ->visible(fn (ProductionOrder $record) =>
+                ->visible(
+                    fn(ProductionOrder $record) =>
                     optional($record->productionStages->firstWhere('stage', 'delivery'))->status === 'in_progress'
                 ),
         ];

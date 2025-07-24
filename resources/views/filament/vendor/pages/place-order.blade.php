@@ -9,18 +9,17 @@
             {{-- Left side: Product details and controls --}}
             <div class="flex-1 space-y-6">
                 {{-- Product image --}}
-                <div class="bg-white rounded-xl p-4 shadow-inner overflow-hidden transition-transform duration-300 hover:shadow-lg">
-                    <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" 
-                         class="w-48 h-48 object-cover rounded-lg transform transition-all duration-300 hover:scale-105">
+                <div style="background-color: white !important;" class="w-48 h-48 flex items-start justify-center bg-white rounded-md mb-3 overflow-hidden flex-shrink-0">
+                    <img src="{{ asset($item['image'] ?? 'images/default-product.png') }}" alt="{{ $item['name'] ?? 'Product' }}" class="w-auto h-auto object-cover rounded max-w-none min-w-0 min-h-0" style="width: 280px !important; height: auto !important;">
                 </div>
                 
                 {{-- Product info and quantity controls in one row --}}
                 <div class="flex justify-between items-start space-x-8">
                     {{-- Product info --}}
-                    <div class="space-y-2">
-                        <h4 class="text-xl font-bold text-white">{{ $item['name'] }}s</h4>
-                        <p class="text-primary-100">Price: <span class="font-semibold">UGX {{ $item['price'] }}</span></p>
-                        <p class="text-primary-100">Quantity: <span class="font-semibold">{{ $item['quantity'] }}</span></p>
+                    <div>
+                        <h4 class="font-semibold text-lg">{{ $item['name'] ?? 'Unknown Product' }}s</h4>
+                        <p class="">Price: UGX {{ $item['price'] ?? 0 }}</p>
+                        <p class="">Quantity: {{ $item['quantity'] ?? 0 }}</p>
                     </div>
                     
                     {{-- Quantity control buttons --}}
@@ -89,26 +88,35 @@
                         </div>
                     </div>
                 @endif
-                <div class="mt-6 border-t border-primary-600/30 pt-6">
-                    <h2 class="text-xl font-bold text-primary-100 mb-4 flex items-center">
-                        <x-heroicon-m-truck class="w-6 h-6 mr-2 text-primary-300" />
-                        Pick Delivery Option
-                    </h2>
-                    <div class="space-y-3">
-                        <label class="flex items-center p-3 rounded-lg transition-all duration-300 hover:bg-primary-700/30 cursor-pointer group">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="standard" 
-                                   class="mr-3 h-4 w-4 border-primary-500 text-primary-600 focus:ring-primary-500"> 
-                            <span class="text-primary-100 group-hover:text-primary-50">Standard Delivery (3-5 days) : <span class="font-semibold">UGX 3000</span></span>
+                <div style="margin-top: 5px !important;" class="mt-4">
+                    <h2 style="font-weight:bold !important; color: rgb(31, 221, 31) !important;">Pick Delivery Option</h2>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="delivery_option_{{ $item['id'] }}" 
+                                   value="delivery" 
+                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'delivery')"
+                                   @if(($delivery_options[$item['id']] ?? '') === 'delivery') checked @endif
+                                   class="mr-2"> 
+                            <span>Standard Delivery (3-5 days) : UGX 3000</span>
                         </label>
-                        <label class="flex items-center p-3 rounded-lg transition-all duration-300 hover:bg-primary-700/30 cursor-pointer group">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="express" 
-                                   class="mr-3 h-4 w-4 border-primary-500 text-primary-600 focus:ring-primary-500"> 
-                            <span class="text-primary-100 group-hover:text-primary-50">Express Delivery (1 day) : <span class="font-semibold">UGX 5000</span></span>
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="delivery_option_{{ $item['id'] }}" 
+                                   value="express" 
+                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'express')"
+                                   @if(($delivery_options[$item['id']] ?? '') === 'express') checked @endif
+                                   class="mr-2"> 
+                            <span>Express Delivery (1 day) : UGX 5000</span>
                         </label>
-                        <label class="flex items-center p-3 rounded-lg transition-all duration-300 hover:bg-primary-700/30 cursor-pointer group">
-                            <input type="radio" name="delivery_option_{{ $item['id'] }}" value="pickup" 
-                                   class="mr-3 h-4 w-4 border-primary-500 text-primary-600 focus:ring-primary-500"> 
-                            <span class="text-primary-100 group-hover:text-primary-50">Pick Up : <span class="font-semibold">UGX 0</span></span>
+                        <label class="flex items-center">
+                            <input type="radio" 
+                                   name="delivery_option_{{ $item['id'] }}" 
+                                   value="pickup" 
+                                   wire:click="updateDeliveryOption({{ $item['id'] }}, 'pickup')"
+                                   @if(($delivery_options[$item['id']] ?? '') === 'pickup') checked @endif
+                                   class="mr-2"> 
+                            <span>Pick Up : UGX 0</span>
                         </label>
                     </div>
                 </div>

@@ -26,25 +26,25 @@ class PrintingStage extends Page implements HasTable
     protected static string $view = 'filament.manufacturer.pages.printing-stage';
 
     public static function getNavigationBadge(): ?string
-{
-    return (string) ProductionStage::where('stage', 'printing')
-        ->where('status', 'in_progress')
-        ->count();
-}
+    {
+        return (string) ProductionStage::where('stage', 'printing')
+            ->where('status', 'in_progress')
+            ->count();
+    }
 
-public static function getNavigationBadgeColor(): ?string
-{
-    $count = ProductionStage::where('stage', 'printing')
-        ->where('status', 'in_progress')
-        ->count();
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $count = ProductionStage::where('stage', 'printing')
+            ->where('status', 'in_progress')
+            ->count();
 
-    return $count > 0 ? 'info' : 'gray';
-}
+        return $count > 0 ? 'info' : 'gray';
+    }
 
-public static function getNavigationBadgeTooltip(): ?string
-{
-    return 'Printing tasks in progress';
-}
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Printing tasks in progress';
+    }
 
     public function getTableQuery(): Builder
     {
@@ -60,7 +60,7 @@ public static function getNavigationBadgeTooltip(): ?string
             Tables\Columns\TextColumn::make('productionOrder.quantity')->label('Quantity'),
             Tables\Columns\TextColumn::make('status')
                 ->badge()
-                ->color(fn (string $state): string => match ($state) {
+                ->color(fn(string $state): string => match ($state) {
                     'pending' => 'gray',
                     'in_progress' => 'warning',
                     'completed' => 'success',
@@ -80,7 +80,7 @@ public static function getNavigationBadgeTooltip(): ?string
                 ->label('Mark as Completed')
                 ->requiresConfirmation()
                 ->color('success')
-                ->action(function (ProductionStage $record) {
+                ->action(function (ProductionStage $record, $livewire) {
                     // Complete current stage
                     $record->update([
                         'status' => 'completed',
@@ -112,26 +112,28 @@ public static function getNavigationBadgeTooltip(): ?string
 
                         $packagingWorker->update(['is_available' => false]);
 
-                        Notification::make()
-                            ->title("Packaging started. Assigned to: {$packagingWorker->name}")
-                            ->success()
-                            ->send();
+                        $livewire->dispatch('sweetalert', [
+                            'title' => "Packaging started. Assigned to: {$packagingWorker->name}",
+                            'icon' => 'success',
+
+                        ]);
                     } else {
-                        Notification::make()
-                            ->title('Printing completed.')
-                            ->body('Moved to packaging. No available packaging worker.')
-                            ->warning()
-                            ->send();
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Printing completed.',
+                            'text' => 'Moved to packaging. No available packaging worker.',
+                            'icon' => 'warning',
+
+                        ]);
                     }
                 })
-                ->visible(fn ($record) => $record->status === 'in_progress'),
+                ->visible(fn($record) => $record->status === 'in_progress'),
         ];
     }
 
     protected function getHeaderWidgets(): array
-{
-    return [
-        StageStatsWidget::make(['stage' => 'printing']),
-    ];
-}
+    {
+        return [
+            StageStatsWidget::make(['stage' => 'printing']),
+        ];
+    }
 }
