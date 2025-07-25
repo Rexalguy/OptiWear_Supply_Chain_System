@@ -93,7 +93,7 @@
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{{ $product->name }}s</h3>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">SKU: <span class="text-gray-800 dark:text-gray-200">{{ $product->sku }}</span></p>
-                        <p ><span style="text-decoration: line-through;" class="text-lg font-bold text-grey-600 dark:text-grey-400">UGX {{ number_format($product->unit_price) }}</span><br><span class="text-lg font-bold text-green-600 dark:text-green-400">UGX {{ number_format( $product->unit_price - ($product->unit_price * 0.05)) }}</span></p>
+                        <p ><span style="text-decoration: line-through; margin-right: 0.5rem;" class="text-lg font-bold text-grey-600 dark:text-grey-400">UGX {{ number_format($product->unit_price) }}</span><span class="text-lg font-bold text-green-600 dark:text-green-400">UGX {{ number_format( $product->unit_price - ($product->unit_price * 0.05)) }}</span></p>
                     </div>
                     
                     <!-- Enhanced select dropdown -->

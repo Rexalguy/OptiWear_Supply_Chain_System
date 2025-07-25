@@ -76,26 +76,18 @@
                         </h4>
                         <div class="space-y-2">
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Base Price:</span>
-                                <span class="text-blue-600 dark:text-blue-400 text-xl font-bold">UGX {{ number_format($item['base_price'] ?? 0) }}</span>
+                                <span class="text-gray-500 dark:text-gray-400">Price:</span>
+                                <span class="text-green-600 dark:text-green-400 text-xl font-bold">UGX {{ number_format($item['price'] ?? 0) }}</span>
                             </p>
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
                                 <span class="text-gray-500 dark:text-gray-400">Quantity:</span>
                                 <span class="text-xl font-semibold">{{ number_format($item['quantity'] ?? 0) }}</span>
                                 <span class="text-sm text-blue-600 dark:text-blue-400">pieces</span>
                             </p>
+                            /
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Subtotal:</span>
-                                <span class="text-gray-600 dark:text-gray-400 text-xl font-bold">UGX {{ number_format($item['base_total'] ?? 0) }}</span>
-                            </p>
-                            <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Discount ({{ $item['discount_percent'] ?? 0 }}%):</span>
-                                <span class="text-red-600 dark:text-red-400 text-xl font-bold">-UGX {{ number_format($item['discount_amount'] ?? 0) }}</span>
-                            </p>
-                            <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Final Total:</span>
+                                <span class="text-gray-500 dark:text-gray-400">Total:</span>
                                 <span class="text-green-600 dark:text-green-400 text-xl font-bold">UGX {{ number_format($item['total'] ?? 0) }}</span>
-                            </p>
                         </div>
                     </div>
                     
@@ -241,64 +233,28 @@
         </div>
             
     @empty
-        <div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
-            {{-- Empty State Container --}}
-            <div class="w-full max-w-4xl transform transition-all duration-500 hover:scale-[1.02] bg-gradient-to-br from-primary-50 to-white dark:from-gray-900 dark:to-primary-950 rounded-3xl shadow-2xl overflow-hidden">
-                {{-- Content Container --}}
-                <div class="relative px-8 py-16 flex flex-col items-center">
-                    {{-- Background Pattern --}}
-                    <div class="absolute inset-0 opacity-10">
-                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary-200 rounded-full animate-pulse"></div>
-                        <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-primary-200 rounded-full animate-pulse delay-150"></div>
-                    </div>
-
-                    {{-- Content --}}
-                    <div class="relative flex flex-col items-center text-center space-y-8 mb-12">
-                        {{-- Bags Icon Container with Animation --}}
-                        <div class="relative transform transition-all duration-500 hover:scale-110">
-                            <x-heroicon-o-shopping-bag class="w-32 h-32 text-primary-200 dark:text-primary-800 animate-float"/>
-                            <x-heroicon-o-shopping-bag class="absolute inset-0 w-32 h-32 text-primary-300 dark:text-primary-700 transform translate-x-2 translate-y-2 animate-float-delayed"/>
-                        </div>
-                        
-                        <div class="space-y-4 transform transition-all duration-500">
-                            <h2 class="text-4xl font-bold text-primary-900 dark:text-primary-100">Your Cart is Empty</h2>
-                            <p class="text-xl text-primary-600 dark:text-primary-400 max-w-lg">Ready to start your bulk shopping journey? Visit our shop to explore amazing deals.</p>
-                        </div>
-                    </div>
-
-                    {{-- Action Buttons Container --}}
-                    <div class="flex justify-center items-center gap-6">
-                        {{-- Shopping Button --}}
-                        <a href="{{ url('/vendor/product') }}" 
-                           class="group relative inline-flex items-center justify-center bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-xl font-medium px-10 py-5 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-primary-500/25 hover:shadow-2xl transform hover:scale-105">
-                            <div class="flex items-center space-x-4">
-                                {{-- Shopping Bags Icon Container --}}
-                                <div class="relative">
-                                    <x-heroicon-o-shopping-bag class="w-8 h-8 transition-transform duration-300 group-hover:scale-110 animate-bounce"/>
-                                    <x-heroicon-o-shopping-bag class="absolute inset-0 w-8 h-8 transform translate-x-1 translate-y-1 opacity-50 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2"/>
-                                </div>
-                                <span class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-white after:origin-bottom-left after:transition-transform after:duration-300 group-hover:after:scale-x-100">
-                                    Shop in Bulk
-                                </span>
-                                <x-heroicon-m-arrow-right class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-2"/>
-                            </div>
-                        </a>
-
-                        {{-- View Orders Button --}}
-                        <a href="{{ url('/vendor/vendor-orders') }}" 
-                           class="group relative inline-flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xl font-medium px-10 py-5 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-purple-500/25 hover:shadow-2xl transform hover:scale-105">
-                            <div class="flex items-center space-x-4">
-                                <div class="relative">
-                                    <x-heroicon-o-clipboard-document-list class="w-8 h-8 transition-transform duration-300 group-hover:scale-110 animate-pulse"/>
-                                    <x-heroicon-o-clipboard-document-list class="absolute inset-0 w-8 h-8 transform translate-x-1 translate-y-1 opacity-50 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2"/>
-                                </div>
-                                <span class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-white after:origin-bottom-left after:transition-transform after:duration-300 group-hover:after:scale-x-100">
-                                    View Orders
-                                </span>
-                                <x-heroicon-m-arrow-right class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-2"/>
-                            </div>
-                        </a>
-                    </div>
+        {{-- Clean empty cart design --}}
+        <div class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg" style="border-radius: 1rem !important;">
+            <!-- Subtle gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl" style="border-radius: 1rem !important;"></div>
+            
+            <!-- Simple cart icon -->
+            <div class="relative z-10 mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-8 shadow-lg">
+                <span class="text-4xl">🛒</span>
+            </div>
+            
+            <!-- Clean empty message -->
+            <div class="relative z-10">
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    Your Cart is Empty
+                </h3>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                    Ready to start shopping? Add some products to get started!
+                </p>
+                
+                <!-- Simple call to action -->
+                <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    <span class="text-lg font-bold">Start Shopping</span>
                 </div>
             </div>
         </div>

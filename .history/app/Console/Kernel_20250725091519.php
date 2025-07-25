@@ -13,18 +13,18 @@ class Kernel extends ConsoleKernel
     protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule)
     {
         $schedule->command('send:supplier-report')
-            ->weekly()
-            ->at('07:00')
-            ->timezone(config('app.timezone'));
+                 ->weekly()
+                 ->at('07:00')
+                 ->timezone(config('app.timezone'));
 
         $schedule->command('send:manufacturer-report')
-            ->weekly()
-            ->at('07:00')
-            ->timezone(config('app.timezone'));
+                 ->weekly()
+                 ->at('07:00')
+                 ->timezone(config('app.timezone'));
     }
 
     protected function commands()
     {
-        $this->load(__DIR__ . '/Commands');
+        $this->load(__DIR__.'/Commands');
     }
 }

@@ -25,10 +25,7 @@ class PlaceOrder extends Page
 
     public $cart;
     public $cartCount;
-    public $totalPrices = []; // Total price of the cart
-    public $delivery_options = [];
-    public $totalDiscountPercent = 0;
-    public $deliveryOptions = []; // Array to store delivery option for each cart item
+    public $delivery_options = []; // Array to store delivery option for each cart item
 
     public function mount()
     {
@@ -36,7 +33,7 @@ class PlaceOrder extends Page
         $this->cart = session()->get('cart', []);
         $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
 
-        // Ensure all cart items have required fields and calculate totals
+        // Ensure all cart items have required fields
         foreach ($this->cart as $id => $item) {
             $product = Product::find($id);
 
@@ -45,7 +42,7 @@ class PlaceOrder extends Page
                 $this->cart[$id]['name'] = $product->name;
             }
             if (!isset($this->cart[$id]['price']) && $product) {
-                $this->cart[$id]['price'] = $product->unit_price;
+                $this->cart[$id]['price'] = $product->unit_price * 0.05; // Assuming 5% discount
             }
             if (!isset($this->cart[$id]['image'])) {
                 $this->cart[$id]['image'] = $product ? $product->image : 'images/default-product.png';
@@ -53,9 +50,6 @@ class PlaceOrder extends Page
 
             // Calculate packages for each cart item
             $this->cart[$id]['packages'] = $this->calculatePackages($id, $item['quantity']);
-
-            // Calculate total and discount for this item
-            $this->calculateItemTotal($id);
 
             // Initialize delivery option for each cart item if not already set
             if (!isset($this->cart[$id]['delivery_option'])) {
@@ -137,15 +131,15 @@ class PlaceOrder extends Page
                 $this->dispatch('sweetalert', [
                     'title' => "Quantity Updated. Reduced by {$quantity}",
                     'icon' => 'info',
+
                 ]);
                 $this->cart[$id]['packages'] = $this->calculatePackages($id, $this->cart[$id]['quantity']);
-                // Recalculate total and discount after quantity change
-                $this->calculateItemTotal($id);
             } else {
                 unset($this->cart[$id]);
                 $this->dispatch('sweetalert', [
                     'title' => "Product no longer in cart.",
                     'icon' => 'info',
+
                 ]);
             }
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
@@ -162,10 +156,9 @@ class PlaceOrder extends Page
             $this->dispatch('sweetalert', [
                 'title' => "Product Quantity Updated. Increased by {$quantity}",
                 'icon' => 'info',
+
             ]);
             $this->cart[$id]['packages'] = $this->calculatePackages($id, $this->cart[$id]['quantity']);
-            // Recalculate total and discount after quantity change
-            $this->calculateItemTotal($id);
             $this->cartCount = array_sum(array_column($this->cart, 'quantity'));
             session()->put('cart', $this->cart);
             session()->put('cartCount', array_sum(array_column($this->cart, 'quantity')));
@@ -240,13 +233,13 @@ class PlaceOrder extends Page
                 'status' => 'pending',
                 'created_by' => Auth::id(),
                 'delivery_option' => $deliveryOption,
-                'total' => $this->cart[$id]['total'] ?? ($product->unit_price * $this->cart[$id]['quantity']),
+                'total' => $product->unit_price * $this->cart[$id]['quantity'],
             ]);
             VendorOrderItem::create([
                 'vendor_order_id' => $vendorOrder->id,
                 'product_id' => $id,
                 'quantity' => $this->cart[$id]['quantity'],
-                'unit_price' => $this->cart[$id]['base_price'] ?? $product->unit_price,
+                'unit_price' => $product->unit_price,
             ]);
             $this->dispatch('sweetalert', [
                 'title' => "Order placed successfully with {$deliveryOption} delivery!",
@@ -265,48 +258,5 @@ class PlaceOrder extends Page
         }
 
         self::getNavigationBadge();
-    }
-    public function calculateItemTotal($id)
-    {
-        if (!isset($this->cart[$id])) {
-            return 0; // Item not found in cart
-        }
-
-        $item = $this->cart[$id];
-        $product = Product::find($id);
-        if (!$product) return 0;
-
-        $qty = $item['quantity'] ?? 1;
-        $baseTotal = $product->unit_price * $qty;
-
-        // Calculate packages for discount
-        $packages = $this->calculatePackages($id, $qty);
-
-        // Reset discount for this item calculation
-        $itemDiscountPercent = 0;
-
-        // Calculate discount percentage based on packages
-        if ($packages['starter'] > 0) {
-            $itemDiscountPercent += 2; // 2% for starter
-        }
-        if ($packages['standard'] > 0) {
-            $itemDiscountPercent += 3; // 3% for standard (classic)
-        }
-        if ($packages['premium'] > 0) {
-            $itemDiscountPercent += 5; // 5% for premium
-        }
-
-        // Apply discount
-        $discountAmount = $baseTotal * ($itemDiscountPercent / 100);
-        $finalTotal = $baseTotal - $discountAmount;
-
-        // Store calculated values in cart item
-        $this->cart[$id]['base_price'] = $product->unit_price;
-        $this->cart[$id]['base_total'] = $baseTotal;
-        $this->cart[$id]['discount_percent'] = $itemDiscountPercent;
-        $this->cart[$id]['discount_amount'] = $discountAmount;
-        $this->cart[$id]['total'] = $finalTotal;
-
-        return $finalTotal;
     }
 }
