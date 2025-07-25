@@ -327,32 +327,42 @@
                 @endif
             </div>
         @else
-            {{-- Products Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 products-grid">
+          {{--product grid--}}
+ <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 products-grid">
     @foreach ($products as $product)
-        <div class="product-card dark-gradient-card rounded-xl overflow-hidden {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
+        <div class="product-card 
+            rounded-xl overflow-hidden shadow-sm 
+            bg-white dark:bg-gray-800 
+            transition-colors duration-300
+            {{ $selectedCategory === 'recommendations' ? 'recommendations-glow' : '' }}">
 
-            {{-- Image Section with Overlay --}}
+            {{-- Image Section --}}
             <div class="product-image-container relative w-full">
-                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="product-image w-full h-48 object-cover" />
+                <img src="{{ asset($product->image) }}" 
+                     alt="{{ $product->name }}" 
+                     class="product-image w-full h-48 object-cover" />
+
                 @if($product->quantity_available > ($product->low_stock_threshold + 200))
-                    <div class="top-quality-overlay">New Stock</div>
+                    <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-md shadow">
+                        New Stock
+                    </div>
                 @endif
             </div>
 
-            <div class="p-4 space-y-3">
-                <h3 class="product-name text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100">
+            {{-- Info Section --}}
+            <div class="p-4 space-y-3 border-t border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100">
                     {{ $product->name }}
                 </h3>
 
                 <p class="text-xl font-bold text-gray-900 dark:text-gray-200">
-                     UGX {{ number_format($product->unit_price) }}
+                    UGX {{ number_format($product->unit_price) }}
                 </p>
 
                 <x-filament::button
                     size="sm"
                     color="primary"
-                    class="custom-order-btn full-width-animated-btn w-full"
+                    class="w-full custom-order-btn full-width-animated-btn"
                     wire:click="openProductModal({{ $product->id }})"
                     icon="heroicon-o-shopping-cart"
                 >
@@ -360,11 +370,9 @@
                 </x-filament::button>
             </div>
         </div>
-        @endforeach
-        </div>
-        @endif
-
-    </div>
+    @endforeach
+</div>
+@endif
 
     {{-- Product Modal --}}
     @if ($selectedProduct && $clickedProduct)
@@ -447,12 +455,14 @@
                         @endif
 
                         {{-- Add Another Size Button --}}
-                        @if ($cartItemsForClicked->count() > 0)
-                            <x-filament::button color="secondary" class="mt-4 w-full"
-                                wire:click="requestNewSize({{ $clickedProduct->id }})">
-                                + Add Another Size
-                            </x-filament::button>
-                        @endif
+                       @if ($cartItemsForClicked->count() > 0)
+    <x-filament::button 
+        class="mt-4 w-full bg-gray-200 text-gray-800 hover:bg-gray-300 
+               dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+        wire:click="requestNewSize({{ $clickedProduct->id }})">
+        + Add Another Size
+    </x-filament::button>
+@endif
 
                         {{-- Size Dropdown & Confirm Add --}}
                         @if ($cartItemsForClicked->isEmpty() || (isset($showSizeDropdown[$clickedProduct->id]) && $showSizeDropdown[$clickedProduct->id]))
