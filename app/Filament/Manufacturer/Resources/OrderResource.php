@@ -266,6 +266,10 @@ class OrderResource extends Resource
                                                 TextEntry::make('product')
                                                     ->label('Product')
                                                     ->default($item->product->name),
+                                                TextEntry::make('size')
+                        ->label('Size')
+                        ->default($item->size ?? 'N/A'), // fallback if size is null
+
 
                                                 TextEntry::make('quantity')
                                                     ->label('Quantity')
