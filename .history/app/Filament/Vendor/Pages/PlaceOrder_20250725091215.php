@@ -39,7 +39,7 @@ class PlaceOrder extends Page
         // Ensure all cart items have required fields and calculate totals
         foreach ($this->cart as $id => $item) {
             $product = Product::find($id);
-
+            
             // Add missing fields if not present
             if (!isset($this->cart[$id]['name']) && $product) {
                 $this->cart[$id]['name'] = $product->name;
@@ -53,7 +53,7 @@ class PlaceOrder extends Page
 
             // Calculate packages for each cart item
             $this->cart[$id]['packages'] = $this->calculatePackages($id, $item['quantity']);
-
+            
             // Calculate total and discount for this item
             $this->calculateItemTotal($id);
 
@@ -246,7 +246,7 @@ class PlaceOrder extends Page
                 'vendor_order_id' => $vendorOrder->id,
                 'product_id' => $id,
                 'quantity' => $this->cart[$id]['quantity'],
-                'unit_price' => $this->cart[$id]['base_price'] ?? $product->unit_price,
+                'unit_price' => $product->unit_price,
             ]);
             $this->dispatch('sweetalert', [
                 'title' => "Order placed successfully with {$deliveryOption} delivery!",
@@ -281,10 +281,10 @@ class PlaceOrder extends Page
 
         // Calculate packages for discount
         $packages = $this->calculatePackages($id, $qty);
-
+        
         // Reset discount for this item calculation
         $itemDiscountPercent = 0;
-
+        
         // Calculate discount percentage based on packages
         if ($packages['starter'] > 0) {
             $itemDiscountPercent += 2; // 2% for starter
