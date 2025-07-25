@@ -15,7 +15,6 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Notifications\Notification;
 use App\Filament\Customer\Widgets\MyStatsWidget;
 use Filament\Tables\Concerns\InteractsWithTable;
 

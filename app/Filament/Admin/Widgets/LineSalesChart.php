@@ -9,7 +9,7 @@ use Filament\Widgets\ChartWidget;
 
 class LineSalesChart extends ChartWidget
 {
-        protected static ?string $heading = 'Sales Trends Over the Last 90 Days';
+    protected static ?string $heading = 'Sales Trends Over the Last 90 Days';
 
     protected static ?string $description = 'rack the daily sales volume over the past three months to identify growth patterns, dips, and peak performance periods.';
 
@@ -23,18 +23,18 @@ class LineSalesChart extends ChartWidget
 
         $sales = Order::where('created_at', '>=', $startDate)
             ->get()
-            ->groupBy(fn ($order) => Carbon::parse($order->created_at)->format('Y-m-d'))
-            ->map(fn ($orders) => $orders->sum('total'))
+            ->groupBy(fn($order) => Carbon::parse($order->created_at)->format('Y-m-d'))
+            ->map(fn($orders) => $orders->sum('total'))
             ->toArray();
 
         $dates = collect(range(0, 89))
-            ->map(fn ($i) => now()->subDays(89 - $i)->format('Y-m-d'));
+            ->map(fn($i) => now()->subDays(89 - $i)->format('Y-m-d'));
 
         return [
             'datasets' => [
                 [
                     'label' => 'Daily Sales',
-                    'data' => $dates->map(fn ($date) => $sales[$date] ?? 0)->toArray(),
+                    'data' => $dates->map(fn($date) => $sales[$date] ?? 0)->toArray(),
                     'fill' => true,
                     'tension' => 0.4,
                     'borderColor' => '#10b981',
@@ -52,32 +52,32 @@ class LineSalesChart extends ChartWidget
                 'x' => [
                     'display' => false, // Hide X-axis labels
 
-                    
+
                     'title' => [
-                    'text' => 'Date',
-                    'color' => '#6b7280', // Optional: Tailwind gray-500
-                    'font' => [
-                        'size' => 14,
-                        'weight' => 'bold',
+                        'text' => 'Date',
+                        'color' => '#6b7280', // Optional: Tailwind gray-500
+                        'font' => [
+                            'size' => 14,
+                            'weight' => 'bold',
+                        ],
                     ],
+
+
                 ],
 
-           
-            ],  
- 
-        ],
+            ],
 
-                   'plugins' => [
+            'plugins' => [
 
                 'legend' => [
                     'display' => true,
                 ],
             ],
 
-                    'animation' => [
-            'duration' => 1500,
-            'easing' => 'easeOutQuart',
-        ],
+            'animation' => [
+                'duration' => 1500,
+                'easing' => 'easeOutQuart',
+            ],
 
         ];
     }

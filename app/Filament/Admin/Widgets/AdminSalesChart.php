@@ -7,9 +7,9 @@ use Filament\Widgets\ChartWidget;
 
 class AdminSalesChart extends ChartWidget
 {
-     protected static ?string $heading = '🗓️ Mothly Sales';
+    protected static ?string $heading = '🗓️ Mothly Sales';
 
-     protected static ?int $sort = 3;
+    protected static ?int $sort = 3;
 
 
     protected function getData(): array
