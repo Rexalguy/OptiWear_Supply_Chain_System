@@ -38,6 +38,6 @@ class SupplierReport extends Command
         $cancelledOrdersCount = RawMaterialsPurchaseOrder::where('status', 'cancelled')->count();
         $totalOrdersCount = RawMaterialsPurchaseOrder::count();
         $totalSales = RawMaterialsPurchaseOrder::whereIn('status', ['delivered', 'confirmed'])->sum('total_price');
-        Mail::to($supplier->email)->send(new SendSupplierReport($supplier, $pendingOrdersCount, $deliveredOrdersCount, $confirmedOrdersCount, $cancelledOrdersCount, $totalOrdersCount, $totalSales, $reportDate));
+        Mail::to($)->send(new SendSupplierReport($supplier, $pendingOrdersCount, $deliveredOrdersCount, $confirmedOrdersCount, $cancelledOrdersCount, $totalOrdersCount, $totalSales, $reportDate));
     }
 }

@@ -56,6 +56,6 @@ class ManufacturerReport extends Command
             ->count();
         $out = RawMaterial::whereColumn('current_stock', '<', 'reorder_level')->count();
 
-        Mail::to($user->email)->send(new SendManufacturerReport($user, $deliveredCount, $pendingCount, $confirmedCount, $cancelledCount, $totalCount, $still, $low, $out, $date));
+        Mail::to($user)->send(new SendManufacturerReport($user, $deliveredCount, $pendingCount, $confirmedCount, $cancelledCount, $totalCount, $still, $low, $out, $date));
     }
 }
