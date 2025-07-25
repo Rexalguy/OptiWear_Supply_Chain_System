@@ -21,16 +21,16 @@ class UserInsight extends Page implements HasTable
 
     protected static string $view = 'filament.admin.pages.user-insight';
 
-        protected function getHeaderWidgets(): array
-{
-    return [
-        UserStatsOverview::class,
-        
-        
-    ];
-}
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            UserStatsOverview::class,
 
-        public function table(Table $table): Table
+
+        ];
+    }
+
+    public function table(Table $table): Table
     {
         return $table
             ->query($this->getTableQuery())
@@ -43,13 +43,13 @@ class UserInsight extends Page implements HasTable
                 TextColumn::make('role')
                     ->label('Role')
                     ->badge()
-                        ->colors([
-                            'primary' => 'admin',
-                            'success' => 'customer',
-                            'warning' => 'vendor',
-                            'danger'  => 'manufacturer',
-                            // add more roles and colors as needed
-                        ])
+                    ->colors([
+                        'primary' => 'admin',
+                        'success' => 'customer',
+                        'warning' => 'vendor',
+                        'danger'  => 'manufacturer',
+                        // add more roles and colors as needed
+                    ])
                     ->sortable(),
 
                 TextColumn::make('tokens')
@@ -63,9 +63,9 @@ class UserInsight extends Page implements HasTable
                 TextColumn::make('age')
                     ->label('Age')
                     ->state(function ($record) {
-                return $record->date_of_birth
-                    ? Carbon::parse($record->date_of_birth)->age
-                    : 'N/A';
+                        return $record->date_of_birth
+                            ? Carbon::parse($record->date_of_birth)->age
+                            : 'N/A';
                     }),
             ]);
     }
@@ -76,24 +76,23 @@ class UserInsight extends Page implements HasTable
     }
 
 
-public function getTarget(): int
-{
-    return 100;
-}
+    public function getTarget(): int
+    {
+        return 100;
+    }
 
-public function getCurrent(): int
-{
-    return User::count(); // You can add filters like ->where('role', 'customer') if needed
-}
+    public function getCurrent(): int
+    {
+        return User::count(); // You can add filters like ->where('role', 'customer') if needed
+    }
 
-public function getProgressPercentage(): float
-{
-    return min(($this->getCurrent() / $this->getTarget()) * 100, 100);
-}
+    public function getProgressPercentage(): float
+    {
+        return min(($this->getCurrent() / $this->getTarget()) * 100, 100);
+    }
 
-public function getMilestones(): array
-{
-    return [10, 25, 50, 75, 100];
-}
-
+    public function getMilestones(): array
+    {
+        return [10, 25, 50, 75, 100];
+    }
 }

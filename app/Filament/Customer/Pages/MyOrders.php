@@ -192,20 +192,20 @@ class MyOrders extends Page implements HasTable
     public function placeOrder(): void
     {
         if (empty($this->cart)) {
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Cart is empty',
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
             return;
         }
 
         if ($this->deliveryOption === 'delivery' && empty(trim($this->address))) {
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Address Required',
                 'text' => 'Please enter your delivery address.',
-                'icon' => 'warning',
-                'iconColor' => 'orange',
+                'icon' => 'error',
+
             ]);
             return;
         }
@@ -258,11 +258,11 @@ class MyOrders extends Page implements HasTable
 
             if ($validItems === 0) {
                 DB::rollBack();
-                $this->dispatch('cart-updated', [
+                $this->dispatch('sweetalert', [
                     'title' => 'No valid products found',
                     'text' => 'Some items in your cart are no longer available. Please refresh your cart.',
                     'icon' => 'error',
-                    'iconColor' => 'red',
+
                 ]);
                 return;
             }
@@ -281,19 +281,19 @@ class MyOrders extends Page implements HasTable
             session()->forget('cart');
             $this->calculatePotentialTokens();
 
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Order placed successfully!',
                 'text' => "🕒 Expected delivery: {$expectedDate->format('d M Y, h:i A')}",
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Failed to place order',
                 'text' => $e->getMessage(),
                 'icon' => 'error',
-                'iconColor' => 'red',
+
             ]);
         }
     }
@@ -304,10 +304,10 @@ class MyOrders extends Page implements HasTable
             unset($this->cart[$cartKey]);
             session()->put('cart', $this->cart);
             $this->calculatePotentialTokens();
-            $this->dispatch('cart-updated', [
+            $this->dispatch('sweetalert', [
                 'title' => 'Removed from cart',
                 'icon' => 'success',
-                'iconColor' => 'green',
+
             ]);
         }
     }
@@ -399,15 +399,15 @@ class MyOrders extends Page implements HasTable
                             ->placeholder('Write your review here...')
                             ->rows(4),
                     ])
-                    ->action(function (Order $record, array $data) {
+                    ->action(function (Order $record, array $data, $livewire) {
                         $record->update([
                             'rating' => $data['rating'],
                             'review' => $data['review'],
                         ]);
-                        $this->dispatch('cart-updated', [
+                        $livewire->dispatch('sweetalert', [
                             'title' => 'Thank you for your feedback!',
                             'icon' => 'success',
-                            'iconColor' => 'green',
+
                         ]);
                     }),
             ])

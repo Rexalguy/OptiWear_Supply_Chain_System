@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 class SegmentationBehaviorChart extends ChartWidget
 {
     protected static ?string $heading = 'Segment Behavior Trends';
-    
+
     protected static ?int $sort = 3;
-    
+
     protected int | string | array $columnSpan = 2;
 
     protected function getData(): array
@@ -25,7 +25,7 @@ class SegmentationBehaviorChart extends ChartWidget
             ->toArray();
 
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
+
         $datasets = [];
         $colors = [
             ['rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 1)'],   // Blue
@@ -43,7 +43,7 @@ class SegmentationBehaviorChart extends ChartWidget
 
             // Generate realistic trend data based on segment characteristics
             $trendData = $this->generateSegmentTrend($segment, $baseAmount);
-            
+
             $datasets[] = [
                 'label' => $segment,
                 'data' => $trendData,
@@ -69,7 +69,7 @@ class SegmentationBehaviorChart extends ChartWidget
     protected function generateSegmentTrend(string $segment, float $baseAmount): array
     {
         $trend = [];
-        
+
         // Different seasonal patterns for different segments
         switch ($segment) {
             case 'High Value Customers':

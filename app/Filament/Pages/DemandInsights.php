@@ -36,12 +36,11 @@ class DemandInsights extends Page
                     try {
                         // Execute the Artisan command silently
                         $exitCode = \Illuminate\Support\Facades\Artisan::call('insights:populate-demand');
-                        
+
                         // Refresh the page to show new data after a short delay
                         if ($exitCode === 0) {
                             $this->js('setTimeout(() => window.location.reload(), 2000)');
                         }
-                        
                     } catch (\Exception $e) {
                         // Silent execution - no notifications
                     }
@@ -68,21 +67,21 @@ class DemandInsights extends Page
     }
 
     protected function getHeaderWidgets(): array
-{
-    return [
-        ManufacturerStatsOverview::class
-    ];
-}
+    {
+        return [
+            ManufacturerStatsOverview::class
+        ];
+    }
 
     protected function getFooterWidgets(): array
-{
-    return [
-        casualWearChart::class,
-        childrenWearChart::class,
-        formalWearChart::class,
-        workWearChart::class,
-        sportsWearChart::class,
-        percentageContributionChart::class,
-    ];
-}
+    {
+        return [
+            casualWearChart::class,
+            childrenWearChart::class,
+            formalWearChart::class,
+            workWearChart::class,
+            sportsWearChart::class,
+            percentageContributionChart::class,
+        ];
+    }
 }

@@ -17,7 +17,7 @@ class VendorOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationLabel = 'Track Orders';
+    protected static ?string $navigationLabel = 'View Orders';
     protected static ?string $navigationGroup = 'Orders';
     public static function canCreate(): bool
     {
@@ -50,76 +50,112 @@ class VendorOrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(VendorOrder::with('items.product')->latest())
             ->columns([
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('delivery_option'),
-                Tables\Columns\TextColumn::make('total')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Order #')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('order_date')
-                    ->label('Order Date')
+                Tables\Columns\TextColumn::make('delivery_option')
+                    ->label('Delivery')
+                    ->badge()
+                    ->color(fn($state) => match ($state) {
+                        'pickup' => 'gray',
+                        'delivery' => 'info',
+                        default => 'secondary',
+                    }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Placed On')
                     ->dateTime()
+                    ->since()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expected_fulfillment')
                     ->label('Expected Fulfillment')
-                    ->dateTime()
+                    ->getStateUsing(function ($record) {
+                        if ($record->created_at->addDays(3) < now() || $record->status == 'cancelled') {
+                            return 'Closed';
+                        } elseif ($record->status == 'delivered') {
+                            return 'Done';
+                        }
+                        return \Carbon\Carbon::parse($record->created_at->addDays(3))->diffForHumans([
+                            'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
+                            'parts' => 2,
+                        ]);
+                    })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('items')
-                    ->label('Products Ordered')
+                    ->label('Items')
                     ->html()
                     ->formatStateUsing(function ($state, $record) {
                         return $record->items
                             ->map(fn($item) => e($item->product->name) . " <small>(Qty: {$item->quantity})</small>")
                             ->implode('<br>');
                     }),
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Final Charged (UGX)')
+                    ->formatStateUsing(fn($state) => 'UGX ' . number_format($state))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'confirmed',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
+                    ]),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'confirmed' => 'Confirmed',
+                        'delivered' => 'Delivered',
+                        'cancelled' => 'Cancelled',
+                    ])
+                    ->label('Order Status'),
+                Tables\Filters\SelectFilter::make('delivery_option')
+                    ->options([
+                        'pickup' => 'Pickup',
+                        'delivery' => 'Delivery',
+                    ])
+                    ->label('Delivery Method'),
             ])
             ->actions([
-                Action::make('CancelOrder')
-                    ->label('Cancel Order')
+                Tables\Actions\Action::make('resume')
+                    ->color('warning')
+                    ->icon('heroicon-o-play')
+                    ->label('Resume Order')
+                    ->visible(fn(VendorOrder $record) => $record->status === 'cancelled')
                     ->requiresConfirmation()
+                    ->action(function (VendorOrder $record, $livewire) {
+                        $record->update(['status' => 'pending']);
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Resumed Successfully',
+                            'icon' => 'success',
+
+                        ]);
+                    }),
+
+                Tables\Actions\Action::make('cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
-                    ->visible(fn($record) => $record->status === 'pending' || $record->status === 'confirmed')
+                    ->label('Cancel')
+                    ->visible(fn(VendorOrder $record) => $record->status === 'pending')
+                    ->requiresConfirmation()
                     ->action(function ($record, $livewire) {
                         $record->update(['status' => 'cancelled']);
-                        $livewire->dispatch('cart-updated', [
-                            'title' => 'Order cancelled successfully!',
-                            'icon' => 'warning',
-                            'iconColor' => 'red',
-                        ]);
-                    }),
-                Action::make('ResumeOrder')
-                    ->label('Resume Order')
-                    ->requiresConfirmation()
-                    ->color('success')
-                    ->icon('heroicon-o-play-circle')
-                    ->visible( fn($record) => $record->status === 'cancelled')
-                    ->action(function ($record, $livewire) {
-                        $record->update(['status' => 'pending']);
-                        $livewire->dispatch('cart-updated', [
-                            'title' => 'Order Resumed successfully!',
+                        $livewire->dispatch('sweetalert', [
+                            'title' => 'Order Cancelled Successfully',
                             'icon' => 'info',
-                            'iconColor' => 'blue',
+
                         ]);
                     }),
-                Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\ViewAction::make()
+                    ->label('View Details')
+                    ->visible(fn(VendorOrder $record) => in_array($record->status, ['pending', 'confirmed', 'delivered']))
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->defaultSort('id', 'desc');
     }
 
     public static function getRelations(): array

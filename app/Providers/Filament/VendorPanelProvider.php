@@ -4,7 +4,6 @@ namespace App\Providers\Filament;
 
 use App\Filament\Customer\Pages\ChatPage;
 use Filament\Panel;
-use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -20,7 +19,6 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Widgets\StatsOverviewWidget;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
@@ -37,6 +35,7 @@ class VendorPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarWidth('20rem')
             ->login([RedirectController::class, 'toLogin'])
+            ->viteTheme('resources/css/filament/vendor/theme.css')
             ->colors([
                 'primary' => Color::Teal,
                 'info' => Color::Blue,
@@ -59,8 +58,8 @@ class VendorPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
             ->pages([
-                ChatPage::class,
                 AnalyticsDashboard::class,
+                ChatPage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Vendor/Widgets'), for: 'App\\Filament\\Vendor\\Widgets')
             ->widgets([])
