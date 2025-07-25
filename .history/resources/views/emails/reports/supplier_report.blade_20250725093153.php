@@ -40,7 +40,7 @@ This is your weekly report for the period ending <strong>{{ $reportDate }}</stro
 </table>
 
 <p style="font-size:16px; color:#2d3748;">
-    <strong>Total Sales:</strong> UGX {{ number_format($totalSales, 2) }}
+    <strong>Total Sales:</strong> UGX{{ number_format($totalSales, 2) }}
 </p>
 <p>
     <strong>Note:</strong> These total sales constitute orders whose statuses are either <strong>delivered</strong> or <strong>confirmed</strong>. Please consider visiting your account for more information.

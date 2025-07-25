@@ -76,26 +76,18 @@
                         </h4>
                         <div class="space-y-2">
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Base Price:</span>
-                                <span class="text-blue-600 dark:text-blue-400 text-xl font-bold">UGX {{ number_format($item['base_price'] ?? 0) }}</span>
+                                <span class="text-gray-500 dark:text-gray-400">Price:</span>
+                                <span class="text-green-600 dark:text-green-400 text-xl font-bold">UGX {{ number_format($item['price'] ?? 0) }}</span>
                             </p>
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
                                 <span class="text-gray-500 dark:text-gray-400">Quantity:</span>
                                 <span class="text-xl font-semibold">{{ number_format($item['quantity'] ?? 0) }}</span>
                                 <span class="text-sm text-blue-600 dark:text-blue-400">pieces</span>
                             </p>
+                            percentage
                             <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Subtotal:</span>
-                                <span class="text-gray-600 dark:text-gray-400 text-xl font-bold">UGX {{ number_format($item['base_total'] ?? 0) }}</span>
-                            </p>
-                            <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Discount ({{ $item['discount_percent'] ?? 0 }}%):</span>
-                                <span class="text-red-600 dark:text-red-400 text-xl font-bold">-UGX {{ number_format($item['discount_amount'] ?? 0) }}</span>
-                            </p>
-                            <p class="text-lg text-gray-700 dark:text-gray-300 flex items-center space-x-2">
-                                <span class="text-gray-500 dark:text-gray-400">Final Total:</span>
+                                <span class="text-gray-500 dark:text-gray-400">Total:</span>
                                 <span class="text-green-600 dark:text-green-400 text-xl font-bold">UGX {{ number_format($item['total'] ?? 0) }}</span>
-                            </p>
                         </div>
                     </div>
                     
