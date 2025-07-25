@@ -289,11 +289,14 @@
                 @endforeach
 
                 {{-- If there are existing sizes, allow adding another size --}}
-                @if ($cartItemsForClicked->count() > 0)
-                    <x-filament::button color="secondary" class="mt-3"
-                        wire:click="requestNewSize({{ $clickedProduct->id }})">
-                        + Add Another Size
-                    </x-filament::button>
+              
+                                       @if ($cartItemsForClicked->count() > 0)
+    <x-filament::button 
+        class="mt-4 w-full bg-gray-200 text-gray-800 hover:bg-gray-300 
+               dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+        wire:click="requestNewSize({{ $clickedProduct->id }})">
+        + Add Another Size
+    </x-filament::button>
                 @endif
 
                 {{-- Size dropdown if requested OR first-time add --}}
