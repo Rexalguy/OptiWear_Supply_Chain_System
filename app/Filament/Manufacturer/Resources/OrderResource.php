@@ -260,23 +260,28 @@ class OrderResource extends Resource
 
                             return [
                                 Section::make('Items')
-                                    ->schema(
-                                        $items->map(function ($item) {
+                                    ->schema([
+                                        ...$items->map(function ($item) {
                                             return Grid::make(3)->schema([
                                                 TextEntry::make('product')
                                                     ->label('Product')
                                                     ->default($item->product->name),
+                                                TextEntry::make('size')
+                        ->label('Size')
+                        ->default($item->size ?? 'N/A'), // fallback if size is null
+
 
                                                 TextEntry::make('quantity')
                                                     ->label('Quantity')
                                                     ->default($item->quantity),
-
-                                                TextEntry::make('total')
-                                                    ->label('Total (UGX)')
-                                                    ->default('UGX ' . number_format($item->quantity * $item->product->price)),
                                             ]);
-                                        })->toArray()
-                                    ),
+                                        })->toArray(),
+                                        TextEntry::make('total')
+                                            ->label('Total (UGX)')
+                                            ->default('UGX ' . number_format($items->sum(function ($item) {
+                                                return $item->quantity * $item->product->unit_price;
+                                            }))),
+                                    ]),
                             ];
                         })
                         ->modalSubmitAction(false)
