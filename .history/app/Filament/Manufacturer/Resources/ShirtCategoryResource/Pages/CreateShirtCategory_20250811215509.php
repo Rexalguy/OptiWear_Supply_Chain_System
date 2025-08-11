@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Filament\Vendor\Resources\VendorOrderResource\Pages;
+namespace App\Filament\Manufacturer\Resources\ShirtCategoryResource\Pages;
 
-use App\Filament\Vendor\Resources\VendorOrderResource;
+use App\Filament\Manufacturer\Resources\ShirtCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 
-class CreateVendorOrder extends CreateRecord
+class CreateShirtCategory extends CreateRecord
 {
-    protected static string $resource = VendorOrderResource::class;
+    protected static string $resource = ShirtCategoryResource::class;
 
     protected function afterCreate(): void
     {
         $livewire = $this;
         $livewire->dispatch('sweetalert', [
-            'title' => 'Vendor Order created successfully!'
+            'title' => 'Shirt Category created successfully!'
         ]);
     }
 

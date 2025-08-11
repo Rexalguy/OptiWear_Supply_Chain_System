@@ -10,7 +10,7 @@ use App\Filament\Manufacturer\Resources\RawMaterialsPurchaseOrderResource;
 class CreateRawMaterialsPurchaseOrder extends CreateRecord
 {
     protected static string $resource = RawMaterialsPurchaseOrderResource::class;
-
+    
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['expected_delivery_date'] = now()->addDays(3);
